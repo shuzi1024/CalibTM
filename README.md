@@ -53,3 +53,18 @@ historical findings, but rerunning experiments requires data/model downloads on
 the target GPU server. Some historical reports contain old machine paths; these
 are provenance records, not portable launch commands. Prefer current relative
 paths and `python -m ...` entry points.
+
+## Moving existing checkpoints
+
+If you want evaluation without retraining, copy the required checkpoint and its
+matching dataset from the old machine separately, for example:
+
+```bash
+rsync -avP OLD_SERVER:/path/to/checkpoints/ ./checkpoints/
+rsync -avP OLD_SERVER:/path/to/datasets/net_traffic/ ./datasets/net_traffic/
+```
+
+The checkpoint must match the experiment configuration and preprocessing
+registry. A newly designed GapCalib/KAN/Attention/Mamba module has no compatible
+old checkpoint and must be trained once; the existing v3 `value_only` model can
+be evaluated directly after its checkpoint is copied.
