@@ -37,7 +37,7 @@
 
 - 新包聚焦测试：19/19 passed。
 - 旧 ACIL + 新 SC-ACIL 联合套件：295/295 passed，使用独立 fresh pytest basetemp。
-- Python runtime 固定为现有实验环境 `experiments/od_orbit_gpt_v1/.venv_runtime_v1/bin/python`；它与旧成功 GPU jobs 的 runtime 一致。
+- Python runtime 使用当前环境的 `.venv/bin/python`（或 `PYTHON` 环境变量）；旧机器的运行时路径不属于可迁移配置。
 - 尚待：最终 freeze 后的 CUDA deterministic smoke（两次 forward/backward hash 一致）。该项失败则不得启动正式队列。
 
 ## 审计判定

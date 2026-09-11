@@ -27,7 +27,7 @@ output/pdf/CalibTM_中文方法论文_v3.pdf
 生成；它不访问数据、checkpoint、sealed test 或旧 test cache：
 
 ```bash
-experiments/od_orbit_gpt_v1/.venv_runtime_v1/bin/python \
+.venv/bin/python \
   paper/value_only/scripts/build_cn_pdf.py
 ```
 

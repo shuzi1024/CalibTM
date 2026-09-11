@@ -322,7 +322,7 @@ def test_config_contains_no_raw_test_or_split_override_authority():
     encoded = json.dumps(config, sort_keys=True).lower()
     assert "_test.npz" not in encoded
     assert "test_cache" not in encoded
-    assert "/gfs/" not in encoded
+    assert "ARI-LLM-E7A3" not in encoded
 
 
 def test_config_semantic_hash_is_stable_and_source_pinned():

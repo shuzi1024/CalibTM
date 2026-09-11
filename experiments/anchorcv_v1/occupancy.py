@@ -20,8 +20,10 @@ from pathlib import Path
 from typing import Callable, Iterator, Sequence
 
 
-OCCUPANCY_CWD = Path("/gfs/space/private/suuuz")
-OCCUPANCY_ARGV = ("/usr/bin/python3.10", "-u", "neural.py")
+OCCUPANCY_CWD = Path(os.environ.get("CALIBTM_OCCUPANCY_DIR", Path.cwd()))
+OCCUPANCY_ARGV = tuple(
+    os.environ.get("CALIBTM_OCCUPANCY_ARGV", "python -u neural.py").split()
+)
 DEFAULT_OPERATION_LOG = OCCUPANCY_CWD / "anchorcv_occupancy_operational.log"
 DEFAULT_LOCK_PATH = OCCUPANCY_CWD / ".anchorcv_occupancy.lock"
 DEFAULT_WATCHDOG_LOCK_PATH = (

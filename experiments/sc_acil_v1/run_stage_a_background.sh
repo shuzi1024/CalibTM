@@ -7,9 +7,9 @@ if [[ "$#" -ne 1 ]]; then
 fi
 
 OUTPUT_ROOT="$1"
-WATCHDOG=/gfs/space/private/xb/gpu/gpu_watchdog.sh
-OCCUPANCY=/gfs/space/private/xb/gpu/start_gpu.sh
-PYTHON=/gfs/space/private/suuuz/ARI-LLM/experiments/od_orbit_gpt_v1/.venv_runtime_v1/bin/python
+WATCHDOG=${WATCHDOG:-true}
+OCCUPANCY=${OCCUPANCY:-true}
+PYTHON=${PYTHON:-python}
 RESTORED=0
 
 restore_occupancy() {
