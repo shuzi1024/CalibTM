@@ -1,0 +1,194 @@
+{
+  "schema_version": 1,
+  "protocol": "minimal-calibrator-v1",
+  "status": "prototype_protocol_frozen",
+  "question": "Under a matched branch-sealed protocol, does conditioning the bounded interpolation calibrator on observation-derived values materially outperform a static-coefficient calibrator?",
+  "falsifiable_claim": {
+    "candidate": "value_only",
+    "matched_control": "static_zero",
+    "simplification_probe": "blinear_only",
+    "deterministic_baseline": "linear",
+    "claim": "Observation-conditioned calibration must explain at least 0.5% structured improvement beyond static learned coefficients, while retaining at least 1% improvement over ordinary linear interpolation."
+  },
+  "exact_method_difference": {
+    "shared": [
+      "ACILBase interpolation formula",
+      "5475 trainable parameters",
+      "bit-identical parameter initialization within each dataset",
+      "same fit windows, K3/K2 objective, masks, data order, optimizer and 20-epoch budget",
+      "same source-dev checkpoint selection and tune targets"
+    ],
+    "static_zero": "All 16 MLP input channels are exactly zero. The MLP heads can express only three learned global coefficients; the fixed outer interpolation formula still uses observed anchors, distances, anchor delta and local volatility.",
+    "blinear_only": "Only the ordinary linear interpolation value B_linear is visible to the MLP.",
+    "value_only": "Only B_linear, observed value, observation mask and local volatility are visible to the MLP. At missing targets, observed value and mask are zero, so the additional effective input beyond B_linear is primarily local volatility.",
+    "only_difference": "fixed feature-channel masking before the shared MLP",
+    "hidden_truth_input": false,
+    "selector_or_router": false,
+    "residual_network": false,
+    "large_backbone": false
+  },
+  "headroom_probe": {
+    "type": "cheapest deployable matched control",
+    "arm": "static_zero",
+    "hidden_truth_oracle": false,
+    "reason": "The first unresolved mechanism is whether the existing learned gain needs any sample-varying MLP input at all."
+  },
+  "data": {
+    "boundary": "branch-sealed, not project-wide pristine",
+    "training_cohorts": [
+      "fit",
+      "source_dev"
+    ],
+    "evaluation_cohort": "tune",
+    "abilene": {
+      "fit": [
+        0,
+        33335
+      ],
+      "source_dev": [
+        33384,
+        33884
+      ],
+      "tune": [
+        33884,
+        37484
+      ],
+      "flows": 144,
+      "tune_windows": 72
+    },
+    "geant": {
+      "fit": [
+        0,
+        7023
+      ],
+      "source_dev": [
+        7072,
+        7572
+      ],
+      "tune": [
+        7572,
+        8322
+      ],
+      "sealed_test": [
+        9172,
+        10772
+      ],
+      "flows": 462,
+      "tune_windows": 15
+    }
+  },
+  "masks": {
+    "observed_points_per_flow": 3,
+    "families": [
+      "random",
+      "internal_block",
+      "two_burst"
+    ],
+    "structured_headline": [
+      "internal_block",
+      "two_burst"
+    ],
+    "random_role": "pre-registered no-harm check",
+    "target": "immutable K3 missing complement"
+  },
+  "training": {
+    "fit_windows": 512,
+    "epochs": 20,
+    "physical_batches_per_epoch": 64,
+    "physical_batch_size": 8,
+    "gradient_accumulation_steps": 4,
+    "optimizer_updates": 320,
+    "optimizer": "AdamW",
+    "learning_rate": 0.0003,
+    "weight_decay": 0.01,
+    "gradient_clip_norm": 1.0,
+    "precision": "bf16_on_cuda",
+    "objective": "equal mean of K3 missing-target and K2 middle-anchor-drop normalized MAE",
+    "checkpoint": "lowest source-dev ratio-of-sums NMAE pooled over all three masks; ties choose earlier epoch",
+    "outcome_dependent_early_stop": false
+  },
+  "stage": {
+    "name": "prototype",
+    "seed_bundles": [
+      1
+    ],
+    "methods": [
+      "static_zero",
+      "blinear_only",
+      "value_only"
+    ],
+    "primary_jobs": 6,
+    "future_seeds": "not registered; any confirmation requires a separately frozen protocol after a proceed verdict"
+  },
+  "metrics": {
+    "primary": "ratio-of-sums NMAE on immutable missing targets",
+    "dataset_aggregation": "compute each dataset relative effect from pooled structured error/truth sums, then average the two dataset effects equally",
+    "secondary": [
+      "random no-harm",
+      "per-dataset effect",
+      "per-dataset-mask effect"
+    ]
+  },
+  "uncertainty": {
+    "rng": "PCG64DXSM",
+    "seed": 83002,
+    "draws": 10000,
+    "window_block_length": 4,
+    "method": "paired circular-window block bootstrap within each dataset",
+    "shared_draws": "all methods and mask families share window selections"
+  },
+  "gates": {
+    "kill_point_effects": {
+      "value_over_static_structured_min": 0.005,
+      "value_over_linear_structured_min": 0.01
+    },
+    "primary_robustness": {
+      "value_over_static_bootstrap_lower_strictly_positive": 0.0,
+      "value_over_static_each_dataset_positive": 2,
+      "value_over_linear_each_dataset_positive": 2,
+      "worst_value_over_static_structured_cell_min": -0.005,
+      "worst_value_over_static_random_dataset_min": -0.005
+    },
+    "blinear_simplification": {
+      "blinear_over_static_structured_min": 0.005,
+      "blinear_over_static_bootstrap_lower_strictly_positive": 0.0,
+      "blinear_over_static_each_dataset_positive": 2,
+      "blinear_noninferior_to_value_bootstrap_lower_min": -0.001,
+      "worst_blinear_over_static_structured_cell_min": -0.005,
+      "worst_blinear_over_static_random_dataset_min": -0.005
+    }
+  },
+  "decision_rule": {
+    "kill": "If either value-only point-effect minimum fails, kill the input-conditioning method claim; blinear-only cannot rescue it.",
+    "revise": "If both point effects pass but any primary robustness gate fails, report revise and do not add seeds.",
+    "proceed_blinear": "If all primary and blinear simplification gates pass, carry only the one-channel calibrator into a separately frozen confirmation.",
+    "proceed_value": "If all primary gates pass but any blinear simplification gate fails, carry value/local-scale conditioning into a separately frozen confirmation."
+  },
+  "stop_rules": {
+    "kill": "Do not run additional seeds and do not tune the feature masks or gates.",
+    "revise": "Do not run additional seeds; inspect the failed robustness condition before defining a new method.",
+    "proceed": "Do not use unregistered seeds in this protocol; freeze a separate confirmation protocol before further GPU training."
+  },
+  "evidence_boundary": {
+    "branch_sealed_not_project_pristine": true,
+    "legacy_tune_and_test_artifacts_exist_elsewhere": true,
+    "permitted_train_and_validation_arrays_only": true,
+    "sealed_test_access": false,
+    "legacy_test_cache_access": false,
+    "whole_raw_csv_access": false,
+    "whole_raw_csv_hashing": false,
+    "runner_exposes_test_path": false,
+    "runner_exposes_split_override": false,
+    "test_access": false
+  },
+  "execution": {
+    "fixed_grid_only": true,
+    "intermediate_metric_inspection": false,
+    "replacement_seeds": false,
+    "outcome_based_retry": false,
+    "infrastructure_retry": "same job identity, command and hashes only",
+    "retain_failures": true,
+    "write_once_results": true,
+    "occupancy_is_research_evidence": false
+  }
+}

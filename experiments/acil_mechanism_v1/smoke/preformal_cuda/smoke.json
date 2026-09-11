@@ -1,0 +1,39 @@
+{
+  "freeze_file_sha256": "26a6bcda73f8d42e12ab8505495e84deb53481c36c8a6160b6da70fabbf2ab34",
+  "git_available": false,
+  "git_commit": null,
+  "protocol": "acil-mechanism-v1",
+  "records": [
+    {
+      "digest": "e7dc5f2b420a95abbf3cc94c616c8e21a2f93ab048bc76aa5fcc1f2a6f5def9a",
+      "gpu": 0,
+      "gpu_name": "NVIDIA H800 80GB",
+      "loss": 6.488019943237305,
+      "method": "full"
+    },
+    {
+      "digest": "bb5f10d9de703f0c36a52f6c67e1ffea5daee03210d254378b253f8d3a728bf7",
+      "gpu": 1,
+      "gpu_name": "NVIDIA H800 80GB",
+      "loss": 6.488019943237305,
+      "method": "value_only"
+    },
+    {
+      "digest": "33e0f377f5f56acc1f34cd848b27d4b394bf410fb76706af0ceef6d8b8d382f6",
+      "gpu": 2,
+      "gpu_name": "NVIDIA H800 80GB",
+      "loss": 6.488022804260254,
+      "method": "no_anchor"
+    },
+    {
+      "digest": "e7dc5f2b420a95abbf3cc94c616c8e21a2f93ab048bc76aa5fcc1f2a6f5def9a",
+      "gpu": 3,
+      "gpu_name": "NVIDIA H800 80GB",
+      "loss": 6.488019943237305,
+      "method": "full"
+    }
+  ],
+  "source_tree_sha256": "1be43dbe9433f05b05e63dc2485b8c7835126ad262c693574ef31327a31a5598",
+  "status": "passed",
+  "test_access": false
+}

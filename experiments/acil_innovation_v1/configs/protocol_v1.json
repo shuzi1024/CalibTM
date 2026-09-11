@@ -1,0 +1,637 @@
+{
+  "schema_version": 1,
+  "protocol": {
+    "branch_sealed": true,
+    "id": "acil-innovation-v1",
+    "status": "draft_protocol",
+    "window_length": 50
+  },
+  "evidence_boundary": {
+    "project_wide_pristine_holdout": false,
+    "discovery_test_access": false,
+    "permitted_parent_arrays_only": true,
+    "whole_source_file_hashing": false,
+    "legacy_cache_access": false
+  },
+  "freeze": {
+    "active_manifest_stages": ["stage0_acil_tune", "stage_h", "stage_i", "full_tune"],
+    "allow_latest": false,
+    "future_formal_protocol": "separate_v2_only_after_full_tune_proceed",
+    "git_available": false,
+    "git_commit": null,
+    "publication_contract": "protocol_controlled_single_publisher_no_replace",
+    "source_tree_sha256_required": true,
+    "revision_limit": 1
+  },
+  "datasets": {
+    "abilene": {
+      "flows": 144,
+      "permitted_splits": {
+        "train": [0, 33884],
+        "val": [33884, 41134]
+      },
+      "cohorts": {
+        "fit": {
+          "bounds": [0, 33335],
+          "kind": "data",
+          "split": "train",
+          "window_schedule": {"count": 512, "kind": "linspace_floor"}
+        },
+        "train_gap": {
+          "bounds": [33335, 33384],
+          "kind": "gap",
+          "split": "train"
+        },
+        "source_dev": {
+          "bounds": [33384, 33884],
+          "kind": "data",
+          "split": "train",
+          "window_schedule": {"count": 10, "kind": "stride", "stride": 50}
+        },
+        "tune": {
+          "bounds": [33884, 37484],
+          "kind": "data",
+          "split": "val",
+          "window_schedule": {"count": 72, "kind": "stride", "stride": 50}
+        },
+        "validation_gap": {
+          "bounds": [37484, 37534],
+          "kind": "gap",
+          "split": "val"
+        },
+        "gate": {
+          "bounds": [37534, 41134],
+          "kind": "data",
+          "split": "val",
+          "window_schedule": {"count": 72, "kind": "stride", "stride": 50}
+        }
+      }
+    },
+    "geant": {
+      "flows": 462,
+      "permitted_splits": {
+        "train": [0, 7572],
+        "val": [7572, 9172]
+      },
+      "cohorts": {
+        "fit": {
+          "bounds": [0, 7023],
+          "kind": "data",
+          "split": "train",
+          "window_schedule": {"count": 512, "kind": "linspace_floor"}
+        },
+        "train_gap": {
+          "bounds": [7023, 7072],
+          "kind": "gap",
+          "split": "train"
+        },
+        "source_dev": {
+          "bounds": [7072, 7572],
+          "kind": "data",
+          "split": "train",
+          "window_schedule": {"count": 10, "kind": "stride", "stride": 50}
+        },
+        "tune": {
+          "bounds": [7572, 8322],
+          "kind": "data",
+          "split": "val",
+          "window_schedule": {"count": 15, "kind": "stride", "stride": 50}
+        },
+        "validation_gap": {
+          "bounds": [8322, 8372],
+          "kind": "gap",
+          "split": "val"
+        },
+        "gate": {
+          "bounds": [8372, 9172],
+          "kind": "data",
+          "split": "val",
+          "window_schedule": {"count": 16, "kind": "stride", "stride": 50}
+        }
+      }
+    }
+  },
+  "masks": {
+    "schema_version": 1,
+    "families": ["random", "internal_block", "two_burst"],
+    "observed_count": 3,
+    "evaluation_replica": 0,
+    "internal_block_length": 8,
+    "two_burst_length_inclusive": [3, 8],
+    "k5_registered": false
+  },
+  "seeds": {
+    "bootstrap": 81001,
+    "bundles": [
+      {"bundle": 1, "model": 41001, "data_order": 51001, "training_mask": 61001, "evaluation_mask": 71001},
+      {"bundle": 2, "model": 41002, "data_order": 51002, "training_mask": 61002, "evaluation_mask": 71002},
+      {"bundle": 3, "model": 41003, "data_order": 51003, "training_mask": 61003, "evaluation_mask": 71003},
+      {"bundle": 4, "model": 41004, "data_order": 51004, "training_mask": 61004, "evaluation_mask": 71004},
+      {"bundle": 5, "model": 41005, "data_order": 51005, "training_mask": 61005, "evaluation_mask": 71005},
+      {"bundle": 6, "model": 41006, "data_order": 51006, "training_mask": 61006, "evaluation_mask": 71006}
+    ]
+  },
+  "rng": {
+    "algorithm": "PCG64DXSM",
+    "training_mask_replica": "zero_based_epoch",
+    "epoch_order_identity_fields": ["protocol", "dataset", "data_order_seed", "epoch"]
+  },
+  "training": {
+    "epochs": 20,
+    "fit_window_count": 512,
+    "mixed_masks": {
+      "family_formula": "families[(epoch*512+epoch_order_position+bundle-1)%3]",
+      "one_checkpoint_per_dataset_seed_method": true,
+      "training_job_has_mask_axis": false,
+      "window_level_family_assignment": true
+    },
+    "acil_k2_auxiliary": {
+      "enabled": true,
+      "construction": "drop_sorted_middle_from_registered_k3",
+      "loss": "mean_of_k3_and_k2_target_mae",
+      "role": "train_support_for_loo_only",
+      "registered_evaluation_budget": false
+    },
+    "checkpoint": {
+      "metric": "source_dev_three_mask_raw_ratio_of_sums_nmae",
+      "tie_break": "earlier_epoch"
+    },
+    "residual_target_contracts": {
+      "stage_h_truth_q_deepsets": {
+        "loss_target": "E=unobserved_complement_minus_support",
+        "checkpoint_target": "E=unobserved_complement_minus_support"
+      },
+      "deployable_residual_methods": {
+        "methods": ["local_loo", "global_loo", "full_u0", "loo_deepsets", "full_scratch", "full_gpt2"],
+        "loss_target": "U=unobserved_complement",
+        "checkpoint_target": "U=unobserved_complement"
+      }
+    },
+    "objective": {
+      "headline_loss": "target_only_observation_normalized_mae",
+      "normalization_inputs": "observed_values_only",
+      "scale_floor": 0.000001,
+      "fallback": "fit_cohort_dataset_population_scale"
+    },
+    "optimizer": {
+      "type": "AdamW",
+      "betas": [0.9, 0.999],
+      "epsilon": 0.00000001,
+      "lr_schedule": "constant",
+      "physical_batch_size": 8,
+      "gradient_accumulation_steps": 4,
+      "effective_batch_size": 32,
+      "optimizer_updates_per_epoch": 16,
+      "total_optimizer_updates": 320,
+      "learning_rates": {
+        "new_modules": 0.0003,
+        "scratch_gpt_blocks": 0.0003,
+        "pretrained_gpt_blocks": 0.00001
+      },
+      "gradient_clip_norm": 1.0,
+      "weight_decay": 0.01,
+      "no_decay_rules": [
+        "parameter_name_endswith_bias",
+        "parameter_belongs_to_layernorm_and_name_endswith_weight"
+      ],
+      "weight_decay_applies_to": "all_other_trainable_parameters"
+    },
+    "outcome_dependent_early_stop": false,
+    "precision": "bf16"
+  },
+  "innovation": {
+    "loo_anchor_rule": "sorted_observed_middle",
+    "loo_anchor_count": 1,
+    "temporary_observed_count": 2,
+    "loo_predictor": "same_frozen_acil_checkpoint",
+    "full_base_observed_count": 3,
+    "multiscale_claim": false,
+    "missing_truth_operand": false
+  },
+  "oracle_partition": {
+    "support_count_per_flow": 1,
+    "support_pool": "unobserved_complement",
+    "structured_preference": "outside_controlled_gap_then_all_missing",
+    "selection": "domain_separated_sha256_mod_sorted_eligible_pool",
+    "identity_fields": [
+      "protocol",
+      "dataset",
+      "cohort",
+      "window_schedule_sha256",
+      "window_start",
+      "flow_index",
+      "mask_family",
+      "seed_bundle",
+      "mask_sha256"
+    ],
+    "evaluation_set": "unobserved_complement_minus_support",
+    "support_truth_role": "diagnostic_only",
+    "method_dependent_identity": false,
+    "evaluation_target_count_per_flow": 46
+  },
+  "deployable_partition": {
+    "oracle_support_count": 0,
+    "evaluation_set": "unobserved_complement",
+    "target_count_per_flow": 47
+  },
+  "model_boundary": {
+    "absolute_flow_identity": false,
+    "routing": false,
+    "topology": false,
+    "hard_observed_projection": true,
+    "nonnegative_output": true,
+    "acil_frozen_downstream": true,
+    "gpt_disabled_components": ["tokenizer", "wte", "wpe", "prompt", "causal_mask"]
+  },
+  "metrics": {
+    "primary": "nmae",
+    "nmae": "sum_absolute_error_over_sum_absolute_truth",
+    "nrmse": "sqrt_sum_squared_error_over_sum_squared_truth",
+    "pooling": "ratio_of_registered_sums",
+    "paired_improvement": "one_minus_candidate_nmae_over_comparator_nmae",
+    "positive_seed_definition": "paired_improvement_of_ratio_of_sums_pooled_over_both_datasets_and_effect_pooling_masks_for_one_seed_bundle_strictly_above_zero_before_rounding",
+    "rounding_before_gate": false
+  },
+  "bootstrap": {
+    "block_length": 4,
+    "draws": 10000,
+    "interval": [0.025, 0.975],
+    "resampling": "paired_hierarchical_seed_then_circular_window_block",
+    "rng": "PCG64DXSM",
+    "seed": 81001
+  },
+  "capabilities": {
+    "stage0_acil_tune": {"datasets": ["abilene", "geant"], "cohorts": ["fit", "source_dev", "tune"]},
+    "stage_h": {"datasets": ["abilene", "geant"], "cohorts": ["fit", "source_dev", "tune"]},
+    "stage_i": {"datasets": ["abilene", "geant"], "cohorts": ["fit", "source_dev", "tune"]},
+    "full_tune": {"datasets": ["abilene", "geant"], "cohorts": ["fit", "source_dev", "tune"]},
+    "formal_acil": {"datasets": ["abilene", "geant"], "cohorts": ["fit", "source_dev"]},
+    "formal_gate": {"datasets": ["abilene", "geant"], "cohorts": ["fit", "source_dev", "gate"]},
+    "infrastructure_smoke": {"datasets": ["abilene", "geant"], "cohorts": ["fit"]}
+  },
+  "stages": {
+    "stage0_acil_tune": {
+      "datasets": ["abilene", "geant"],
+      "train_cohorts": ["fit", "source_dev"],
+      "eval_cohort": "tune",
+      "methods": ["linear_fill", "acil"],
+      "learned_methods": ["acil"],
+      "result_carriers": {"acil": ["linear_fill", "acil"]},
+      "seed_bundles": [1, 2, 3],
+      "training_has_mask_axis": false,
+      "learned_fit_count": 6,
+      "result_cell_count": 36
+    },
+    "stage_h": {
+      "datasets": ["abilene", "geant"],
+      "train_cohorts": ["fit", "source_dev"],
+      "eval_cohort": "tune",
+      "methods": ["acil", "truth_q_deepsets"],
+      "learned_methods": ["truth_q_deepsets"],
+      "result_carriers": {"truth_q_deepsets": ["acil", "truth_q_deepsets"]},
+      "reuse_methods": ["acil"],
+      "dependency_stages": ["stage0_acil_tune"],
+      "checkpoint_hash_bindings": [
+        {
+          "source_stage": "stage0_acil_tune",
+          "source_method": "acil",
+          "consumer_roles": ["acil", "truth_q_deepsets.acil_base"],
+          "match_fields": ["dataset", "seed_bundle"],
+          "selection": "source_stage_best_source_dev_checkpoint",
+          "relationship": "exact_checkpoint_reuse",
+          "required_exact_matches": [
+            "checkpoint_identity_sha256",
+            "checkpoint_file_sha256",
+            "checkpoint_tensor_sha256"
+          ]
+        }
+      ],
+      "seed_bundles": [1, 2, 3],
+      "training_has_mask_axis": false,
+      "learned_fit_count": 6,
+      "result_cell_count": 36
+    },
+    "stage_i": {
+      "datasets": ["abilene", "geant"],
+      "train_cohorts": ["fit", "source_dev"],
+      "eval_cohort": "tune",
+      "methods": ["acil", "local_loo", "global_loo"],
+      "learned_methods": ["local_loo", "global_loo"],
+      "result_carriers": {
+        "local_loo": ["acil", "local_loo"],
+        "global_loo": ["global_loo"]
+      },
+      "reuse_methods": ["acil"],
+      "dependency_stages": ["stage0_acil_tune"],
+      "checkpoint_hash_bindings": [
+        {
+          "source_stage": "stage0_acil_tune",
+          "source_method": "acil",
+          "consumer_roles": ["acil", "local_loo.acil_base", "global_loo.acil_base"],
+          "match_fields": ["dataset", "seed_bundle"],
+          "selection": "source_stage_best_source_dev_checkpoint",
+          "relationship": "exact_checkpoint_reuse",
+          "required_exact_matches": [
+            "checkpoint_identity_sha256",
+            "checkpoint_file_sha256",
+            "checkpoint_tensor_sha256"
+          ]
+        }
+      ],
+      "seed_bundles": [1, 2, 3],
+      "training_has_mask_axis": false,
+      "learned_fit_count": 12,
+      "result_cell_count": 54,
+      "derived_diagnostics": ["global_loo_window_flow_derangement"],
+      "derangement": {
+        "cohort": "tune",
+        "retraining": false,
+        "signal": "scalar_loo_innovation",
+        "scope": "each_dataset_seed_bundle_mask_family",
+        "rng": "PCG64DXSM",
+        "domain": "acil-innovation-v1:stage-i-derangement:v1",
+        "seed_derivation": "sha256_domain_nul_canonical_identity_first_128_bits_big_endian",
+        "identity_fields": [
+          "protocol",
+          "dataset",
+          "cohort",
+          "window_schedule_sha256",
+          "seed_bundle",
+          "mask_family",
+          "evaluation_mask_seed",
+          "registered_window_count",
+          "flow_count"
+        ],
+        "joint_permutation_axis": "all_registered_window_flow_scalar_loo_innovations",
+        "permutation": "single_fixed_permutation_without_replacement",
+        "fixed_fields": ["query_geometry", "middle_indicator", "truth", "targets"],
+        "method_outcome_in_identity": false
+      }
+    },
+    "full_tune": {
+      "datasets": ["abilene", "geant"],
+      "train_cohorts": ["fit", "source_dev"],
+      "eval_cohort": "tune",
+      "methods": ["acil", "full_u0", "loo_deepsets", "full_scratch", "full_gpt2"],
+      "learned_methods": ["full_u0", "full_scratch", "full_gpt2"],
+      "result_carriers": {
+        "full_u0": ["acil", "loo_deepsets", "full_u0"],
+        "full_scratch": ["full_scratch"],
+        "full_gpt2": ["full_gpt2"]
+      },
+      "reuse_methods": ["acil", "loo_deepsets"],
+      "dependency_stages": ["stage0_acil_tune", "stage_i"],
+      "checkpoint_hash_bindings": [
+        {
+          "source_stage": "stage0_acil_tune",
+          "source_method": "acil",
+          "consumer_roles": ["acil", "full_u0.acil_base", "full_scratch.acil_base", "full_gpt2.acil_base"],
+          "match_fields": ["dataset", "seed_bundle"],
+          "selection": "source_stage_best_source_dev_checkpoint",
+          "relationship": "exact_checkpoint_reuse",
+          "required_exact_matches": [
+            "checkpoint_identity_sha256",
+            "checkpoint_file_sha256",
+            "checkpoint_tensor_sha256"
+          ]
+        },
+        {
+          "source_stage": "stage_i",
+          "source_method": "global_loo",
+          "consumer_roles": ["loo_deepsets"],
+          "match_fields": ["dataset", "seed_bundle"],
+          "selection": "source_stage_best_source_dev_checkpoint",
+          "relationship": "method_label_rename_exact_same_checkpoint",
+          "required_exact_matches": [
+            "checkpoint_identity_sha256",
+            "checkpoint_file_sha256",
+            "checkpoint_tensor_sha256"
+          ]
+        }
+      ],
+      "seed_bundles": [1, 2, 3],
+      "training_has_mask_axis": false,
+      "learned_fit_count": 18,
+      "result_cell_count": 90
+    },
+    "formal_acil": {
+      "role": "training_only_dependency",
+      "datasets": ["abilene", "geant"],
+      "train_cohorts": ["fit", "source_dev"],
+      "eval_cohort": null,
+      "methods": ["acil"],
+      "learned_methods": ["acil"],
+      "result_carriers": {"acil": []},
+      "seed_bundles": [4, 5, 6],
+      "training_has_mask_axis": false,
+      "learned_fit_count": 6,
+      "result_cell_count": 0
+    },
+    "formal_gate": {
+      "datasets": ["abilene", "geant"],
+      "train_cohorts": ["fit", "source_dev"],
+      "eval_cohort": "gate",
+      "methods": ["linear_fill", "acil", "ari_llm", "loo_deepsets", "full_u0", "full_scratch", "full_gpt2", "imputeformer"],
+      "learned_methods": ["full_u0", "loo_deepsets", "full_scratch", "full_gpt2", "ari_llm", "imputeformer"],
+      "result_carriers": {
+        "full_u0": ["linear_fill", "acil", "full_u0"],
+        "loo_deepsets": ["loo_deepsets"],
+        "full_scratch": ["full_scratch"],
+        "full_gpt2": ["full_gpt2"],
+        "ari_llm": ["ari_llm"],
+        "imputeformer": ["imputeformer"]
+      },
+      "reuse_methods": ["acil"],
+      "dependency_stages": ["formal_acil"],
+      "checkpoint_hash_bindings": [
+        {
+          "source_stage": "formal_acil",
+          "source_method": "acil",
+          "consumer_roles": ["acil", "loo_deepsets.acil_base", "full_u0.acil_base", "full_scratch.acil_base", "full_gpt2.acil_base"],
+          "match_fields": ["dataset", "seed_bundle"],
+          "selection": "source_stage_best_source_dev_checkpoint",
+          "relationship": "exact_checkpoint_reuse",
+          "required_exact_matches": [
+            "checkpoint_identity_sha256",
+            "checkpoint_file_sha256",
+            "checkpoint_tensor_sha256"
+          ]
+        }
+      ],
+      "seed_bundles": [4, 5, 6],
+      "training_has_mask_axis": false,
+      "learned_fit_count": 36,
+      "result_cell_count": 144
+    }
+  },
+  "gates": {
+    "stage0_acil_tune": {
+      "effect_contrasts": {
+        "main": {
+          "candidate": "acil",
+          "comparator": "linear_fill",
+          "pooling_masks": ["internal_block", "two_burst"],
+          "minimum": 0.01
+        }
+      },
+      "per_mask_rule": {
+        "effect_contrast": "main",
+        "masks": ["internal_block", "two_burst"],
+        "strictly_above": 0.0
+      },
+      "bootstrap_ci": {"effect_contrast": "main", "lower_strictly_above": 0.0},
+      "positive_seed_rule": {"effect_contrast": "main", "required": 2, "total": 3},
+      "failure": "kill"
+    },
+    "stage_h": {
+      "effect_contrasts": {
+        "main": {
+          "candidate": "truth_q_deepsets",
+          "comparator": "acil",
+          "pooling_masks": ["internal_block", "two_burst"],
+          "minimum": 0.05
+        },
+        "random_no_harm": {
+          "candidate": "truth_q_deepsets",
+          "comparator": "acil",
+          "pooling_masks": ["random"],
+          "minimum": -0.01
+        }
+      },
+      "per_mask_rule": {
+        "effect_contrast": "main",
+        "masks": ["internal_block", "two_burst"],
+        "strictly_above": 0.0
+      },
+      "bootstrap_ci": {"effect_contrast": "main", "lower_strictly_above": 0.0},
+      "positive_seed_rule": {"effect_contrast": "main", "required": 2, "total": 3},
+      "failure": "kill"
+    },
+    "stage_i": {
+      "effect_contrasts": {
+        "main": {
+          "candidate": "global_loo",
+          "comparator": "acil",
+          "pooling_masks": ["internal_block", "two_burst"],
+          "minimum": 0.015
+        },
+        "global_over_local": {
+          "candidate": "global_loo",
+          "comparator": "local_loo",
+          "pooling_masks": ["internal_block", "two_burst"],
+          "minimum": 0.005
+        },
+        "derangement_gain_loss": {
+          "candidate": "global_loo",
+          "comparator": "global_loo_deranged",
+          "pooling_masks": ["internal_block", "two_burst"],
+          "gain_loss_formula": "unshuffled_improvement_over_acil_minus_deranged_improvement_over_acil",
+          "fraction_formula": "gain_loss_divided_by_unshuffled_improvement_over_acil",
+          "requires_unshuffled_main_gain_strictly_above": 0.0,
+          "minimum": 0.005,
+          "fraction_minimum": 0.30
+        }
+      },
+      "per_dataset_rule": {
+        "effect_contrast": "main",
+        "pooling_masks": ["internal_block", "two_burst"],
+        "minimum": -0.005
+      },
+      "bootstrap_ci": {"effect_contrast": "main", "lower_strictly_above": 0.0},
+      "positive_seed_rule": {"effect_contrast": "main", "required": 2, "total": 3},
+      "revision_primary_min": 0.005,
+      "revision_limit": 1,
+      "failure_below_revision_min": "kill"
+    },
+    "full_tune": {
+      "effect_contrasts": {
+        "main": {
+          "candidate": "full_gpt2",
+          "comparator_candidates": ["acil", "full_u0"],
+          "comparator_selection": "lowest_ratio_of_sums_nmae_on_same_pooling_masks",
+          "pooling_masks": ["internal_block", "two_burst"],
+          "minimum": 0.02
+        },
+        "over_deepsets": {
+          "candidate": "full_gpt2",
+          "comparator": "loo_deepsets",
+          "pooling_masks": ["internal_block", "two_burst"],
+          "minimum": 0.005
+        },
+        "pretraining_attribution": {
+          "candidate": "full_gpt2",
+          "comparator": "full_scratch",
+          "pooling_masks": ["internal_block", "two_burst"],
+          "claim_minimum": 0.01,
+          "no_claim_floor": -0.005
+        },
+        "random_no_harm": {
+          "candidate": "full_gpt2",
+          "comparator_candidates": ["acil", "full_u0"],
+          "comparator_selection": "lowest_ratio_of_sums_nmae_on_same_pooling_masks",
+          "pooling_masks": ["random"],
+          "minimum": -0.005
+        }
+      },
+      "bootstrap_ci": {"effect_contrast": "main", "lower_strictly_above": 0.0},
+      "pretraining_claim_ci": {
+        "effect_contrast": "pretraining_attribution",
+        "lower_strictly_above": 0.0
+      },
+      "positive_seed_rule": {"effect_contrast": "main", "required": 2, "total": 3},
+      "failure": "kill_current_full_gpt_candidate"
+    },
+    "formal_gate": {
+      "effect_contrasts": {
+        "main": {
+          "candidate": "full_gpt2",
+          "comparator_candidates": ["acil", "full_u0"],
+          "comparator_selection": "lowest_ratio_of_sums_nmae_on_same_pooling_masks",
+          "pooling_masks": ["internal_block", "two_burst"],
+          "minimum": 0.02
+        },
+        "random_no_harm": {
+          "candidate": "full_gpt2",
+          "comparator_candidates": ["acil", "full_u0"],
+          "comparator_selection": "lowest_ratio_of_sums_nmae_on_same_pooling_masks",
+          "pooling_masks": ["random"],
+          "minimum": -0.005
+        },
+        "dataset_mask_cell_wins": {
+          "candidate": "full_gpt2",
+          "comparator_candidates": ["acil", "full_u0"],
+          "comparator_selection": "lowest_ratio_of_sums_nmae_within_same_dataset_mask_cell",
+          "pooling_masks": ["random", "internal_block", "two_burst"],
+          "strictly_above": 0.0,
+          "required": 4,
+          "total": 6
+        },
+        "external_no_harm": {
+          "candidate": "full_gpt2",
+          "comparator_candidates": ["ari_llm", "imputeformer"],
+          "comparator_selection": "lowest_ratio_of_sums_nmae_on_same_pooling_masks",
+          "pooling_masks": ["random", "internal_block", "two_burst"],
+          "minimum": -0.005,
+          "per_dataset_minimum": -0.005
+        }
+      },
+      "per_dataset_rule": {
+        "effect_contrast": "main",
+        "pooling_masks": ["internal_block", "two_burst"],
+        "minimum": -0.005
+      },
+      "bootstrap_ci": {"effect_contrast": "main", "lower_strictly_above": 0.0},
+      "positive_seed_rule": {"effect_contrast": "main", "required": 2, "total": 3},
+      "failure": "kill_no_gate_revision"
+    }
+  },
+  "adjudication": {
+    "allowed_verdicts": ["blocked", "revise", "kill", "proceed"],
+    "algorithmic_failures_retained": true,
+    "replacement_seeds_forbidden": true,
+    "bootstrap_over_survivors": false,
+    "numeric_dtype": "float64",
+    "oracle_evidence_class": "diagnostic",
+    "deployable_evidence_class": "method"
+  }
+}

@@ -1,0 +1,295 @@
+{
+  "schema_version": 1,
+  "protocol": {
+    "id": "anchorcv-v1",
+    "status": "frozen_full_pipeline",
+    "claim_scope": "within_instance_anchor_cross_validation_for_traffic_matrix_completion",
+    "git_available": false,
+    "git_commit": null
+  },
+  "question": "Can within-instance held-out-anchor errors identify, per flow, whether a frozen ACIL prior or a prior-free mask-native neural expert will have lower error on the fixed missing targets?",
+  "evidence_boundary": {
+    "branch_sealed": true,
+    "pristine_project_wide_holdout": false,
+    "physical_gate_isolation_from_upstream_loader": false,
+    "upstream_loader_may_read_validation_parent_before_cohort_slice": true,
+    "anchorcv_discovery_api_returns_final_gate": false,
+    "anchorcv_discovery_models_final_gate": false,
+    "permitted_splits": [
+      "fit",
+      "source_dev",
+      "tune"
+    ],
+    "test_access": false,
+    "legacy_test_cache_access": false,
+    "whole_raw_csv_access": false,
+    "runner_exposes_test_path": false,
+    "runner_exposes_split_override": false
+  },
+  "datasets": [
+    "abilene",
+    "geant"
+  ],
+  "cohorts": {
+    "fit": "neural_expert_parameter_fitting_only",
+    "source_dev": "checkpoint_selection_only",
+    "tune": "prototype_extension_and_multibundle_adjudication_only",
+    "final_gate": "final_only_confirmation_after_verified_method_freeze_authority"
+  },
+  "masks": {
+    "families": [
+      "random",
+      "internal_block",
+      "two_burst"
+    ],
+    "structured_families": [
+      "internal_block",
+      "two_burst"
+    ],
+    "observed_points_per_flow": 3,
+    "headline_target_scope": "fixed_k3_missing_complement",
+    "mask_identity": "dataset_cohort_window_family_bundle_deterministic"
+  },
+  "stages": {
+    "stage_order": [
+      "prototype_bundle_1",
+      "conditional_extension_bundles_2_and_3",
+      "complete_six_tune_job_multibundle_gate",
+      "method_freeze_authority",
+      "one_shot_six_job_final_gate"
+    ],
+    "prototype_bundles": [
+      1
+    ],
+    "prototype_job_count": 2,
+    "extension_bundles": [
+      2,
+      3
+    ],
+    "extension_job_count": 4,
+    "extension_is_conditional": true,
+    "extension_condition": "prototype_verdict_proceed",
+    "multibundle_input": "complete_six_tune_jobs_two_datasets_by_three_bundles",
+    "multibundle_condition": "all_six_tune_jobs_verified_complete",
+    "method_freeze_authority_condition": "multibundle_verdict_proceed",
+    "final_gate_bundles": [
+      1,
+      2,
+      3
+    ],
+    "final_gate_job_count": 6,
+    "final_gate_condition": "verified_method_freeze_authority"
+  },
+  "experts": {
+    "p": {
+      "identity": "seed_matched_frozen_acil",
+      "checkpoint_selection": "source_dev_only",
+      "bundle_matching": "exact",
+      "training": "forbidden_in_anchorcv_stage",
+      "hard_project_observations": true
+    },
+    "n": {
+      "identity": "prior_free_mask_native_neural",
+      "inputs": [
+        "observed_values",
+        "observation_mask",
+        "normalized_time_coordinate",
+        "flow_id"
+      ],
+      "forbidden_inputs": [
+        "linear_interpolation",
+        "acil_output",
+        "missing_truth"
+      ],
+      "architecture": {
+        "temporal_encoder": "one_layer_bidirectional_gru",
+        "temporal_hidden_per_direction": 128,
+        "flow_token_dim": 256,
+        "flow_id_embedding": "learned_dataset_specific",
+        "cross_flow_encoder": "four_layer_noncausal_transformer_encoder",
+        "attention_heads": 8,
+        "feedforward_dim": 1024,
+        "dropout": 0.1,
+        "decoder": "linear_256_128_gelu_dropout_linear_128_50",
+        "output": "direct_normalized_trajectory_not_residual"
+      },
+      "normalization": {
+        "location_scale": "per_window_flow_observation_only_mean_population_std",
+        "degenerate_fallback": "fit_only_dataset_mean_std",
+        "missing_payload_before_model": 0,
+        "normalized_time_range": [
+          -1.0,
+          1.0
+        ]
+      },
+      "training": {
+        "epochs": 20,
+        "physical_batches_per_epoch": 64,
+        "physical_batch_size": 8,
+        "gradient_accumulation_steps": 4,
+        "effective_batch_size": 32,
+        "optimizer_updates": 320,
+        "optimizer": "AdamW",
+        "learning_rate": 0.0003,
+        "lr_schedule": "constant",
+        "betas": [
+          0.9,
+          0.999
+        ],
+        "epsilon": 1e-08,
+        "weight_decay": 0.01,
+        "no_decay_rules": [
+          "parameter_name_endswith_bias",
+          "parameter_belongs_to_layernorm_and_name_endswith_weight"
+        ],
+        "weight_decay_applies_to": "all_other_trainable_parameters",
+        "gradient_clip_norm": 1.0,
+        "cuda_precision": "bf16_with_fp32_gru_frontend",
+        "attention_backend": "math_sdp_flash_and_mem_efficient_disabled",
+        "outcome_dependent_early_stop": false,
+        "checkpoint_selection": "source_dev_ratio_of_sums_all_three_masks",
+        "objective": {
+          "k3_missing_weight": 0.5,
+          "k2_all_missing_weight": 0.5
+        },
+        "anchor_drop_schedule": "fixed_sorted_middle_rank_1"
+      },
+      "training_masks": [
+        "k3",
+        "k2_anchor_drop"
+      ],
+      "anchor_drop_ranks": [
+        1
+      ],
+      "hard_project_observations": true
+    }
+  },
+  "evaluation": {
+    "anchor_cross_validation": {
+      "held_out_anchors": "sorted_middle_rank_1_only",
+      "anchor_index_synchronization": "within_window_all_flows_drop_their_own_sorted_middle_rank_simultaneously",
+      "expert_error": "normalized_absolute_error",
+      "routing_unit": "per_window_flow",
+      "anchor_error_scale": "original_k3_observation_only_std",
+      "anchor_error_aggregation": "single_middle_anchor",
+      "tie_break": "expert_p",
+      "target_regret_scale": "k3_observation_only_std",
+      "target_scope": "fixed_k3_missing_complement",
+      "hidden_truth_oracle_is_deployable": false
+    },
+    "metrics": [
+      "ratio_of_sums_nmae",
+      "loo_winner_auroc",
+      "loo_target_regret_spearman",
+      "oracle_gap_capture",
+      "paired_per_run_relative_improvement"
+    ],
+    "primary_aggregation": "dataset_equal_structured_masks",
+    "error_aggregation": "ratio_of_sums",
+    "uncertainty": "frozen_two_level_bundle_and_window_bootstrap",
+    "cell_definition": "dataset_by_structured_mask_family"
+  },
+  "uncertainty": {
+    "bit_generator": "PCG64DXSM",
+    "seed": 81001,
+    "replicates": 10000,
+    "outer": {
+      "unit": "seed_bundle",
+      "draws_per_replicate": 3,
+      "replacement": true
+    },
+    "inner": {
+      "method": "circular_block_bootstrap",
+      "block_length_windows": 4,
+      "sampling_unit": "whole_window_all_flows",
+      "independent_per": "sampled_bundle_occurrence_by_dataset",
+      "shared_across": [
+        "mask_families",
+        "method_contrasts"
+      ]
+    },
+    "interval": {
+      "confidence": 0.95,
+      "quantile_method": "linear_percentile"
+    },
+    "hard_improvement_statistic": "dataset_equal_structured_masks_relative_improvement",
+    "hard_improvement_ci_lower_bound": "strictly_greater_than_zero",
+    "positive_bundle_count_min": 2
+  },
+  "gates": {
+    "structured_per_flow_oracle_dataset_equal_min": 0.03,
+    "loo_winner_auroc_min": 0.60,
+    "loo_target_regret_spearman_min": 0.15,
+    "hard_anchorcv_oracle_gap_capture_min": 0.30,
+    "hard_anchorcv_actual_improvement_min": 0.005,
+    "worst_structured_oracle_cell_relative_improvement_min": 0.015,
+    "worst_structured_cell_relative_improvement_min": -0.01
+  },
+  "final_gate": {
+    "cohort": "gate",
+    "datasets": [
+      "abilene",
+      "geant"
+    ],
+    "bundles": [
+      1,
+      2,
+      3
+    ],
+    "job_count": 6,
+    "checkpoint_policy": "reuse_exact_authority_bound_tune_checkpoint",
+    "training": "forbidden",
+    "launch_policy": "single_complete_six_job_grid",
+    "mid_grid_metric_inspection": "forbidden",
+    "method_or_threshold_change_after_access": "forbidden",
+    "outcome_selected_seed_addition": "forbidden",
+    "infrastructure_retry": "identical_job_identity_only",
+    "adjudication": "same_seven_method_gates_plus_uncertainty_gates"
+  },
+  "stop_rules": {
+    "oracle_gate_failure": "kill_routing_paper",
+    "loo_gate_failure": "kill_anchorcv",
+    "prototype_gate_pass": "run_extension_bundles_2_and_3",
+    "allowed_verdicts": [
+      "revise",
+      "kill",
+      "proceed"
+    ],
+    "prototype_verdict_rule": "revise_if_incomplete_or_invalid_else_kill_if_any_seven_gate_fails_else_proceed",
+    "extension_verdict_rule": "revise_if_incomplete_or_invalid_else_kill_if_any_seven_or_uncertainty_gate_fails_else_proceed",
+    "final_gate_verdict_rule": "revise_if_incomplete_or_invalid_else_kill_if_any_seven_or_uncertainty_gate_fails_else_proceed",
+    "undefined_metric_on_complete_evidence": "kill_scientific_gate_failure",
+    "replacement_seeds_from_outcomes": "forbidden",
+    "failed_or_missing_jobs": "retain_and_report",
+    "post_final_gate_adaptation": "forbidden"
+  },
+  "integrity": {
+    "hash_algorithm": "sha256",
+    "required_manifest_fields": [
+      "source_tree_sha256",
+      "config_sha256",
+      "data_sha256",
+      "result_sha256"
+    ],
+    "source_tree_sha256_required": true,
+    "config_sha256_required": true,
+    "data_sha256_required": true,
+    "result_sha256_required": true,
+    "data_hash_scope": "canonical_parsed_permitted_split_arrays_only",
+    "whole_raw_csv_hashing": false,
+    "source_change_after_freeze": "new_protocol_version_and_rerun_affected_pairs",
+    "git_available_required": false,
+    "git_commit_required": null,
+    "method_freeze_authority_issuance": "only_after_verified_multibundle_proceed",
+    "method_freeze_authority_binds": [
+      "source_tree_sha256",
+      "config_sha256",
+      "six_tune_result_file_sha256",
+      "six_tune_manifest_file_sha256",
+      "six_neural_checkpoint_file_sha256",
+      "six_neural_checkpoint_tensor_sha256",
+      "six_acil_checkpoint_sha256"
+    ],
+    "method_freeze_authority_immutable": true
+  }
+}

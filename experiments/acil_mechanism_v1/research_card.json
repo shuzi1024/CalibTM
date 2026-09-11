@@ -1,0 +1,210 @@
+{
+  "schema_version": 1,
+  "protocol": "acil-mechanism-v1",
+  "status": "prototype_protocol_frozen",
+  "question": "Under an exactly matched branch-sealed training protocol, do the extra MLP-visible ACIL feature channels outperform fixed restricted-channel controls and ordinary linear interpolation?",
+  "falsifiable_claim": {
+    "candidate": "full",
+    "matched_controls": [
+      "value_only",
+      "no_anchor"
+    ],
+    "deterministic_baseline": "linear",
+    "claim": "The additional observation-only channels exposed to the shared ACIL MLP contribute a repeatable structured-mask improvement that cannot be explained by parameter count alone; this experiment does not claim that the controls remove every indirect geometric quantity from the interpolation formula."
+  },
+  "exact_method_difference": {
+    "shared": [
+      "ACILBase architecture",
+      "5475 trainable parameters",
+      "bit-identical parameter initialization within each dataset and seed",
+      "same fit windows, K3/K2 objective, masks, data order, optimizer and 20-epoch budget",
+      "same source-dev checkpoint selection and tune targets"
+    ],
+    "full": "All 16 registered observation-only interpolation features.",
+    "value_only": "Only B_linear, observed value, observation mask and local volatility; all remaining feature channels are exactly zero.",
+    "no_anchor": "All registered features except explicit left/right anchor values, anchor delta and anchor slope; removed channels are exactly zero.",
+    "only_difference": "fixed feature-channel masking before the shared MLP",
+    "hidden_truth_input": false,
+    "selector_or_router": false,
+    "residual_network": false,
+    "large_backbone": false
+  },
+  "oracle_policy": {
+    "separate_hidden_truth_oracle": false,
+    "reason": "This is a direct matched representation ablation with no selector; the three tiny models are the cheapest discriminating experiment."
+  },
+  "data": {
+    "boundary": "branch-sealed, not project-wide pristine",
+    "training_cohorts": [
+      "fit",
+      "source_dev"
+    ],
+    "evaluation_cohort": "tune",
+    "abilene": {
+      "fit": [
+        0,
+        33335
+      ],
+      "source_dev": [
+        33384,
+        33884
+      ],
+      "tune": [
+        33884,
+        37484
+      ],
+      "flows": 144,
+      "tune_windows": 72
+    },
+    "geant": {
+      "fit": [
+        0,
+        7023
+      ],
+      "source_dev": [
+        7072,
+        7572
+      ],
+      "tune": [
+        7572,
+        8322
+      ],
+      "sealed_test": [
+        9172,
+        10772
+      ],
+      "flows": 462,
+      "tune_windows": 15
+    }
+  },
+  "masks": {
+    "observed_points_per_flow": 3,
+    "families": [
+      "random",
+      "internal_block",
+      "two_burst"
+    ],
+    "structured_headline": [
+      "internal_block",
+      "two_burst"
+    ],
+    "random_role": "pre-registered no-harm check",
+    "target": "immutable K3 missing complement"
+  },
+  "training": {
+    "fit_windows": 512,
+    "epochs": 20,
+    "physical_batches_per_epoch": 64,
+    "physical_batch_size": 8,
+    "gradient_accumulation_steps": 4,
+    "optimizer_updates": 320,
+    "optimizer": "AdamW",
+    "learning_rate": 0.0003,
+    "weight_decay": 0.01,
+    "gradient_clip_norm": 1.0,
+    "precision": "bf16_on_cuda",
+    "objective": "equal mean of K3 missing-target and K2 middle-anchor-drop normalized MAE",
+    "checkpoint": "lowest source-dev ratio-of-sums NMAE pooled over all three masks; ties choose earlier epoch",
+    "outcome_dependent_early_stop": false
+  },
+  "stages": {
+    "prototype": {
+      "seed_bundles": [
+        1
+      ],
+      "methods": [
+        "full",
+        "value_only",
+        "no_anchor"
+      ],
+      "primary_jobs": 6
+    },
+    "extension": {
+      "conditional_on": "prototype verdict proceed",
+      "seed_bundles": [
+        2,
+        3
+      ],
+      "methods": [
+        "full",
+        "value_only",
+        "no_anchor"
+      ],
+      "additional_primary_jobs": 12,
+      "combined_primary_jobs": 18
+    }
+  },
+  "metrics": {
+    "primary": "ratio-of-sums NMAE on immutable missing targets",
+    "dataset_aggregation": "compute each dataset relative effect from pooled structured error/truth sums, then average the two dataset effects equally",
+    "secondary": [
+      "random no-harm",
+      "per-dataset effect",
+      "per-dataset-mask effect",
+      "per-dataset-seed effect"
+    ]
+  },
+  "uncertainty": {
+    "rng": "PCG64DXSM",
+    "seed": 83001,
+    "draws": 10000,
+    "window_block_length": 4,
+    "prototype": "paired circular-window block bootstrap within each dataset",
+    "extension": "outer resample three seed bundles with replacement, then paired circular-window blocks",
+    "shared_draws": "all methods and mask families share seed/window selections"
+  },
+  "prototype_gates": {
+    "full_over_value_structured_min": 0.005,
+    "full_over_value_bootstrap_lower_strictly_positive": 0.0,
+    "full_over_no_anchor_structured_min": 0.0025,
+    "full_over_no_anchor_bootstrap_lower_strictly_positive": 0.0,
+    "full_over_linear_structured_min": 0.01,
+    "full_over_linear_each_dataset_positive": 2,
+    "both_matched_controls_each_dataset_strictly_positive": 2,
+    "worst_matched_structured_cell_min": -0.005,
+    "worst_matched_random_dataset_min": -0.005,
+    "positive_dataset_seed_for_both_controls_required": 2,
+    "positive_dataset_seed_total": 2
+  },
+  "extension_gates": {
+    "full_over_value_structured_min": 0.005,
+    "full_over_value_bootstrap_lower_strictly_positive": 0.0,
+    "full_over_no_anchor_structured_min": 0.0025,
+    "full_over_no_anchor_bootstrap_lower_strictly_positive": 0.0,
+    "full_over_linear_structured_min": 0.01,
+    "full_over_linear_each_dataset_positive": 2,
+    "both_matched_controls_each_dataset_strictly_positive": 2,
+    "worst_matched_structured_cell_min": -0.005,
+    "worst_matched_random_dataset_min": -0.005,
+    "positive_dataset_seed_for_both_controls_required": 4,
+    "positive_dataset_seed_total": 6
+  },
+  "stop_rules": {
+    "prototype_failure": "kill the ACIL feature-attribution claim; do not run bundles 2 or 3 and do not change feature masks or gates",
+    "prototype_success": "run only the frozen bundles 2 and 3 extension",
+    "extension_failure": "retain ACIL only as an empirical interpolation baseline; do not claim anchor/gap feature attribution",
+    "extension_success": "allow a separately frozen final confirmation or downstream transfer experiment"
+  },
+  "evidence_boundary": {
+    "branch_sealed_not_project_pristine": true,
+    "legacy tune and test artifacts exist elsewhere": true,
+    "permitted_train_and_validation_arrays_only": true,
+    "sealed_test_access": false,
+    "legacy_test_cache_access": false,
+    "whole_raw_csv_access": false,
+    "whole_raw_csv_hashing": false,
+    "runner_exposes_test_path": false,
+    "runner_exposes_split_override": false,
+    "test_access": false
+  },
+  "execution": {
+    "fixed_grid_only": true,
+    "intermediate_metric_inspection": false,
+    "replacement_seeds": false,
+    "outcome_based_retry": false,
+    "infrastructure_retry": "same job identity, command, seed and hashes only",
+    "retain_failures": true,
+    "write_once_results": true,
+    "occupancy_is_research_evidence": false
+  }
+}

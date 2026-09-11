@@ -1,0 +1,100 @@
+{
+  "schema_version": 1,
+  "protocol": "tiny-kan-calibrator-v1",
+  "status": "one_shot_development_collision_frozen_before_candidate_results",
+  "question": "Does an edge-wise cubic B-spline KAN parameterize the existing low-dimensional bounded interpolation-calibration law materially better than the current parameter-matched MLP?",
+  "motivation_boundary": {
+    "problem_first_evidence": "The frozen value_only model is driven mainly by B_linear and local scale at missing targets, and post-gate head ablation localizes measurable gains to bounded internal and edge offsets.",
+    "missing_evidence": "There is no oracle or residual-complexity result showing that MLP expressivity is the current bottleneck.",
+    "research_role": "A single low-cost popular-module collision, not a new open-ended architecture search and not independent paper confirmation."
+  },
+  "hypothesis": "If the useful correction is a locally smooth low-dimensional deformation law, learnable edge-wise cubic B-splines should be more parameter-efficient and inspectable than a fixed-activation MLP under the same information and output constraints.",
+  "arms": {
+    "mlp_value": "Exact current 5,475-parameter value_only incumbent, rerun in the same worker for operationally matched comparison.",
+    "kan_value": "Only replace the 16-to-three-logit MLP map with the single frozen 5,539-parameter cubic B-spline KAN.",
+    "kan_static": "The identical 5,539-parameter KAN with all 16 feature channels algebraically zeroed."
+  },
+  "only_model_difference": {
+    "replaced": "LayerNorm(16) -> Linear(16,64) -> GELU -> Linear(64,64) -> GELU -> three Linear(64,1) heads",
+    "replacement": "LayerNorm(16) -> edge-wise cubic B-spline KAN(16,32) -> edge-wise cubic B-spline KAN(32,3)",
+    "kan": {
+      "base_branch": "SiLU",
+      "grid_range": [-1.0, 1.0],
+      "grid_size": 5,
+      "hidden_dim": 32,
+      "learned_grid": false,
+      "num_basis_per_edge": 8,
+      "output_layer_initialization": "base and spline weights N(0,1e-4), bias zero, matching the incumbent near-Linear output prior",
+      "spline_order": 3,
+      "variant_sweep": false
+    },
+    "unchanged": [
+      "exact value_only feature mask",
+      "canonical observation-only Linear and nearest-anchor edge rule",
+      "normalization and hidden-truth exclusion",
+      "beta_r=0.25, beta_o=0.10, beta_e=0.10",
+      "tanh, r_hat clipping, anchor and scale formulas",
+      "observed hard-copy and raw-space nonnegativity",
+      "K3/K2 training objective",
+      "fit/source-dev/tune boundaries, masks, seeds, optimizer, and 320 updates"
+    ]
+  },
+  "data": {
+    "datasets": ["abilene", "geant"],
+    "training": ["fit", "source_dev"],
+    "evaluation": "tune",
+    "boundary": "post-project development evidence; tune is not project-wide pristine and cannot become independent confirmation",
+    "sealed_test_access": false,
+    "legacy_test_cache_access": false
+  },
+  "grid": {
+    "datasets": 2,
+    "seed_bundles": [1, 2, 3],
+    "methods": ["mlp_value", "kan_value", "kan_static"],
+    "mask_families": ["random", "internal_block", "two_burst"],
+    "jobs": 18,
+    "intermediate_metric_inspection": false
+  },
+  "training": {
+    "epochs": 20,
+    "optimizer_updates": 320,
+    "precision": "existing BF16-on-CUDA lane with numerically stable KAN basis implementation",
+    "checkpoint_selection": "lowest pooled source-dev NMAE across the three masks, ties choose the earlier epoch"
+  },
+  "accuracy_proceed_conditions": {
+    "kan_over_mlp_equal_dataset_structured_relative_gain_min": 0.01,
+    "kan_over_mlp_paired_block_bootstrap_lower_strictly_positive": 0.0,
+    "kan_over_mlp_both_datasets_positive": true,
+    "kan_over_mlp_positive_seed_bundles_min": 2,
+    "worst_structured_dataset_mask_min": -0.005,
+    "worst_random_dataset_min": -0.005,
+    "kan_value_over_static_structured_min": 0.005,
+    "kan_value_over_static_bootstrap_lower_strictly_positive": 0.0,
+    "kan_value_over_static_both_datasets_positive": true
+  },
+  "conditional_attribution_and_cost_gates": {
+    "run_only_if_accuracy_proceeds": true,
+    "full_kan_over_zero_spline_relative_gain_min": 0.005,
+    "median_end_to_end_latency_ratio_vs_mlp_max": 2.0,
+    "peak_memory_ratio_vs_mlp_max": 2.0,
+    "fresh_confirmation_required_before_replacing_paper_incumbent": true
+  },
+  "stop_rules": {
+    "accuracy_fail": "KILL_TINY_KAN_KEEP_VALUE_ONLY; do not run latency or zero-spline attribution.",
+    "spline_attribution_fail": "Do not call the result a KAN/spline contribution even if full accuracy increased.",
+    "cost_fail": "Do not replace the current accuracy-efficiency incumbent.",
+    "forbidden_followups": [
+      "ChebyshevKAN",
+      "FastKAN",
+      "RBF-KAN",
+      "FourierKAN",
+      "WavKAN",
+      "different grids, spline orders, widths, depths, learned grids, gates, routers, or auxiliary losses"
+    ]
+  },
+  "paper_interpretation": {
+    "strong_pass": "A constrained spline calibrator remains only a candidate until a fresh confirmation is obtained.",
+    "single_dataset_or_small_gain": "Retain as a negative/diagnostic result; do not alter the value_only paper identity.",
+    "failure": "Freeze value_only and proceed with the existing CCF-C writing route."
+  }
+}

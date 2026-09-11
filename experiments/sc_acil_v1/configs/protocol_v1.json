@@ -1,0 +1,133 @@
+{
+  "schema_version": 1,
+  "protocol": {
+    "branch_sealed": true,
+    "git_available": false,
+    "git_commit": null,
+    "id": "sc-acil-v1",
+    "status": "frozen_before_gate",
+    "window_length": 50
+  },
+  "question": "Does deployment-legal per-flow middle-anchor leave-one-out innovation improve an anchor-constrained imputer beyond both ACIL alone and an exactly matched residual network with the innovation channel zeroed?",
+  "method_roles": {
+    "sc_acil": "proposed_full_method",
+    "acil_only": "internal_ablation_without_self_calibration",
+    "sc_acil_u0": "matched_capacity_internal_ablation",
+    "linear_interpolation": "external_classical_baseline"
+  },
+  "evidence_boundary": {
+    "discovery_test_path_exposed": false,
+    "gate_first_used_by_this_protocol": true,
+    "legacy_test_cache_access": false,
+    "permitted_parent_arrays_only": true,
+    "project_wide_pristine_holdout": false,
+    "sealed_test_access": false,
+    "whole_raw_csv_access": false,
+    "whole_raw_csv_hashing": false
+  },
+  "datasets": {
+    "abilene": {
+      "flows": 144,
+      "permitted_splits": {"train": [0, 33884], "val": [33884, 41134]},
+      "cohorts": {
+        "fit": {"bounds": [0, 33335], "split": "train", "window_count": 512, "schedule": "linspace_floor"},
+        "source_dev": {"bounds": [33384, 33884], "split": "train", "window_count": 10, "schedule": "stride_50"},
+        "gate": {"bounds": [37534, 41134], "split": "val", "window_count": 72, "schedule": "stride_50"}
+      }
+    },
+    "geant": {
+      "flows": 462,
+      "permitted_splits": {"train": [0, 7572], "val": [7572, 9172]},
+      "cohorts": {
+        "fit": {"bounds": [0, 7023], "split": "train", "window_count": 512, "schedule": "linspace_floor"},
+        "source_dev": {"bounds": [7072, 7572], "split": "train", "window_count": 10, "schedule": "stride_50"},
+        "gate": {"bounds": [8372, 9172], "split": "val", "window_count": 16, "schedule": "stride_50"}
+      }
+    }
+  },
+  "formal_gate": {
+    "datasets": ["abilene", "geant"],
+    "evaluation_cohort": "gate",
+    "mask_families": ["random", "internal_block", "two_burst"],
+    "observation_count": 3,
+    "seed_bundles": [4, 5, 6],
+    "structured_masks": ["internal_block", "two_burst"],
+    "training_cohorts": ["fit", "source_dev"]
+  },
+  "training": {
+    "acil_k2_auxiliary": true,
+    "best_checkpoint": "lowest_source_dev_ratio_of_sums_nmae_all_three_masks_tie_earlier_epoch",
+    "epochs": 20,
+    "fit_windows": 512,
+    "gradient_accumulation_steps": 4,
+    "gradient_clip_norm": 1.0,
+    "learning_rate": 0.0003,
+    "mixed_mask_schedule": "acil-innovation-v1-registered-window-level-schedule",
+    "optimizer": "AdamW",
+    "optimizer_updates": 320,
+    "physical_batch_size": 8,
+    "precision": "bf16_on_cuda",
+    "weight_decay": 0.01
+  },
+  "model_contract": {
+    "acil_frozen_inside_residual_models": true,
+    "absolute_flow_identity": false,
+    "cross_flow_aggregation": false,
+    "hard_observed_projection": true,
+    "missing_truth_operand": false,
+    "nonnegative_output": true,
+    "routing": false,
+    "topology": false,
+    "u0_difference": "replace_only_normalized_scalar_loo_innovation_with_zero"
+  },
+  "metrics": {
+    "bootstrap_primary": "dataset_equal_mean_of_per_dataset_ratio_of_sums_improvements",
+    "nmae": "sum_absolute_error_over_sum_absolute_truth",
+    "paired_improvement": "one_minus_candidate_nmae_over_comparator_nmae",
+    "raw_evidence_unit": "seed_dataset_mask_window_summed_over_flows",
+    "rounding_before_gate": false
+  },
+  "bootstrap": {
+    "block_length": 4,
+    "draws": 10000,
+    "interval": [0.025, 0.975],
+    "resampling": "paired_seed_then_dataset_specific_circular_window_blocks",
+    "rng": "PCG64DXSM",
+    "seed": 91001
+  },
+  "gate": {
+    "main_full_over_acil": {
+      "bootstrap_ci_lower_strictly_above": 0.0,
+      "candidate": "sc_acil",
+      "comparator": "acil_only",
+      "dataset_equal_structured_improvement_minimum": 0.015,
+      "per_dataset_minimum": -0.005,
+      "positive_dataset_mask_cells_required": 3,
+      "positive_dataset_mask_cells_total": 4,
+      "positive_seed_bundles_required": 2,
+      "positive_seed_bundles_total": 3,
+      "worst_dataset_mask_cell_minimum": -0.01
+    },
+    "innovation_attribution": {
+      "bootstrap_ci_lower_strictly_above": 0.0,
+      "candidate": "sc_acil",
+      "comparator": "sc_acil_u0",
+      "dataset_equal_structured_improvement_minimum": 0.005
+    },
+    "random_no_harm": {
+      "candidate": "sc_acil",
+      "comparator": "acil_only",
+      "dataset_equal_improvement_minimum": -0.005
+    },
+    "failure": "kill_sc_acil_method_claim_no_gate_revision",
+    "success": "proceed_to_rate_and_external_baseline_stage"
+  },
+  "execution": {
+    "algorithmic_failures_retained": true,
+    "gate_revision_forbidden": true,
+    "missing_jobs_block_adjudication": true,
+    "replacement_seeds_forbidden": true,
+    "stage_order": ["fit_acil", "formal_gate"]
+  }
+}
+
