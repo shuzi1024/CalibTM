@@ -12,6 +12,8 @@ KAN/Attention/Mamba-lite bake-off protocol.
 - `plan/`: current GapCalib module protocol and novelty plan.
 - `paper/` and `docs/`: paper materials and evidence handoffs.
 - `setup/`: environment and asset preparation helpers.
+- [`review_packet/`](review_packet/README.md): downloadable papers, experiment
+  plans, and instructions for external review.
 
 Large checkpoints, model caches, raw archives, generated predictions, and datasets
 are intentionally omitted.
