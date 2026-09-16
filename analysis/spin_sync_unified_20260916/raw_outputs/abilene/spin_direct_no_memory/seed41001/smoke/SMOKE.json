@@ -1,0 +1,42 @@
+{
+  "batch": 8,
+  "config_sha256": "472cb2baa85613cc5398d008e50c4ca27f8aaa20de9ec2b9c6a328b9c737119b",
+  "dataset": "abilene",
+  "development_scores_computed": false,
+  "exact_checkpoint_continuation": true,
+  "finished": "2026-09-16T04:35:06.507508+00:00",
+  "first_step": {
+    "gradient_norm": 2.3696236610412598,
+    "loss": 1.1280996799468994,
+    "missing_targets": 46080
+  },
+  "fit_evaluation_output_sha256": "1efa335b0459594b0fa7a76ddae3873f720bcf3f153705f08c8c172f4177530e",
+  "fit_evaluation_path_checked": true,
+  "node_chunk": 32,
+  "parameter_count": 73733,
+  "passed": true,
+  "peak_evaluation_allocated_bytes_including_training_state": 3072439296,
+  "peak_training_allocated_bytes": 5491861504,
+  "protocol": "spin-sync-unified-development-20260916-v1",
+  "replayed_updates": 1,
+  "role": "fit_runner_smoke_not_formal_result",
+  "rough_epoch_seconds_from_smoke": 21.495007543824613,
+  "schedule": {
+    "epoch_zero_based": 0,
+    "mask_sha256": "4b31c16de8581aa3fcdddcf92deb0768338790a73e59e0117169a01194010896",
+    "order_sha256": "55c8cae168e40ecd1bcf253d6dc51dfef5d299ac93483aa4858cba084cc0e4d6",
+    "path": "/mnt/suzikun/CalibTM/outputs/sync-delta-pilot-20260913-v11/abilene/shared/masks/masks_train_seed61001_epoch000.npz",
+    "sha256": "d8dffee08373b5162e1a45f2048a906637bed1f7a7b1549b17b1139fbd171ab4"
+  },
+  "second_step": {
+    "gradient_norm": 2.1429524421691895,
+    "loss": 1.0900583267211914,
+    "missing_targets": 46080
+  },
+  "seconds_per_evaluation_batch": 0.04885703232139349,
+  "seconds_per_update_including_resume_io": 0.31066758558154106,
+  "seed": 41001,
+  "target_block": 144,
+  "unique_updates": 2,
+  "variant": "spin_direct_no_memory"
+}

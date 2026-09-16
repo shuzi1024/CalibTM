@@ -1,0 +1,25 @@
+{
+  "device": "cpu",
+  "real_data_loaded": false,
+  "gpu_used": false,
+  "torch_version": "2.2.2+cu121",
+  "shared_initialization_exact": true,
+  "no_memory_removed_state_keys": [
+    "key.bias",
+    "key.weight",
+    "value.0.bias",
+    "value.0.weight",
+    "value.2.bias",
+    "value.2.weight"
+  ],
+  "hidden_truth_invariance_and_zero_hidden_gradients": true,
+  "masked_only_sync_writes": true,
+  "neighbor_permutation_output_and_gradients": true,
+  "full_graph_target_block_output_and_gradients": true,
+  "direct_support_own_flow_and_value_conditioned_keys_queries": true,
+  "two_update_contextual_kvq_trainability": true,
+  "all_missing_t50_finite_zero_reads": true,
+  "no_memory_scan_bypassed": true,
+  "state_reload_exact": true,
+  "passed": true
+}

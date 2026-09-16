@@ -1,0 +1,13 @@
+{
+  "best_epoch": 119,
+  "best_score": 0.16767624917576404,
+  "config_sha256": "4beef3853b5553f8ef467ca679f750222b313c615c11e0a433668b45585e9293",
+  "dataset": "geant",
+  "deadline_unix": 1789558409.0,
+  "epochs_completed": 120,
+  "protocol": "spin-sync-unified-fixed120-development-20260916-v1",
+  "seed": 41001,
+  "state": "complete",
+  "updated": "2026-09-16T06:15:21.087645+00:00",
+  "variant": "spin_direct_no_memory"
+}

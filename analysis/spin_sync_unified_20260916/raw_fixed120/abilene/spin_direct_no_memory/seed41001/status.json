@@ -1,0 +1,13 @@
+{
+  "best_epoch": 118,
+  "best_score": 0.16343286878009566,
+  "config_sha256": "685912b41a4f270c471be613e671cc1ca69edb4796f64a7043db34dc37951980",
+  "dataset": "abilene",
+  "deadline_unix": 1789558409.0,
+  "epochs_completed": 120,
+  "protocol": "spin-sync-unified-fixed120-development-20260916-v1",
+  "seed": 41001,
+  "state": "complete",
+  "updated": "2026-09-16T05:28:08.284282+00:00",
+  "variant": "spin_direct_no_memory"
+}

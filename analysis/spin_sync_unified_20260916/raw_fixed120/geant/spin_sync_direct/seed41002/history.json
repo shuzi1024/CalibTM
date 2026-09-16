@@ -1,0 +1,2882 @@
+[
+  {
+    "bad_epochs": 0,
+    "best_epoch": 1,
+    "best_score": 0.2678178518180514,
+    "condition_nmae": {
+      "unequal": 0.28057744150963154,
+      "unequal_gap": 0.28633678204463053,
+      "uniform": 0.2365393318998921
+    },
+    "epoch": 1,
+    "evaluation_seconds": 2.507592177949846,
+    "mean_gradient_norm": 6.691412549465895,
+    "schedule": {
+      "epoch_zero_based": 0,
+      "mask_sha256": "8cd018c03ecb841bde4337aaa2488c54b0bae87ae3fc4bafd5f68a536faef679",
+      "order_sha256": "1a6f4e7a257f3e683c1e1cb61fc7cf892fc98d829ceaac6d14dd7f2199f2c166",
+      "path": "/mnt/suzikun/CalibTM/outputs/sync-delta-pilot-20260913-v11/geant/shared/masks/masks_train_seed61001_epoch000.npz",
+      "sha256": "61e9b4c26d904cf346f26808e9facc7a5d480d405154c7a658e55a82b14a414e"
+    },
+    "selection_score": 0.2678178518180514,
+    "train_loss": 0.5937226375099272,
+    "training_seconds": 95.80300718732178,
+    "updates": 64
+  },
+  {
+    "bad_epochs": 0,
+    "best_epoch": 2,
+    "best_score": 0.2572967104824605,
+    "condition_nmae": {
+      "unequal": 0.26968013143646635,
+      "unequal_gap": 0.2751571839368647,
+      "uniform": 0.22705281607405045
+    },
+    "epoch": 2,
+    "evaluation_seconds": 2.5073919454589486,
+    "mean_gradient_norm": 6.174234678968787,
+    "schedule": {
+      "epoch_zero_based": 1,
+      "mask_sha256": "87e80a8d8146f0fa1e48b08e0c7f23a2b805271dac3fd56236c441b852ec80ba",
+      "order_sha256": "f7fc48384bbf8a595aa5758964dd68a7f03194b13b08af7271ebc4fa4f8c6643",
+      "path": "/mnt/suzikun/CalibTM/outputs/sync-delta-pilot-20260913-v11/geant/shared/masks/masks_train_seed61001_epoch001.npz",
+      "sha256": "d309fb061802070039cd6b0831bbd7de7c128b4841143f7f7ddf6c9aaf6097d3"
+    },
+    "selection_score": 0.2572967104824605,
+    "train_loss": 0.31439862214028835,
+    "training_seconds": 95.44945385959,
+    "updates": 128
+  },
+  {
+    "bad_epochs": 0,
+    "best_epoch": 3,
+    "best_score": 0.24376380460624936,
+    "condition_nmae": {
+      "unequal": 0.25360338311087466,
+      "unequal_gap": 0.25807409526175207,
+      "uniform": 0.21961393544612132
+    },
+    "epoch": 3,
+    "evaluation_seconds": 2.503848367370665,
+    "mean_gradient_norm": 5.618355484679341,
+    "schedule": {
+      "epoch_zero_based": 2,
+      "mask_sha256": "e14ae0ffca9eec3baff7a43bcb8e4da2bcc23540360f83a9e3aba3cf42fa5906",
+      "order_sha256": "b9857b845d92a395a1fd20321a1527a606615eb53bb4fb69250c1751591d2c3c",
+      "path": "/mnt/suzikun/CalibTM/outputs/sync-delta-pilot-20260913-v11/geant/shared/masks/masks_train_seed61001_epoch002.npz",
+      "sha256": "b61d6234de4e8d657b37889d523666e3d1fa62251be93daa5d3c3ab754ab4e79"
+    },
+    "selection_score": 0.24376380460624936,
+    "train_loss": 0.2945525706745684,
+    "training_seconds": 95.43945160228759,
+    "updates": 192
+  },
+  {
+    "bad_epochs": 0,
+    "best_epoch": 4,
+    "best_score": 0.23113998584655185,
+    "condition_nmae": {
+      "unequal": 0.23887734209472938,
+      "unequal_gap": 0.24272217607987215,
+      "uniform": 0.21182043936505407
+    },
+    "epoch": 4,
+    "evaluation_seconds": 2.501635231077671,
+    "mean_gradient_norm": 6.068790828809142,
+    "schedule": {
+      "epoch_zero_based": 3,
+      "mask_sha256": "a791bd1f6dc3934e7e156a3e978cc616cb6e0a52e595bdc87a41c6d5dd1c9ae2",
+      "order_sha256": "7e5fa43de8e6633a97a1515c93151218992e7e95d7c2b117928aac126058b053",
+      "path": "/mnt/suzikun/CalibTM/outputs/sync-delta-pilot-20260913-v11/geant/shared/masks/masks_train_seed61001_epoch003.npz",
+      "sha256": "9a4bc253971f54df81840ff1dfc1ed975a862789dbed19fe4204285ca1d7bb2f"
+    },
+    "selection_score": 0.23113998584655185,
+    "train_loss": 0.28695176891051233,
+    "training_seconds": 95.47365836240351,
+    "updates": 256
+  },
+  {
+    "bad_epochs": 0,
+    "best_epoch": 5,
+    "best_score": 0.19201939539282156,
+    "condition_nmae": {
+      "unequal": 0.19764293077496492,
+      "unequal_gap": 0.20068496595397303,
+      "uniform": 0.17773028944952676
+    },
+    "epoch": 5,
+    "evaluation_seconds": 2.504657432436943,
+    "mean_gradient_norm": 5.311668582260609,
+    "schedule": {
+      "epoch_zero_based": 4,
+      "mask_sha256": "2aba0ef97f797b099c26feaaad65d92a531680a62f778f9ba34d8b7e4168f13a",
+      "order_sha256": "d3f55d3fe463b60414e55dabcd04114ad31bc4064ae74dd03a2d6292fe6efec0",
+      "path": "/mnt/suzikun/CalibTM/outputs/sync-delta-pilot-20260913-v11/geant/shared/masks/masks_train_seed61001_epoch004.npz",
+      "sha256": "ed5b5e0089598035905ac40562d9b8f3243b56001d2a32cbe93f7187117e748f"
+    },
+    "selection_score": 0.19201939539282156,
+    "train_loss": 0.25731947529129684,
+    "training_seconds": 95.43458127882332,
+    "updates": 320
+  },
+  {
+    "bad_epochs": 0,
+    "best_epoch": 6,
+    "best_score": 0.1831771001702582,
+    "condition_nmae": {
+      "unequal": 0.18869789866294837,
+      "unequal_gap": 0.1919634256655165,
+      "uniform": 0.1688699761823097
+    },
+    "epoch": 6,
+    "evaluation_seconds": 2.5008507324382663,
+    "mean_gradient_norm": 5.126066195778549,
+    "schedule": {
+      "epoch_zero_based": 5,
+      "mask_sha256": "2b4eaa9d89ab71461aeb03911a3d40322172c98ef54f408384e798bcbc315e81",
+      "order_sha256": "8ae4cdb0b665adb0a800cf456a1298c1d1f3f5861333e180019c89134ec30e5c",
+      "path": "/mnt/suzikun/CalibTM/outputs/sync-delta-pilot-20260913-v11/geant/shared/masks/masks_train_seed61001_epoch005.npz",
+      "sha256": "37bf6d1cb51b299238b3eddf91de48af4f5318d194b7d0624af21e3ea716a0c5"
+    },
+    "selection_score": 0.1831771001702582,
+    "train_loss": 0.2539125746116042,
+    "training_seconds": 95.46647347137332,
+    "updates": 384
+  },
+  {
+    "bad_epochs": 0,
+    "best_epoch": 6,
+    "best_score": 0.1831771001702582,
+    "condition_nmae": {
+      "unequal": 0.188701694134882,
+      "unequal_gap": 0.1917639596013867,
+      "uniform": 0.1690713163272843
+    },
+    "epoch": 7,
+    "evaluation_seconds": 2.5010521057993174,
+    "mean_gradient_norm": 4.1652265610173345,
+    "schedule": {
+      "epoch_zero_based": 6,
+      "mask_sha256": "7a401adbc67012043ca86d44ebeae37728f9d2822846c916bff5f224dfff221d",
+      "order_sha256": "19993e87950dbaa4d77e08d8e603f962c43696f82daa88b61df8d09cbe817068",
+      "path": "/mnt/suzikun/CalibTM/outputs/sync-delta-pilot-20260913-v11/geant/shared/masks/masks_train_seed61001_epoch006.npz",
+      "sha256": "4bf667f3946955e94007905e1231d4c3d6c10d95c32a01c4e7c32406d4602997"
+    },
+    "selection_score": 0.18317899002118435,
+    "train_loss": 0.2382282328326255,
+    "training_seconds": 95.49233129061759,
+    "updates": 448
+  },
+  {
+    "bad_epochs": 0,
+    "best_epoch": 8,
+    "best_score": 0.18206328536428126,
+    "condition_nmae": {
+      "unequal": 0.18791519993981876,
+      "unequal_gap": 0.19084098041547998,
+      "uniform": 0.16743367573754495
+    },
+    "epoch": 8,
+    "evaluation_seconds": 2.511759945191443,
+    "mean_gradient_norm": 4.027006705291569,
+    "schedule": {
+      "epoch_zero_based": 7,
+      "mask_sha256": "5a40aff269e462d0f8cd845cd4fd0efa9c93076a368caa3c5c5874675bb81189",
+      "order_sha256": "061ecad8de731bd23acda01405c894fc74feb18efcb5e59650b7904f478af223",
+      "path": "/mnt/suzikun/CalibTM/outputs/sync-delta-pilot-20260913-v11/geant/shared/masks/masks_train_seed61001_epoch007.npz",
+      "sha256": "aaed90d6c722d733ea6a43a5d77867f28e811bb687f84091d0becbb175c1f6ef"
+    },
+    "selection_score": 0.18206328536428126,
+    "train_loss": 0.2346190398093313,
+    "training_seconds": 95.47373004443944,
+    "updates": 512
+  },
+  {
+    "bad_epochs": 0,
+    "best_epoch": 9,
+    "best_score": 0.1803635747214419,
+    "condition_nmae": {
+      "unequal": 0.18630361749717902,
+      "unequal_gap": 0.18909798454613977,
+      "uniform": 0.16568912212100692
+    },
+    "epoch": 9,
+    "evaluation_seconds": 2.5032045263797045,
+    "mean_gradient_norm": 4.2779042441397905,
+    "schedule": {
+      "epoch_zero_based": 8,
+      "mask_sha256": "c5224c83142a8708c8d2b078b30c34862af2bc5e1fe0325a2b29a564a4dd06a9",
+      "order_sha256": "a6b07fc4c9dd1ee3b3d76971142a4f2988df0e2ebb869bcb1de4e44c30052181",
+      "path": "/mnt/suzikun/CalibTM/outputs/sync-delta-pilot-20260913-v11/geant/shared/masks/masks_train_seed61001_epoch008.npz",
+      "sha256": "36d01bb05c1ec5e353d93692b08035cc0a851bcc60f16f1db5455de5930358d1"
+    },
+    "selection_score": 0.1803635747214419,
+    "train_loss": 0.2341188231948763,
+    "training_seconds": 95.47701165359467,
+    "updates": 576
+  },
+  {
+    "bad_epochs": 0,
+    "best_epoch": 9,
+    "best_score": 0.1803635747214419,
+    "condition_nmae": {
+      "unequal": 0.20077915461084486,
+      "unequal_gap": 0.20340057192184754,
+      "uniform": 0.1803186860932522
+    },
+    "epoch": 10,
+    "evaluation_seconds": 2.504431577399373,
+    "mean_gradient_norm": 4.340032902080566,
+    "schedule": {
+      "epoch_zero_based": 9,
+      "mask_sha256": "084e3bc497a0cc5af48704cd869b745f9da433b8ba232492871814a923a5fcde",
+      "order_sha256": "4ba40768259887b0f9701da43766d7495f867aa42446608455be785d9f606126",
+      "path": "/mnt/suzikun/CalibTM/outputs/sync-delta-pilot-20260913-v11/geant/shared/masks/masks_train_seed61001_epoch009.npz",
+      "sha256": "db65dce77dd7ea9b9b56a2ff86820d66c661640296ea1d470bc66537f840afeb"
+    },
+    "selection_score": 0.1948328042086482,
+    "train_loss": 0.2341349080670625,
+    "training_seconds": 95.44695199094713,
+    "updates": 640
+  },
+  {
+    "bad_epochs": 0,
+    "best_epoch": 9,
+    "best_score": 0.1803635747214419,
+    "condition_nmae": {
+      "unequal": 0.19527386563841015,
+      "unequal_gap": 0.19773395262757895,
+      "uniform": 0.17574028517246681
+    },
+    "epoch": 11,
+    "evaluation_seconds": 2.5065383929759264,
+    "mean_gradient_norm": 4.432676020078361,
+    "schedule": {
+      "epoch_zero_based": 10,
+      "mask_sha256": "b67aeb3f31d8ed7c496a053c22e73ebe71b717d7f1d36a81b296925148bb5708",
+      "order_sha256": "0583af62f595b320a060218e73d1c7ad5e900390128a5125a3c94d8affb0db29",
+      "path": "/mnt/suzikun/CalibTM/outputs/sync-delta-pilot-20260913-v11/geant/shared/masks/masks_train_seed61001_epoch010.npz",
+      "sha256": "cf3e07932a436a082e34d75c4119cd1b383d5c636bd0daf612563a84408a1820"
+    },
+    "selection_score": 0.18958270114615197,
+    "train_loss": 0.23580937134101987,
+    "training_seconds": 95.47483217250556,
+    "updates": 704
+  },
+  {
+    "bad_epochs": 0,
+    "best_epoch": 9,
+    "best_score": 0.1803635747214419,
+    "condition_nmae": {
+      "unequal": 0.19137216611373384,
+      "unequal_gap": 0.19378003767475788,
+      "uniform": 0.1720789992658684
+    },
+    "epoch": 12,
+    "evaluation_seconds": 2.505884108133614,
+    "mean_gradient_norm": 4.611224815249443,
+    "schedule": {
+      "epoch_zero_based": 11,
+      "mask_sha256": "c100b9171fb0558d0aa50bdd906a230d3d5c314674dbd01c7b36adfa456eb820",
+      "order_sha256": "6d45e263f6fb0a5031b2ef90b7691c19f949397929a0f32c2083490bd1c0c318",
+      "path": "/mnt/suzikun/CalibTM/outputs/sync-delta-pilot-20260913-v11/geant/shared/masks/masks_train_seed61001_epoch011.npz",
+      "sha256": "c79b31b33dfca2403b565a79e92a7f367018914744e101d75aa06d77fae87b97"
+    },
+    "selection_score": 0.18574373435145333,
+    "train_loss": 0.23903435957618058,
+    "training_seconds": 95.49873423855752,
+    "updates": 768
+  },
+  {
+    "bad_epochs": 0,
+    "best_epoch": 9,
+    "best_score": 0.1803635747214419,
+    "condition_nmae": {
+      "unequal": 0.22788428838520372,
+      "unequal_gap": 0.23008655430505484,
+      "uniform": 0.2101876187929975
+    },
+    "epoch": 13,
+    "evaluation_seconds": 2.506569217890501,
+    "mean_gradient_norm": 4.6163986613973975,
+    "schedule": {
+      "epoch_zero_based": 12,
+      "mask_sha256": "5419c223807aeb06dec06377c4b327ac13083e809196925f6d44f6ee1cded2d3",
+      "order_sha256": "066a0127ccad1e5c851716aa59725a0fa7c5432006c3f491205d7668882d9357",
+      "path": "/mnt/suzikun/CalibTM/outputs/sync-delta-pilot-20260913-v11/geant/shared/masks/masks_train_seed61001_epoch012.npz",
+      "sha256": "ebbf4f933bff0dd80ac7b2d83a4534aa4eb84e71742019680486471003e172aa"
+    },
+    "selection_score": 0.22271948716108536,
+    "train_loss": 0.2495115411002189,
+    "training_seconds": 95.53949647862464,
+    "updates": 832
+  },
+  {
+    "bad_epochs": 0,
+    "best_epoch": 9,
+    "best_score": 0.1803635747214419,
+    "condition_nmae": {
+      "unequal": 0.18709811887945207,
+      "unequal_gap": 0.18993760897868003,
+      "uniform": 0.1666310128060642
+    },
+    "epoch": 14,
+    "evaluation_seconds": 2.5034345537424088,
+    "mean_gradient_norm": 4.698994547128677,
+    "schedule": {
+      "epoch_zero_based": 13,
+      "mask_sha256": "b29349b3bacbfa0f1098de40fd0eb24ebd0830ce79888e46a67d3545a0e3a50d",
+      "order_sha256": "4f206543136d57b1b06407b614f63f17b884663ba24fd2db750d6461f0ba4894",
+      "path": "/mnt/suzikun/CalibTM/outputs/sync-delta-pilot-20260913-v11/geant/shared/masks/masks_train_seed61001_epoch013.npz",
+      "sha256": "4e352dd2b1a973efee6edfe74a03e76b342a814ababe352ad5bdeb22634506a0"
+    },
+    "selection_score": 0.18122224688806543,
+    "train_loss": 0.23378833173774183,
+    "training_seconds": 95.48777925781906,
+    "updates": 896
+  },
+  {
+    "bad_epochs": 0,
+    "best_epoch": 9,
+    "best_score": 0.1803635747214419,
+    "condition_nmae": {
+      "unequal": 0.189627855933345,
+      "unequal_gap": 0.1921814318243621,
+      "uniform": 0.170541527186605
+    },
+    "epoch": 15,
+    "evaluation_seconds": 2.503839982673526,
+    "mean_gradient_norm": 3.828707080334425,
+    "schedule": {
+      "epoch_zero_based": 14,
+      "mask_sha256": "cbef71c2d35db0471768ebe009ab116f761eede089fa4ebdd594d390108068d5",
+      "order_sha256": "06041ee1698a4c75fc611b4ef52d2a7d867c6de015a51b870ba02d06234287f3",
+      "path": "/mnt/suzikun/CalibTM/outputs/sync-delta-pilot-20260913-v11/geant/shared/masks/masks_train_seed61001_epoch014.npz",
+      "sha256": "0f45e7b55d4e9af8722dd5a99459bdb19bc97e416b634a608289bca391cf098a"
+    },
+    "selection_score": 0.18411693831477072,
+    "train_loss": 0.22744795260950923,
+    "training_seconds": 95.47598259802908,
+    "updates": 960
+  },
+  {
+    "bad_epochs": 1,
+    "best_epoch": 9,
+    "best_score": 0.1803635747214419,
+    "condition_nmae": {
+      "unequal": 0.2008675487105393,
+      "unequal_gap": 0.20340101304416497,
+      "uniform": 0.18102094519077758
+    },
+    "epoch": 16,
+    "evaluation_seconds": 2.510184640996158,
+    "mean_gradient_norm": 4.562683685682714,
+    "schedule": {
+      "epoch_zero_based": 15,
+      "mask_sha256": "7c86572dacaffa9c78e3b5f8a572d19a78422264e66d1700aefda6f654156e05",
+      "order_sha256": "9af42bddf72db44190ceb6b771b23a4866ec4a2f8a21c8df2c4471e07691e0b6",
+      "path": "/mnt/suzikun/CalibTM/outputs/sync-delta-pilot-20260913-v11/geant/shared/masks/masks_train_seed61001_epoch015.npz",
+      "sha256": "b631d024e4f31c32fdf08a739eea61ae7ab95232e0f8067c62e1ea8fc2fb3389"
+    },
+    "selection_score": 0.1950965023151606,
+    "train_loss": 0.2358748980332166,
+    "training_seconds": 95.52677921392024,
+    "updates": 1024
+  },
+  {
+    "bad_epochs": 2,
+    "best_epoch": 9,
+    "best_score": 0.1803635747214419,
+    "condition_nmae": {
+      "unequal": 0.19226958468209876,
+      "unequal_gap": 0.19501414806353587,
+      "uniform": 0.17253032090426318
+    },
+    "epoch": 17,
+    "evaluation_seconds": 2.5103866485878825,
+    "mean_gradient_norm": 3.695301903411746,
+    "schedule": {
+      "epoch_zero_based": 16,
+      "mask_sha256": "262eef0ecfa94e27ab8566d806d96475637db3a2e6c893825701b0aa85513684",
+      "order_sha256": "15a183dc056f92567a5498e5d7bfc7a1fa7e47b578d23908452af19ba81182db",
+      "path": "/mnt/suzikun/CalibTM/outputs/sync-delta-pilot-20260913-v11/geant/shared/masks/masks_train_seed61001_epoch016.npz",
+      "sha256": "ac5ec4d20e546a992a8e33e67d614d7c96d2777ef7f5bbd3485e7cf3e6d36889"
+    },
+    "selection_score": 0.18660468454996593,
+    "train_loss": 0.22187013179063797,
+    "training_seconds": 95.53717293590307,
+    "updates": 1088
+  },
+  {
+    "bad_epochs": 3,
+    "best_epoch": 9,
+    "best_score": 0.1803635747214419,
+    "condition_nmae": {
+      "unequal": 0.23186291215317778,
+      "unequal_gap": 0.2349004162828927,
+      "uniform": 0.21142906730608232
+    },
+    "epoch": 18,
+    "evaluation_seconds": 2.506394622847438,
+    "mean_gradient_norm": 3.7957515995949507,
+    "schedule": {
+      "epoch_zero_based": 17,
+      "mask_sha256": "21b6de7927482bda968ceee46b4034ae8d33e285a9cee2e2f70443bbe1b3a1e7",
+      "order_sha256": "655efe5c5b7486a5e06bc33c27f0e41d2915a9f9ca1b35a8f822853765c25e19",
+      "path": "/mnt/suzikun/CalibTM/outputs/sync-delta-pilot-20260913-v11/geant/shared/masks/masks_train_seed61001_epoch017.npz",
+      "sha256": "b80c0fd12dc5b38647d964421ca66c481220f491c89316e61578ffc25ec37e51"
+    },
+    "selection_score": 0.22606413191405095,
+    "train_loss": 0.22287764586508274,
+    "training_seconds": 95.52103650104254,
+    "updates": 1152
+  },
+  {
+    "bad_epochs": 4,
+    "best_epoch": 9,
+    "best_score": 0.1803635747214419,
+    "condition_nmae": {
+      "unequal": 0.19239629073361644,
+      "unequal_gap": 0.19452134179848,
+      "uniform": 0.17381609310035417
+    },
+    "epoch": 19,
+    "evaluation_seconds": 2.5095439814031124,
+    "mean_gradient_norm": 4.297846890054643,
+    "schedule": {
+      "epoch_zero_based": 18,
+      "mask_sha256": "dbc633a9f268494b481b6fd21c7d4c1aa7a7fd76e3b3bc50007aa521590a0ece",
+      "order_sha256": "666728496409fae5642d1f6bcf9dc264eacd80fcf33fe42d593c59488c1248c1",
+      "path": "/mnt/suzikun/CalibTM/outputs/sync-delta-pilot-20260913-v11/geant/shared/masks/masks_train_seed61001_epoch018.npz",
+      "sha256": "865eed158ebc03385e6445a57bd00d3e0b48d8af552be363e89589db9986edd2"
+    },
+    "selection_score": 0.18691124187748354,
+    "train_loss": 0.22712949803099036,
+    "training_seconds": 95.4907346945256,
+    "updates": 1216
+  },
+  {
+    "bad_epochs": 5,
+    "best_epoch": 9,
+    "best_score": 0.1803635747214419,
+    "condition_nmae": {
+      "unequal": 0.19224548941458894,
+      "unequal_gap": 0.19494491116611282,
+      "uniform": 0.17243748585004964
+    },
+    "epoch": 20,
+    "evaluation_seconds": 2.505248673260212,
+    "mean_gradient_norm": 4.506095193326473,
+    "schedule": {
+      "epoch_zero_based": 19,
+      "mask_sha256": "ae3ac6988296aef1496142c9809a42aa269024f18de9d2cee468e14ac8ed707a",
+      "order_sha256": "aeeb5a15688e8b4c2250a9e7f4863a367c514aceeaf3265c847f5d469fd72c74",
+      "path": "/mnt/suzikun/CalibTM/outputs/sync-delta-pilot-20260913-v11/geant/shared/masks/masks_train_seed61001_epoch019.npz",
+      "sha256": "1ce7726837575f5472cf5a05bc024c10ca0c0b502d880ffc34b7218208dd3026"
+    },
+    "selection_score": 0.18654262881025044,
+    "train_loss": 0.23078641737811267,
+    "training_seconds": 95.50130889192224,
+    "updates": 1280
+  },
+  {
+    "bad_epochs": 6,
+    "best_epoch": 9,
+    "best_score": 0.1803635747214419,
+    "condition_nmae": {
+      "unequal": 0.20829429885065479,
+      "unequal_gap": 0.21180876874075816,
+      "uniform": 0.18931837469054533
+    },
+    "epoch": 21,
+    "evaluation_seconds": 2.5075009390711784,
+    "mean_gradient_norm": 3.775520564056933,
+    "schedule": {
+      "epoch_zero_based": 20,
+      "mask_sha256": "8d5c3682a0659f9f1418cf4b4b469aa40e9517fb4dd3ceb64faa6e6a482caef8",
+      "order_sha256": "abcc41391d5cec5e8751bada465100de12f977399ed18cb90ecbfd3ab36ab2d6",
+      "path": "/mnt/suzikun/CalibTM/outputs/sync-delta-pilot-20260913-v11/geant/shared/masks/masks_train_seed61001_epoch020.npz",
+      "sha256": "1d48e58d37af2019f0aeac7d70039c0411b66067c33ac7433f0bde4b17d44df5"
+    },
+    "selection_score": 0.20314048076065275,
+    "train_loss": 0.21908759977668524,
+    "training_seconds": 95.53139296825975,
+    "updates": 1344
+  },
+  {
+    "bad_epochs": 7,
+    "best_epoch": 9,
+    "best_score": 0.1803635747214419,
+    "condition_nmae": {
+      "unequal": 0.19481010387463554,
+      "unequal_gap": 0.19832430211010746,
+      "uniform": 0.1741436280293119
+    },
+    "epoch": 22,
+    "evaluation_seconds": 2.507360400632024,
+    "mean_gradient_norm": 4.517330815084279,
+    "schedule": {
+      "epoch_zero_based": 21,
+      "mask_sha256": "43343c8df2c95298a93550b28d0d4d4ecb819ce7f64a0619786c11da16e70400",
+      "order_sha256": "ac1da546bd3f4f1cd7c608139fdfabfff89a1fb400aa4d0d76659f811969c300",
+      "path": "/mnt/suzikun/CalibTM/outputs/sync-delta-pilot-20260913-v11/geant/shared/masks/masks_train_seed61001_epoch021.npz",
+      "sha256": "130cf7c0fc58eedc4bfbf10f490b86a85a16ee65bbbdae8deeababfb12fceb86"
+    },
+    "selection_score": 0.18909267800468496,
+    "train_loss": 0.22573489835485816,
+    "training_seconds": 95.54710747860372,
+    "updates": 1408
+  },
+  {
+    "bad_epochs": 8,
+    "best_epoch": 9,
+    "best_score": 0.1803635747214419,
+    "condition_nmae": {
+      "unequal": 0.18762653455678358,
+      "unequal_gap": 0.1906908097329489,
+      "uniform": 0.1681973303050512
+    },
+    "epoch": 23,
+    "evaluation_seconds": 2.5079030385240912,
+    "mean_gradient_norm": 3.6729695312678814,
+    "schedule": {
+      "epoch_zero_based": 22,
+      "mask_sha256": "8223b0caf07070988addcbe94d88fbfb933f3063de138025b851dec439ed25b1",
+      "order_sha256": "5964108e1b60e0009a568e63329a35c6c5d61102f04e3eb57df4105a5bad4b22",
+      "path": "/mnt/suzikun/CalibTM/outputs/sync-delta-pilot-20260913-v11/geant/shared/masks/masks_train_seed61001_epoch022.npz",
+      "sha256": "5cfc35b9d305136dc32218be48228597f6ffe631a23bd9b3c827a5e8de0c6775"
+    },
+    "selection_score": 0.18217155819826125,
+    "train_loss": 0.21674267249181867,
+    "training_seconds": 95.50517165474594,
+    "updates": 1472
+  },
+  {
+    "bad_epochs": 9,
+    "best_epoch": 9,
+    "best_score": 0.1803635747214419,
+    "condition_nmae": {
+      "unequal": 0.1878804626659367,
+      "unequal_gap": 0.19096284870803812,
+      "uniform": 0.16931258151526482
+    },
+    "epoch": 24,
+    "evaluation_seconds": 2.507188498042524,
+    "mean_gradient_norm": 3.830435421317816,
+    "schedule": {
+      "epoch_zero_based": 23,
+      "mask_sha256": "43f3d77131959cd2efbcb3bb56c6877eac9fdb4d1745ab012645bcfe71634da8",
+      "order_sha256": "747a18b01a0cb4c71e6f50e2525c60a2b04b7d06c5bfcd9a70f88795565f1199",
+      "path": "/mnt/suzikun/CalibTM/outputs/sync-delta-pilot-20260913-v11/geant/shared/masks/masks_train_seed61001_epoch023.npz",
+      "sha256": "8eee9ca2edeaf5a11a676c0fdb411b5136561c8c63f7b27f8f68692e035df7bb"
+    },
+    "selection_score": 0.18271863096307986,
+    "train_loss": 0.21329113515093923,
+    "training_seconds": 95.51493437681347,
+    "updates": 1536
+  },
+  {
+    "bad_epochs": 10,
+    "best_epoch": 9,
+    "best_score": 0.1803635747214419,
+    "condition_nmae": {
+      "unequal": 0.1923773736353659,
+      "unequal_gap": 0.19537446465489033,
+      "uniform": 0.1727079276750097
+    },
+    "epoch": 25,
+    "evaluation_seconds": 2.515251205302775,
+    "mean_gradient_norm": 4.259008156135678,
+    "schedule": {
+      "epoch_zero_based": 24,
+      "mask_sha256": "8166444ba4ea767aa329eb46a36d98c40c045f3a82694e8af6d83f88d4ed91aa",
+      "order_sha256": "0068f0687ccad21cb604e463bd60c63888c4f6dbb56c171a4c199d6e6d72cec7",
+      "path": "/mnt/suzikun/CalibTM/outputs/sync-delta-pilot-20260913-v11/geant/shared/masks/masks_train_seed61001_epoch024.npz",
+      "sha256": "811769b2e436c75deec7f2da2c9da4c7f828f8fc70c4c29a412e83d98cf69a87"
+    },
+    "selection_score": 0.18681992198842198,
+    "train_loss": 0.22266739653423429,
+    "training_seconds": 95.5564253339544,
+    "updates": 1600
+  },
+  {
+    "bad_epochs": 11,
+    "best_epoch": 9,
+    "best_score": 0.1803635747214419,
+    "condition_nmae": {
+      "unequal": 0.19942628060349496,
+      "unequal_gap": 0.2021846217579172,
+      "uniform": 0.18070509364309464
+    },
+    "epoch": 26,
+    "evaluation_seconds": 2.51451373193413,
+    "mean_gradient_norm": 3.468009469099343,
+    "schedule": {
+      "epoch_zero_based": 25,
+      "mask_sha256": "c6301358d12f2b5aa2ee22669a2f1bb0f1f7faa67af09f593fc2e28a8a373770",
+      "order_sha256": "10ed1d7f2362e2a4711c1482310d064f2082a51493dfe305bc6836ce0b525c08",
+      "path": "/mnt/suzikun/CalibTM/outputs/sync-delta-pilot-20260913-v11/geant/shared/masks/masks_train_seed61001_epoch025.npz",
+      "sha256": "910e858792781e25370ba5599bc8128be0a3e8efc46e41c4a0a83b8aa39c07fb"
+    },
+    "selection_score": 0.19410533200150226,
+    "train_loss": 0.22083305451087654,
+    "training_seconds": 96.04790611751378,
+    "updates": 1664
+  },
+  {
+    "bad_epochs": 12,
+    "best_epoch": 9,
+    "best_score": 0.1803635747214419,
+    "condition_nmae": {
+      "unequal": 0.18803614410359698,
+      "unequal_gap": 0.19082034466902878,
+      "uniform": 0.1694888887693949
+    },
+    "epoch": 27,
+    "evaluation_seconds": 2.5124435871839523,
+    "mean_gradient_norm": 4.8136838264763355,
+    "schedule": {
+      "epoch_zero_based": 26,
+      "mask_sha256": "22972e8de30f379f57403a120e794a4e485a3f92c2631449be378968281c82b6",
+      "order_sha256": "a475da26fd75fcba52ab649a1f34c3720e5253bd84396751bdd7ae220189cd4c",
+      "path": "/mnt/suzikun/CalibTM/outputs/sync-delta-pilot-20260913-v11/geant/shared/masks/masks_train_seed61001_epoch026.npz",
+      "sha256": "917fd2e8a74a9b261326d88191d71c8dec9e88e943fdd659ee5a2f671fc0c06b"
+    },
+    "selection_score": 0.18278179251400686,
+    "train_loss": 0.2196041529532522,
+    "training_seconds": 95.66301625687629,
+    "updates": 1728
+  },
+  {
+    "bad_epochs": 13,
+    "best_epoch": 9,
+    "best_score": 0.1803635747214419,
+    "condition_nmae": {
+      "unequal": 0.1862047997840433,
+      "unequal_gap": 0.18860561411632715,
+      "uniform": 0.16686186336558367
+    },
+    "epoch": 28,
+    "evaluation_seconds": 2.5154413832351565,
+    "mean_gradient_norm": 4.062583623453975,
+    "schedule": {
+      "epoch_zero_based": 27,
+      "mask_sha256": "121736bbfd0eccd45f689d48e1eabfdabb1ef25ecc1ac71e45e17b2261e04fa8",
+      "order_sha256": "c99583662a01d484fd1bd8911151a919b7dd3f036b42d03a105b6fd76d2f8b11",
+      "path": "/mnt/suzikun/CalibTM/outputs/sync-delta-pilot-20260913-v11/geant/shared/masks/masks_train_seed61001_epoch027.npz",
+      "sha256": "3fdc79b1f77f895a9b9e654ebde99d68a432a6075554c5a504d75814c9d1f091"
+    },
+    "selection_score": 0.18055742575531805,
+    "train_loss": 0.2159086223691702,
+    "training_seconds": 95.75830237660557,
+    "updates": 1792
+  },
+  {
+    "bad_epochs": 14,
+    "best_epoch": 9,
+    "best_score": 0.1803635747214419,
+    "condition_nmae": {
+      "unequal": 0.19120761452099305,
+      "unequal_gap": 0.19403857768342,
+      "uniform": 0.17240282041332927
+    },
+    "epoch": 29,
+    "evaluation_seconds": 2.515884069725871,
+    "mean_gradient_norm": 2.840053512249142,
+    "schedule": {
+      "epoch_zero_based": 28,
+      "mask_sha256": "a49e84c3e914ae90071b8f9cb20223b02cf474a9248467b9553cf9924bdb136d",
+      "order_sha256": "9a599eabf698d343e245d15b654172af9c47c17be4f55648a9bc3e2e8c3ebe34",
+      "path": "/mnt/suzikun/CalibTM/outputs/sync-delta-pilot-20260913-v11/geant/shared/masks/masks_train_seed61001_epoch028.npz",
+      "sha256": "773f4325d4c0e2ccf3ec76505a26a3fde2f8407aa429baf728199c9e215f45cc"
+    },
+    "selection_score": 0.1858830042059141,
+    "train_loss": 0.20781701221130788,
+    "training_seconds": 95.70892629120499,
+    "updates": 1856
+  },
+  {
+    "bad_epochs": 15,
+    "best_epoch": 9,
+    "best_score": 0.1803635747214419,
+    "condition_nmae": {
+      "unequal": 0.18897154692985027,
+      "unequal_gap": 0.1919514162550523,
+      "uniform": 0.170084328829216
+    },
+    "epoch": 30,
+    "evaluation_seconds": 2.5194415310397744,
+    "mean_gradient_norm": 2.8320156154222786,
+    "schedule": {
+      "epoch_zero_based": 29,
+      "mask_sha256": "5c1e51c292c150294e9c035faa21571dc77655d74dc8c864ac06412eea45c1ea",
+      "order_sha256": "d7f0edbcf2818a0b74cee79028d628a6ad18bb0e06d162a73fdcc9125877a9fb",
+      "path": "/mnt/suzikun/CalibTM/outputs/sync-delta-pilot-20260913-v11/geant/shared/masks/masks_train_seed61001_epoch029.npz",
+      "sha256": "95b52f928a1e348d0eb717372f3a05a74219ba6414d8caa90420a00e5528b3b9"
+    },
+    "selection_score": 0.18366909733803952,
+    "train_loss": 0.2085764384828508,
+    "training_seconds": 95.72046691086143,
+    "updates": 1920
+  },
+  {
+    "bad_epochs": 16,
+    "best_epoch": 9,
+    "best_score": 0.1803635747214419,
+    "condition_nmae": {
+      "unequal": 0.1931307006381827,
+      "unequal_gap": 0.1958351653026429,
+      "uniform": 0.17301839497487173
+    },
+    "epoch": 31,
+    "evaluation_seconds": 2.5157512351870537,
+    "mean_gradient_norm": 3.636595755815506,
+    "schedule": {
+      "epoch_zero_based": 30,
+      "mask_sha256": "0b5cf50159d0faeb14bb7ca2a0e17f9b921865a5aa6d164f15a74731c93d9b3c",
+      "order_sha256": "3c78b21da547f8b91791b5472f9dfc23b403b3d4c26ce2360961276bc9bb7d28",
+      "path": "/mnt/suzikun/CalibTM/outputs/sync-delta-pilot-20260913-v11/geant/shared/masks/masks_train_seed61001_epoch030.npz",
+      "sha256": "fb1610f76adb1daae31529f43e674a07015aba23202c2375a6a1ae7a5f77b3ff"
+    },
+    "selection_score": 0.1873280869718991,
+    "train_loss": 0.21771524543873966,
+    "training_seconds": 95.68566049262881,
+    "updates": 1984
+  },
+  {
+    "bad_epochs": 17,
+    "best_epoch": 9,
+    "best_score": 0.1803635747214419,
+    "condition_nmae": {
+      "unequal": 0.1880783697087342,
+      "unequal_gap": 0.19109091695283495,
+      "uniform": 0.16935410085572766
+    },
+    "epoch": 32,
+    "evaluation_seconds": 2.5161827160045505,
+    "mean_gradient_norm": 3.2519057113677263,
+    "schedule": {
+      "epoch_zero_based": 31,
+      "mask_sha256": "4001a09b0ec0ef97fde31afb3182c0d6b39440a410de66c479da37ee186943b0",
+      "order_sha256": "9b4d6da18c0e605a3e366b67fc7671116fa1112b1805929ccf0ad8a8672b39df",
+      "path": "/mnt/suzikun/CalibTM/outputs/sync-delta-pilot-20260913-v11/geant/shared/masks/masks_train_seed61001_epoch031.npz",
+      "sha256": "c16e97c56be5497c8c7ebe28f763938349806457cf1490700469395828352af9"
+    },
+    "selection_score": 0.18284112917243225,
+    "train_loss": 0.20913117518648505,
+    "training_seconds": 95.7229116782546,
+    "updates": 2048
+  },
+  {
+    "bad_epochs": 18,
+    "best_epoch": 9,
+    "best_score": 0.1803635747214419,
+    "condition_nmae": {
+      "unequal": 0.19194679383331417,
+      "unequal_gap": 0.19438763828132072,
+      "uniform": 0.17245477468457007
+    },
+    "epoch": 33,
+    "evaluation_seconds": 2.5148694748058915,
+    "mean_gradient_norm": 3.2760949097573757,
+    "schedule": {
+      "epoch_zero_based": 32,
+      "mask_sha256": "51d9b8d2edeff220491897d135ed48573e2edc7a900765754e842efc49aab559",
+      "order_sha256": "47faf6b26d38b544cd81722f8dd86c47283ca38061770c56d204941f7b46aa75",
+      "path": "/mnt/suzikun/CalibTM/outputs/sync-delta-pilot-20260913-v11/geant/shared/masks/masks_train_seed61001_epoch032.npz",
+      "sha256": "7faa9a51d88aee98432e3d1f1da40bc12fac91488c05585e682061da28db4b87"
+    },
+    "selection_score": 0.18626306893306832,
+    "train_loss": 0.20860036835074425,
+    "training_seconds": 95.67932520899922,
+    "updates": 2112
+  },
+  {
+    "bad_epochs": 0,
+    "best_epoch": 34,
+    "best_score": 0.17884885243802595,
+    "condition_nmae": {
+      "unequal": 0.18471658125801482,
+      "unequal_gap": 0.18666070944902463,
+      "uniform": 0.1651692666070384
+    },
+    "epoch": 34,
+    "evaluation_seconds": 2.5143791660666466,
+    "mean_gradient_norm": 3.0652414774522185,
+    "schedule": {
+      "epoch_zero_based": 33,
+      "mask_sha256": "125e533691146365409520d7d530101aef76d7cc6e5b8b7cee78c7d9bfd52ff0",
+      "order_sha256": "e9e825f24cb7a97bab5e059ca61bc1c3c3b769a9655a21741310ef636003244c",
+      "path": "/mnt/suzikun/CalibTM/outputs/sync-delta-pilot-20260913-v11/geant/shared/masks/masks_train_seed61001_epoch033.npz",
+      "sha256": "d68bb7e9273070604d50557d84c6e1c6452f011231bd7b5f05eadd126450e031"
+    },
+    "selection_score": 0.17884885243802595,
+    "train_loss": 0.20933658676221967,
+    "training_seconds": 95.76216154173017,
+    "updates": 2176
+  },
+  {
+    "bad_epochs": 1,
+    "best_epoch": 34,
+    "best_score": 0.17884885243802595,
+    "condition_nmae": {
+      "unequal": 0.18642931782829422,
+      "unequal_gap": 0.1886578910278856,
+      "uniform": 0.16718036991331428
+    },
+    "epoch": 35,
+    "evaluation_seconds": 2.5165703389793634,
+    "mean_gradient_norm": 3.459370607510209,
+    "schedule": {
+      "epoch_zero_based": 34,
+      "mask_sha256": "df5ccc0b9f35c91fb241a17b8d61d68721ac50b1598ae500afb2217a8bde1e5b",
+      "order_sha256": "239c5983876c6e1b2b547e13b8aad8b109eab07bc4cca1bfd4a853d11c45c152",
+      "path": "/mnt/suzikun/CalibTM/outputs/sync-delta-pilot-20260913-v11/geant/shared/masks/masks_train_seed61001_epoch034.npz",
+      "sha256": "f26474a15590d8fed2afbec1ac60b9a38ae75c4f733275158e064125c673693a"
+    },
+    "selection_score": 0.1807558595898314,
+    "train_loss": 0.20795722445473075,
+    "training_seconds": 95.72366392426193,
+    "updates": 2240
+  },
+  {
+    "bad_epochs": 2,
+    "best_epoch": 34,
+    "best_score": 0.17884885243802595,
+    "condition_nmae": {
+      "unequal": 0.18682652759293464,
+      "unequal_gap": 0.18880754443933326,
+      "uniform": 0.16705547609295196
+    },
+    "epoch": 36,
+    "evaluation_seconds": 2.516698240302503,
+    "mean_gradient_norm": 3.364881355315447,
+    "schedule": {
+      "epoch_zero_based": 35,
+      "mask_sha256": "d42e8544892002a72e3f15e8b80d8578b97ecb8305d81f4e445ec3d2c23a6a02",
+      "order_sha256": "6d517909ef7b6bd83a51ca23297bd4a9a452bb01d7142aefb6e9327a6b5ce89d",
+      "path": "/mnt/suzikun/CalibTM/outputs/sync-delta-pilot-20260913-v11/geant/shared/masks/masks_train_seed61001_epoch035.npz",
+      "sha256": "f57a6e20922a0894852c0a2a58f30dada9ba43253716977667865527f0a53bd4"
+    },
+    "selection_score": 0.18089651604173995,
+    "train_loss": 0.2133606772404164,
+    "training_seconds": 95.69172262307256,
+    "updates": 2304
+  },
+  {
+    "bad_epochs": 3,
+    "best_epoch": 34,
+    "best_score": 0.17884885243802595,
+    "condition_nmae": {
+      "unequal": 0.18580000198784757,
+      "unequal_gap": 0.1875555857857037,
+      "uniform": 0.16655503201158295
+    },
+    "epoch": 37,
+    "evaluation_seconds": 2.5122431544587016,
+    "mean_gradient_norm": 3.3100177119486034,
+    "schedule": {
+      "epoch_zero_based": 36,
+      "mask_sha256": "a58a9064a5fa112d6c97d9272352c1d785e52c7def62c6928ec87011596cda10",
+      "order_sha256": "dc0d387f19bdc1591de1c8d07c3c9d41428e38a1d6e8bbdcc7838c2814e8ef76",
+      "path": "/mnt/suzikun/CalibTM/outputs/sync-delta-pilot-20260913-v11/geant/shared/masks/masks_train_seed61001_epoch036.npz",
+      "sha256": "87ab781b1aba64aa8bb298ca33b7b36b7020b6f1dbfe9ee182a294fe7ccae4ea"
+    },
+    "selection_score": 0.17997020659504473,
+    "train_loss": 0.20409702335018665,
+    "training_seconds": 95.6948884613812,
+    "updates": 2368
+  },
+  {
+    "bad_epochs": 4,
+    "best_epoch": 34,
+    "best_score": 0.17884885243802595,
+    "condition_nmae": {
+      "unequal": 0.18831232065171485,
+      "unequal_gap": 0.1902595214961723,
+      "uniform": 0.16902563722936356
+    },
+    "epoch": 38,
+    "evaluation_seconds": 2.5121585074812174,
+    "mean_gradient_norm": 3.925435089506209,
+    "schedule": {
+      "epoch_zero_based": 37,
+      "mask_sha256": "ee471d756de7cee6abfc2c01979bb30d958eca2648f3db344a77a38abc9f87a6",
+      "order_sha256": "370b88a0b22d269be6823e39434448fced28ace58cc1bcdda6ef8e975e5bad50",
+      "path": "/mnt/suzikun/CalibTM/outputs/sync-delta-pilot-20260913-v11/geant/shared/masks/masks_train_seed61001_epoch037.npz",
+      "sha256": "3af5e0bb7e1f7cd00c68569b12ba3564e35faf69a24b9e04d5df3628efaa8aef"
+    },
+    "selection_score": 0.18253249312575023,
+    "train_loss": 0.20333297341130674,
+    "training_seconds": 95.70931076537818,
+    "updates": 2432
+  },
+  {
+    "bad_epochs": 5,
+    "best_epoch": 34,
+    "best_score": 0.17884885243802595,
+    "condition_nmae": {
+      "unequal": 0.18607988483780388,
+      "unequal_gap": 0.18824436900028874,
+      "uniform": 0.16669486214440365
+    },
+    "epoch": 39,
+    "evaluation_seconds": 2.5118678398430347,
+    "mean_gradient_norm": 3.146312678232789,
+    "schedule": {
+      "epoch_zero_based": 38,
+      "mask_sha256": "399c0db5ac922c04e33cf6f4fa9bb190b5c2c499f72e4345ce92e2f60b70f120",
+      "order_sha256": "39e148b8dd9d9879edf0dcb507a24290b7b2a3efbcea389a14ff41271798be27",
+      "path": "/mnt/suzikun/CalibTM/outputs/sync-delta-pilot-20260913-v11/geant/shared/masks/masks_train_seed61001_epoch038.npz",
+      "sha256": "39b40c5727d9ba6740e7ae722ce3d7f2206d2bc98c8d6b0a0384a2952990dcac"
+    },
+    "selection_score": 0.18033970532749877,
+    "train_loss": 0.20476070791482925,
+    "training_seconds": 95.66929979156703,
+    "updates": 2496
+  },
+  {
+    "bad_epochs": 6,
+    "best_epoch": 34,
+    "best_score": 0.17884885243802595,
+    "condition_nmae": {
+      "unequal": 0.18516590463667176,
+      "unequal_gap": 0.186883930773953,
+      "uniform": 0.1658366774737074
+    },
+    "epoch": 40,
+    "evaluation_seconds": 2.5121026216074824,
+    "mean_gradient_norm": 3.880778365768492,
+    "schedule": {
+      "epoch_zero_based": 39,
+      "mask_sha256": "36f9fb39dc97bff1466f6f53c085314163e6a833d478e15eaaaaa38295823497",
+      "order_sha256": "30da55f55a9df38c94abc4ebcdcd32707478bd0b7e1aef50165ae08a11a5f806",
+      "path": "/mnt/suzikun/CalibTM/outputs/sync-delta-pilot-20260913-v11/geant/shared/masks/masks_train_seed61001_epoch039.npz",
+      "sha256": "c0abc0f3633a86565c960f91e4ed83a1dc984b479c72e3ac09afc6604fbc7511"
+    },
+    "selection_score": 0.1792955042947774,
+    "train_loss": 0.20993749308399856,
+    "training_seconds": 95.67032323218882,
+    "updates": 2560
+  },
+  {
+    "bad_epochs": 7,
+    "best_epoch": 34,
+    "best_score": 0.17884885243802595,
+    "condition_nmae": {
+      "unequal": 0.1882580648889121,
+      "unequal_gap": 0.18958400471712267,
+      "uniform": 0.1698867255224822
+    },
+    "epoch": 41,
+    "evaluation_seconds": 2.5158024560660124,
+    "mean_gradient_norm": 3.8731843987479806,
+    "schedule": {
+      "epoch_zero_based": 40,
+      "mask_sha256": "9536745095082ac8456b7abddffe661a0876168efbcdfc29b723bfdc47b173d5",
+      "order_sha256": "aa210f56cb74cccc868d3b95a7d4bc4edda8c3bb4232c70e3a2073b8010e0eb7",
+      "path": "/mnt/suzikun/CalibTM/outputs/sync-delta-pilot-20260913-v11/geant/shared/masks/masks_train_seed61001_epoch040.npz",
+      "sha256": "d114e253948fae94cd050d7e5311c1213496e291bebbea429fd39eafd1be5791"
+    },
+    "selection_score": 0.182576265042839,
+    "train_loss": 0.20723109203390777,
+    "training_seconds": 95.70900553930551,
+    "updates": 2624
+  },
+  {
+    "bad_epochs": 8,
+    "best_epoch": 34,
+    "best_score": 0.17884885243802595,
+    "condition_nmae": {
+      "unequal": 0.18679045929714103,
+      "unequal_gap": 0.18898239807742978,
+      "uniform": 0.1670618983469701
+    },
+    "epoch": 42,
+    "evaluation_seconds": 2.512225728482008,
+    "mean_gradient_norm": 3.2797980532050133,
+    "schedule": {
+      "epoch_zero_based": 41,
+      "mask_sha256": "74652420b0c15691defc969acefe361662af7bf8a583cc296e3bf1efbc1fa9da",
+      "order_sha256": "47ba60b84337f1e67b2beb6eb632aeb345e643ed7b0394a395e44a4d6915aaf3",
+      "path": "/mnt/suzikun/CalibTM/outputs/sync-delta-pilot-20260913-v11/geant/shared/masks/masks_train_seed61001_epoch041.npz",
+      "sha256": "7eee27e4d7d369ef85e3680a5f3b4e57a3937160a3dc7cf1d2a90822f9a598fe"
+    },
+    "selection_score": 0.18094491857384698,
+    "train_loss": 0.2026201745029539,
+    "training_seconds": 95.67374985385686,
+    "updates": 2688
+  },
+  {
+    "bad_epochs": 9,
+    "best_epoch": 34,
+    "best_score": 0.17884885243802595,
+    "condition_nmae": {
+      "unequal": 0.18567812014016064,
+      "unequal_gap": 0.1874336949856108,
+      "uniform": 0.1668606352051241
+    },
+    "epoch": 43,
+    "evaluation_seconds": 2.512858792208135,
+    "mean_gradient_norm": 3.3715488566085696,
+    "schedule": {
+      "epoch_zero_based": 42,
+      "mask_sha256": "fc729d9816be39ff25a16d63b21f7e9cdb6f3ceb463a2c4fa31bc64da2e85eaf",
+      "order_sha256": "81c2090c9a9e89c719639d76efdd59075710e6bc0b9b50257a3b11dd20e056dd",
+      "path": "/mnt/suzikun/CalibTM/outputs/sync-delta-pilot-20260913-v11/geant/shared/masks/masks_train_seed61001_epoch042.npz",
+      "sha256": "49f67d9a43e6af1f42a52618506b034f663afba2dbefde97f29718cefc40537b"
+    },
+    "selection_score": 0.17999081677696518,
+    "train_loss": 0.2023009229451418,
+    "training_seconds": 95.7104934854433,
+    "updates": 2752
+  },
+  {
+    "bad_epochs": 10,
+    "best_epoch": 34,
+    "best_score": 0.17884885243802595,
+    "condition_nmae": {
+      "unequal": 0.18517969369720078,
+      "unequal_gap": 0.18731078747997473,
+      "uniform": 0.16658844665519268
+    },
+    "epoch": 44,
+    "evaluation_seconds": 2.5118405539542437,
+    "mean_gradient_norm": 3.834252896718681,
+    "schedule": {
+      "epoch_zero_based": 43,
+      "mask_sha256": "0203b28464ec75f3de502b3cf2684c0730379ccc2ffbcb9cb9caf0ace0d0b00d",
+      "order_sha256": "2004f426e63c4bdc3827cb49142f5238104c99606a6aa046168eaebbbf560845",
+      "path": "/mnt/suzikun/CalibTM/outputs/sync-delta-pilot-20260913-v11/geant/shared/masks/masks_train_seed61001_epoch043.npz",
+      "sha256": "86f373e758d0641e0a04025add3b98531b9da8191b3ce8f21040453ae9d37143"
+    },
+    "selection_score": 0.17969297594412273,
+    "train_loss": 0.20632756897248328,
+    "training_seconds": 95.67565468605608,
+    "updates": 2816
+  },
+  {
+    "bad_epochs": 11,
+    "best_epoch": 34,
+    "best_score": 0.17884885243802595,
+    "condition_nmae": {
+      "unequal": 0.19002553116924498,
+      "unequal_gap": 0.19272197159387833,
+      "uniform": 0.1724561044607315
+    },
+    "epoch": 45,
+    "evaluation_seconds": 2.5120677864179015,
+    "mean_gradient_norm": 3.8409901531413198,
+    "schedule": {
+      "epoch_zero_based": 44,
+      "mask_sha256": "d3b3dd26287c12c11b633f7057f982ccc8812d353f2b0560df8b83996e4d1fad",
+      "order_sha256": "b464913aac3e5ef9acfb837ef814d6dab8a0f855e96835e047bffb54edea0cac",
+      "path": "/mnt/suzikun/CalibTM/outputs/sync-delta-pilot-20260913-v11/geant/shared/masks/masks_train_seed61001_epoch044.npz",
+      "sha256": "05fab99f695fe4dd0fe597b3512f4d36b89eadcb090b24ce362b89915249f5bf"
+    },
+    "selection_score": 0.18506786907461828,
+    "train_loss": 0.20183694129809737,
+    "training_seconds": 95.73622377961874,
+    "updates": 2880
+  },
+  {
+    "bad_epochs": 12,
+    "best_epoch": 34,
+    "best_score": 0.17884885243802595,
+    "condition_nmae": {
+      "unequal": 0.18957210059190968,
+      "unequal_gap": 0.19158959995429264,
+      "uniform": 0.17128745869034026
+    },
+    "epoch": 46,
+    "evaluation_seconds": 2.51196332834661,
+    "mean_gradient_norm": 3.130895074689761,
+    "schedule": {
+      "epoch_zero_based": 45,
+      "mask_sha256": "c4b5faac3b18d853a6d98331b05339fb224d1a2f00d66d966ed1fa1e854d7b01",
+      "order_sha256": "d19022b731ceadee582ad9fa2ccc0097c04439b2274318f66835086dac17aeb5",
+      "path": "/mnt/suzikun/CalibTM/outputs/sync-delta-pilot-20260913-v11/geant/shared/masks/masks_train_seed61001_epoch045.npz",
+      "sha256": "2a28371ce9b55ef15878d029003e549a9e8fc4ebdeaa283ac36c0b0de82bd498"
+    },
+    "selection_score": 0.1841497197455142,
+    "train_loss": 0.1994508255738765,
+    "training_seconds": 95.69780802633613,
+    "updates": 2944
+  },
+  {
+    "bad_epochs": 0,
+    "best_epoch": 47,
+    "best_score": 0.17641875503836335,
+    "condition_nmae": {
+      "unequal": 0.18208088768001987,
+      "unequal_gap": 0.18401517064927214,
+      "uniform": 0.16316020678579796
+    },
+    "epoch": 47,
+    "evaluation_seconds": 2.5143337780609727,
+    "mean_gradient_norm": 3.6359132044017315,
+    "schedule": {
+      "epoch_zero_based": 46,
+      "mask_sha256": "f1bbe5e76bfd9fa33a91a241d1f25ae2570b5888cb6cb8cef6fedd2ca5950203",
+      "order_sha256": "4e6b1095a0b56637d928e06cf1b7102721a4c381b7baa9ba28e1af722a140971",
+      "path": "/mnt/suzikun/CalibTM/outputs/sync-delta-pilot-20260913-v11/geant/shared/masks/masks_train_seed61001_epoch046.npz",
+      "sha256": "3fda62f90ece0cc747e93b0c54116e2057e3802c618b2e211d06c7b0b24a3db6"
+    },
+    "selection_score": 0.17641875503836335,
+    "train_loss": 0.20249270554631948,
+    "training_seconds": 95.69735879264772,
+    "updates": 3008
+  },
+  {
+    "bad_epochs": 1,
+    "best_epoch": 47,
+    "best_score": 0.17641875503836335,
+    "condition_nmae": {
+      "unequal": 0.18544674910842313,
+      "unequal_gap": 0.18755732465227656,
+      "uniform": 0.16685319536803456
+    },
+    "epoch": 48,
+    "evaluation_seconds": 2.5144486585631967,
+    "mean_gradient_norm": 3.7984789609909058,
+    "schedule": {
+      "epoch_zero_based": 47,
+      "mask_sha256": "ab6e0ac36c2dfeb67f468b72f3384d9c3c2481bd579d02ed741161e5f1a9c6df",
+      "order_sha256": "91f09f11d02dae047e6bc8f16c724c4987a43654b6c6f0c5772a66bf0b43d925",
+      "path": "/mnt/suzikun/CalibTM/outputs/sync-delta-pilot-20260913-v11/geant/shared/masks/masks_train_seed61001_epoch047.npz",
+      "sha256": "25de008488810d6ee30e8562b94cd7e4639f6b8795ae2e0537fb9da846097bf1"
+    },
+    "selection_score": 0.1799524230429114,
+    "train_loss": 0.2041174564510584,
+    "training_seconds": 95.71153793949634,
+    "updates": 3072
+  },
+  {
+    "bad_epochs": 2,
+    "best_epoch": 47,
+    "best_score": 0.17641875503836335,
+    "condition_nmae": {
+      "unequal": 0.18903129656348136,
+      "unequal_gap": 0.19106854580770788,
+      "uniform": 0.16937309237181533
+    },
+    "epoch": 49,
+    "evaluation_seconds": 2.5130118653178215,
+    "mean_gradient_norm": 2.686956118326634,
+    "schedule": {
+      "epoch_zero_based": 48,
+      "mask_sha256": "66c01d123c7fbd773140560c603adef030fcde4747aaf38524f3ed8cadc072e0",
+      "order_sha256": "038aae416b2ebeebdd8459e229d913e8b50b3d4e40d8d0be6b9ad3cb4bd2118c",
+      "path": "/mnt/suzikun/CalibTM/outputs/sync-delta-pilot-20260913-v11/geant/shared/masks/masks_train_seed61001_epoch048.npz",
+      "sha256": "35bba345953cf6bea82283176ebd97f286945a8199f5f93e97678fb2b230c626"
+    },
+    "selection_score": 0.18315764491433484,
+    "train_loss": 0.20226457412354648,
+    "training_seconds": 95.68151995912194,
+    "updates": 3136
+  },
+  {
+    "bad_epochs": 3,
+    "best_epoch": 47,
+    "best_score": 0.17641875503836335,
+    "condition_nmae": {
+      "unequal": 0.1824666486032407,
+      "unequal_gap": 0.184334509510085,
+      "uniform": 0.16319297694674725
+    },
+    "epoch": 50,
+    "evaluation_seconds": 2.5178185114637017,
+    "mean_gradient_norm": 3.5822877660393715,
+    "schedule": {
+      "epoch_zero_based": 49,
+      "mask_sha256": "e88675467ca4ff5357cb105ac5dae986ddde8ff9d2f7a5b022b1e4e787748cd0",
+      "order_sha256": "a5084e286cf2197546e188ecf027ad9e3d6870ff41a60fbb7bbaec458d8617c4",
+      "path": "/mnt/suzikun/CalibTM/outputs/sync-delta-pilot-20260913-v11/geant/shared/masks/masks_train_seed61001_epoch049.npz",
+      "sha256": "69abfcfee6a5ef7661d49dfa462341c6047b6e12be7786bf131ed09586f46a5b"
+    },
+    "selection_score": 0.17666471168669098,
+    "train_loss": 0.1984171608928591,
+    "training_seconds": 95.72234226670116,
+    "updates": 3200
+  },
+  {
+    "bad_epochs": 4,
+    "best_epoch": 47,
+    "best_score": 0.17641875503836335,
+    "condition_nmae": {
+      "unequal": 0.18802376290428158,
+      "unequal_gap": 0.19027987136468652,
+      "uniform": 0.16933579338181726
+    },
+    "epoch": 51,
+    "evaluation_seconds": 2.514236689545214,
+    "mean_gradient_norm": 3.772646825760603,
+    "schedule": {
+      "epoch_zero_based": 50,
+      "mask_sha256": "042f40db7fe0c34c14d5538a8266c0becaf29ee3d37dd42582a77ef503281da5",
+      "order_sha256": "b972822f69578a5ee663ce94052fa10f8c60b866c5a5395af1b30a235ff1bee7",
+      "path": "/mnt/suzikun/CalibTM/outputs/sync-delta-pilot-20260913-v11/geant/shared/masks/masks_train_seed61001_epoch050.npz",
+      "sha256": "e0d1652f387dea3fd4ecd706952c7e0b54485693ce5080ed80c4f328e590ce8d"
+    },
+    "selection_score": 0.1825464758835951,
+    "train_loss": 0.19558118400163949,
+    "training_seconds": 95.7482136413455,
+    "updates": 3264
+  },
+  {
+    "bad_epochs": 0,
+    "best_epoch": 52,
+    "best_score": 0.17533400792172338,
+    "condition_nmae": {
+      "unequal": 0.18103058632228805,
+      "unequal_gap": 0.1830494376697826,
+      "uniform": 0.1619219997730994
+    },
+    "epoch": 52,
+    "evaluation_seconds": 2.5169736156240106,
+    "mean_gradient_norm": 3.7129955254495144,
+    "schedule": {
+      "epoch_zero_based": 51,
+      "mask_sha256": "dd7da1b09810a998b63cc2ba5ceb85d51f4a7ce5b4e16feb1d1c86f3fc3bc9a1",
+      "order_sha256": "79643df0c198f4ef2db2f4843f9ba1c24056c9d0acf927390de917367d2b59bd",
+      "path": "/mnt/suzikun/CalibTM/outputs/sync-delta-pilot-20260913-v11/geant/shared/masks/masks_train_seed61001_epoch051.npz",
+      "sha256": "349416d63190d0eb1b124f8147c3cca93cfd19b998f87213740e1e60f0861253"
+    },
+    "selection_score": 0.17533400792172338,
+    "train_loss": 0.19637495349161327,
+    "training_seconds": 95.65804169606417,
+    "updates": 3328
+  },
+  {
+    "bad_epochs": 1,
+    "best_epoch": 52,
+    "best_score": 0.17533400792172338,
+    "condition_nmae": {
+      "unequal": 0.1819309051512647,
+      "unequal_gap": 0.18387127421078325,
+      "uniform": 0.16323291666057518
+    },
+    "epoch": 53,
+    "evaluation_seconds": 2.51967478916049,
+    "mean_gradient_norm": 3.070298691280186,
+    "schedule": {
+      "epoch_zero_based": 52,
+      "mask_sha256": "7a03bf617a33f248b5084deed7feb600f9c13ab7b52aeeb92a8ed37f207305ec",
+      "order_sha256": "a088e6588c513303c8d5ad5c223f7410b77200b5379d87be0324e9e7f68c6515",
+      "path": "/mnt/suzikun/CalibTM/outputs/sync-delta-pilot-20260913-v11/geant/shared/masks/masks_train_seed61001_epoch052.npz",
+      "sha256": "2c90024695bc938082873f14a27a226355bc67771211dd24d692bbd25b612b58"
+    },
+    "selection_score": 0.17634503200754104,
+    "train_loss": 0.19669855805113912,
+    "training_seconds": 95.73220588080585,
+    "updates": 3392
+  },
+  {
+    "bad_epochs": 2,
+    "best_epoch": 52,
+    "best_score": 0.17533400792172338,
+    "condition_nmae": {
+      "unequal": 0.193728413283082,
+      "unequal_gap": 0.19525666361017197,
+      "uniform": 0.17414889117278348
+    },
+    "epoch": 54,
+    "evaluation_seconds": 2.5133910542353988,
+    "mean_gradient_norm": 3.4644022420980036,
+    "schedule": {
+      "epoch_zero_based": 53,
+      "mask_sha256": "3b1598b4b97c2d54c96496ae7fa0a9657ff1fcce28a3e73f33a540ba19e4e24a",
+      "order_sha256": "2fda9e2a325ff95cbb0e196bca8854df6e08d417961edb5f0060531fa1e6f829",
+      "path": "/mnt/suzikun/CalibTM/outputs/sync-delta-pilot-20260913-v11/geant/shared/masks/masks_train_seed61001_epoch053.npz",
+      "sha256": "fc28398a35593ef7bf5f00dbca47598a2694bd1437726ec892ef47bb49c374fc"
+    },
+    "selection_score": 0.18771132268867916,
+    "train_loss": 0.20222264248877764,
+    "training_seconds": 95.69441267754883,
+    "updates": 3456
+  },
+  {
+    "bad_epochs": 3,
+    "best_epoch": 52,
+    "best_score": 0.17533400792172338,
+    "condition_nmae": {
+      "unequal": 0.18331148445235082,
+      "unequal_gap": 0.18554986879014998,
+      "uniform": 0.1643447873159985
+    },
+    "epoch": 55,
+    "evaluation_seconds": 2.51456505805254,
+    "mean_gradient_norm": 3.0059431004337966,
+    "schedule": {
+      "epoch_zero_based": 54,
+      "mask_sha256": "4c2451c3b44cb722176b6817625c8a11432a25672b126b398bd0197d21240bbd",
+      "order_sha256": "4cbb9fed3c15fb0610913758e1ad62d017df04b45fa2ae810c0ec2216089c14d",
+      "path": "/mnt/suzikun/CalibTM/outputs/sync-delta-pilot-20260913-v11/geant/shared/masks/masks_train_seed61001_epoch054.npz",
+      "sha256": "132cc7b94342bb51f9e247bd7b64759ec8820cafe8b31835823d6f11f5007431"
+    },
+    "selection_score": 0.17773538018616644,
+    "train_loss": 0.20129027660004795,
+    "training_seconds": 95.68774034734815,
+    "updates": 3520
+  },
+  {
+    "bad_epochs": 4,
+    "best_epoch": 52,
+    "best_score": 0.17533400792172338,
+    "condition_nmae": {
+      "unequal": 0.188148753777571,
+      "unequal_gap": 0.19067419533830623,
+      "uniform": 0.169496559654147
+    },
+    "epoch": 56,
+    "evaluation_seconds": 2.513683542609215,
+    "mean_gradient_norm": 2.6038910788483918,
+    "schedule": {
+      "epoch_zero_based": 55,
+      "mask_sha256": "e005e7e82b72de18c245a89fac211325ed3c947cf5e8f7f2c7f0ca0fbe5df29d",
+      "order_sha256": "379c91618a1453ee0e0d151d9536bab3fa4ee730677b0b9586936e7b66adfb19",
+      "path": "/mnt/suzikun/CalibTM/outputs/sync-delta-pilot-20260913-v11/geant/shared/masks/masks_train_seed61001_epoch055.npz",
+      "sha256": "a8fac825be3602daf3e8bbfe54856a0130cfb8d57f0b8225dad4cbf389720180"
+    },
+    "selection_score": 0.18277316959000808,
+    "train_loss": 0.1965526039712131,
+    "training_seconds": 95.68702869582921,
+    "updates": 3584
+  },
+  {
+    "bad_epochs": 5,
+    "best_epoch": 52,
+    "best_score": 0.17533400792172338,
+    "condition_nmae": {
+      "unequal": 0.1821785793083907,
+      "unequal_gap": 0.18458674501037137,
+      "uniform": 0.1626310442134706
+    },
+    "epoch": 57,
+    "evaluation_seconds": 2.5148816248402,
+    "mean_gradient_norm": 3.8354032933712006,
+    "schedule": {
+      "epoch_zero_based": 56,
+      "mask_sha256": "7a38e989e732a918986fd08c11a57ae6c0020a0168c11484da538e6a12ab135c",
+      "order_sha256": "1608d093f390073ec525847ed991df63d06579c4f50086f057b8916a94822997",
+      "path": "/mnt/suzikun/CalibTM/outputs/sync-delta-pilot-20260913-v11/geant/shared/masks/masks_train_seed61001_epoch056.npz",
+      "sha256": "8067036bdb001c38ace6e2eade563fd622e0839796a0f875145c4e34d475f5ca"
+    },
+    "selection_score": 0.1764654561774109,
+    "train_loss": 0.20019113062880933,
+    "training_seconds": 95.71348003391176,
+    "updates": 3648
+  },
+  {
+    "bad_epochs": 6,
+    "best_epoch": 52,
+    "best_score": 0.17533400792172338,
+    "condition_nmae": {
+      "unequal": 0.18144732097340652,
+      "unequal_gap": 0.1836810156678283,
+      "uniform": 0.1628854177899607
+    },
+    "epoch": 58,
+    "evaluation_seconds": 2.5161939756944776,
+    "mean_gradient_norm": 3.7245744224637747,
+    "schedule": {
+      "epoch_zero_based": 57,
+      "mask_sha256": "a08170b7461cac2524d93711f487e932fb99e1ed3934952a5f89d1fef124ecc0",
+      "order_sha256": "6f7f27fdfd297a3109cd78f4fae8eb5c7b33f5f70dcb8f798a4c8af396599637",
+      "path": "/mnt/suzikun/CalibTM/outputs/sync-delta-pilot-20260913-v11/geant/shared/masks/masks_train_seed61001_epoch057.npz",
+      "sha256": "e8b013abbfad8ff28d895f88eb14cb11c30669a4cf255101ab9e960bf925dbb5"
+    },
+    "selection_score": 0.17600458481039852,
+    "train_loss": 0.19573207013309002,
+    "training_seconds": 95.70488829165697,
+    "updates": 3712
+  },
+  {
+    "bad_epochs": 7,
+    "best_epoch": 52,
+    "best_score": 0.17533400792172338,
+    "condition_nmae": {
+      "unequal": 0.18387787703571137,
+      "unequal_gap": 0.1862276053059062,
+      "uniform": 0.16507788682121208
+    },
+    "epoch": 59,
+    "evaluation_seconds": 2.5149527322500944,
+    "mean_gradient_norm": 3.2783661875873804,
+    "schedule": {
+      "epoch_zero_based": 58,
+      "mask_sha256": "b2fb7dcf712d8dd9e7e75241ab1ea1d56e411ef957c49a510116a72027e0a778",
+      "order_sha256": "4e092d43d241daf8d7c644ca32fd0b05e59de96a2b3e3fc24962e9375cde0b9e",
+      "path": "/mnt/suzikun/CalibTM/outputs/sync-delta-pilot-20260913-v11/geant/shared/masks/masks_train_seed61001_epoch058.npz",
+      "sha256": "bb482e34d39fbccc5d5a26595fe32dcd3594b84900b8da59370152a15e31eb13"
+    },
+    "selection_score": 0.17839445638760987,
+    "train_loss": 0.19768959539942443,
+    "training_seconds": 95.71082254871726,
+    "updates": 3776
+  },
+  {
+    "bad_epochs": 8,
+    "best_epoch": 52,
+    "best_score": 0.17533400792172338,
+    "condition_nmae": {
+      "unequal": 0.18408171117142527,
+      "unequal_gap": 0.18584810909954577,
+      "uniform": 0.16522856009813
+    },
+    "epoch": 60,
+    "evaluation_seconds": 2.5136573798954487,
+    "mean_gradient_norm": 2.7390671242028475,
+    "schedule": {
+      "epoch_zero_based": 59,
+      "mask_sha256": "cdde25e1296bebc2d092fb6a1b9f37de6defc986762d1b3d6ffe0d2a8bcacf68",
+      "order_sha256": "49fb5102108e50389ff2ef6cbf9f8ff85de6a8ca4b4a7ddf833706155c9f587b",
+      "path": "/mnt/suzikun/CalibTM/outputs/sync-delta-pilot-20260913-v11/geant/shared/masks/masks_train_seed61001_epoch059.npz",
+      "sha256": "766084ea8373679a0df3b61d73b43b1582ac98f8d0cf81e0513eb96ffdca2fb5"
+    },
+    "selection_score": 0.17838612678970034,
+    "train_loss": 0.19643087405711412,
+    "training_seconds": 95.67839907109737,
+    "updates": 3840
+  },
+  {
+    "bad_epochs": 0,
+    "best_epoch": 61,
+    "best_score": 0.17499744612706336,
+    "condition_nmae": {
+      "unequal": 0.18056077742082194,
+      "unequal_gap": 0.18289364176722708,
+      "uniform": 0.1615379191931411
+    },
+    "epoch": 61,
+    "evaluation_seconds": 2.5111950282007456,
+    "mean_gradient_norm": 3.443132298067212,
+    "schedule": {
+      "epoch_zero_based": 60,
+      "mask_sha256": "2d24de2b5bf43bc0fff6f56ebc8b64869b9ccb1a7ba442284e60e0e8982129af",
+      "order_sha256": "0863a4dd65cdcac8ef62e296588f6946499197fa27a92cfb199b0b8bcee12c9c",
+      "path": "/mnt/suzikun/CalibTM/outputs/sync-delta-pilot-20260913-v11/geant/shared/masks/masks_train_seed61001_epoch060.npz",
+      "sha256": "e2e6ed00fe29581d50d98f5dcadf29122a12d0938af718d709a6d7d92fd4eb5a"
+    },
+    "selection_score": 0.17499744612706336,
+    "train_loss": 0.19913602457381785,
+    "training_seconds": 95.66167699731886,
+    "updates": 3904
+  },
+  {
+    "bad_epochs": 1,
+    "best_epoch": 61,
+    "best_score": 0.17499744612706336,
+    "condition_nmae": {
+      "unequal": 0.18371101889467276,
+      "unequal_gap": 0.18584812408442258,
+      "uniform": 0.16502251770699133
+    },
+    "epoch": 62,
+    "evaluation_seconds": 2.5104417791590095,
+    "mean_gradient_norm": 3.7323856381699443,
+    "schedule": {
+      "epoch_zero_based": 61,
+      "mask_sha256": "d541327c07649146f9d5b1c29bd430e995c7aa97de44b9a437c380acb1bebfac",
+      "order_sha256": "b97337c3af130a14be7bda5b82abf5e4e25770bd7433dac0a8b7fd6fbdcb1f85",
+      "path": "/mnt/suzikun/CalibTM/outputs/sync-delta-pilot-20260913-v11/geant/shared/masks/masks_train_seed61001_epoch061.npz",
+      "sha256": "0544eb3a1113fa5f40ff6cfff01808950e4b572e86ad796d471ef375c37a7763"
+    },
+    "selection_score": 0.17819388689536222,
+    "train_loss": 0.19071806012652814,
+    "training_seconds": 95.66080470662564,
+    "updates": 3968
+  },
+  {
+    "bad_epochs": 0,
+    "best_epoch": 63,
+    "best_score": 0.1743343108465197,
+    "condition_nmae": {
+      "unequal": 0.179783379104574,
+      "unequal_gap": 0.18193687573565417,
+      "uniform": 0.1612826776993309
+    },
+    "epoch": 63,
+    "evaluation_seconds": 2.5121469823643565,
+    "mean_gradient_norm": 3.0030881809070706,
+    "schedule": {
+      "epoch_zero_based": 62,
+      "mask_sha256": "813c5d94676e045db9c487978da51fd13abbe97f9d60d36adaa52cec7ab496ae",
+      "order_sha256": "363921a81806e3d39a2229b483a47a3bb4eb7331fa60ef1443b07bb171b016f4",
+      "path": "/mnt/suzikun/CalibTM/outputs/sync-delta-pilot-20260913-v11/geant/shared/masks/masks_train_seed61001_epoch062.npz",
+      "sha256": "5be6e5cce74fbe3c2f2b264164424f2ef030305bb1fcbbfca384baa439faae1f"
+    },
+    "selection_score": 0.1743343108465197,
+    "train_loss": 0.1915592069271952,
+    "training_seconds": 95.69427077099681,
+    "updates": 4032
+  },
+  {
+    "bad_epochs": 1,
+    "best_epoch": 63,
+    "best_score": 0.1743343108465197,
+    "condition_nmae": {
+      "unequal": 0.1811301327861285,
+      "unequal_gap": 0.18295205950971097,
+      "uniform": 0.16255029304686552
+    },
+    "epoch": 64,
+    "evaluation_seconds": 2.512721713632345,
+    "mean_gradient_norm": 3.4795303056016564,
+    "schedule": {
+      "epoch_zero_based": 63,
+      "mask_sha256": "73464d337a2a2d26f0aaaf5ebbce6140c4727b323fa33c9be48d91798a2b3c71",
+      "order_sha256": "d97737b093d510ab2c95a07a2c329ac7dab2db57d0ed2b2356fa8db6222596f0",
+      "path": "/mnt/suzikun/CalibTM/outputs/sync-delta-pilot-20260913-v11/geant/shared/masks/masks_train_seed61001_epoch063.npz",
+      "sha256": "cf2a784c01aba1fb03386a385499089b554796def7500d447c3a822740e14a3d"
+    },
+    "selection_score": 0.17554416178090168,
+    "train_loss": 0.1978655809070915,
+    "training_seconds": 95.65593173075467,
+    "updates": 4096
+  },
+  {
+    "bad_epochs": 2,
+    "best_epoch": 63,
+    "best_score": 0.1743343108465197,
+    "condition_nmae": {
+      "unequal": 0.18023831713432575,
+      "unequal_gap": 0.18237058893401467,
+      "uniform": 0.1614684465849672
+    },
+    "epoch": 65,
+    "evaluation_seconds": 2.51288899872452,
+    "mean_gradient_norm": 3.4109891206026077,
+    "schedule": {
+      "epoch_zero_based": 64,
+      "mask_sha256": "e2365f740e2284b77ddc8ed92ffdc648efbf8b25024c43b2f5ad386c7d41eab0",
+      "order_sha256": "0d06dc83b098513eab23fa8e15f6b254b5aacad0bbd1a80abceb460d24a8477a",
+      "path": "/mnt/suzikun/CalibTM/outputs/sync-delta-pilot-20260913-v11/geant/shared/masks/masks_train_seed61001_epoch064.npz",
+      "sha256": "0d255ea4c18650d20ca8fe0dee0a0201db6308f1daf5d370d5fe24907d5ec98c"
+    },
+    "selection_score": 0.17469245088443588,
+    "train_loss": 0.19548331247642636,
+    "training_seconds": 95.64447735715657,
+    "updates": 4160
+  },
+  {
+    "bad_epochs": 0,
+    "best_epoch": 66,
+    "best_score": 0.17341666513942555,
+    "condition_nmae": {
+      "unequal": 0.17897995466826408,
+      "unequal_gap": 0.18121260557716948,
+      "uniform": 0.16005743517284315
+    },
+    "epoch": 66,
+    "evaluation_seconds": 2.5150015158578753,
+    "mean_gradient_norm": 2.8139820601791143,
+    "schedule": {
+      "epoch_zero_based": 65,
+      "mask_sha256": "0a501a305a58de27bcfaaedc1cf2639f987d0b469763c3b7f54eb6bacbc78728",
+      "order_sha256": "3f683021afe1f79dfd130711956b064a6ca9e1423099d344016ed393d001c760",
+      "path": "/mnt/suzikun/CalibTM/outputs/sync-delta-pilot-20260913-v11/geant/shared/masks/masks_train_seed61001_epoch065.npz",
+      "sha256": "0f690550f6e9bae700c93ee0f51f489724d94205123ecc03d4b6a6cdeda024ab"
+    },
+    "selection_score": 0.17341666513942555,
+    "train_loss": 0.19440198387019336,
+    "training_seconds": 95.72109462320805,
+    "updates": 4224
+  },
+  {
+    "bad_epochs": 1,
+    "best_epoch": 66,
+    "best_score": 0.17341666513942555,
+    "condition_nmae": {
+      "unequal": 0.1806545913243483,
+      "unequal_gap": 0.18264697430632268,
+      "uniform": 0.16117373567366272
+    },
+    "epoch": 67,
+    "evaluation_seconds": 2.5139454137533903,
+    "mean_gradient_norm": 2.725302802398801,
+    "schedule": {
+      "epoch_zero_based": 66,
+      "mask_sha256": "3647d2530b5345828497371825391e6a06cbd330bd3b924797dc56e7e4f4282e",
+      "order_sha256": "aa73fb65d71a865760a072148d423869ce2b9bc48495a8f9da806e341eae78e9",
+      "path": "/mnt/suzikun/CalibTM/outputs/sync-delta-pilot-20260913-v11/geant/shared/masks/masks_train_seed61001_epoch066.npz",
+      "sha256": "07db559f00f629dfd87fdb49ba46eb6245151b79ddc2f8ed4f902a29ab178ba3"
+    },
+    "selection_score": 0.17482510043477792,
+    "train_loss": 0.19290058920159936,
+    "training_seconds": 95.65270490385592,
+    "updates": 4288
+  },
+  {
+    "bad_epochs": 2,
+    "best_epoch": 66,
+    "best_score": 0.17341666513942555,
+    "condition_nmae": {
+      "unequal": 0.1799925001734714,
+      "unequal_gap": 0.18227445393972827,
+      "uniform": 0.16174702673607408
+    },
+    "epoch": 68,
+    "evaluation_seconds": 2.5111895576119423,
+    "mean_gradient_norm": 2.6870656525716186,
+    "schedule": {
+      "epoch_zero_based": 67,
+      "mask_sha256": "75a54548141f144e890a9d194646500c82bf492e06ff27f240b9f770d2766da3",
+      "order_sha256": "73598599a32c03d81d9f662af7eb0a4f23734faf9ed32b437875342dfbc5ac35",
+      "path": "/mnt/suzikun/CalibTM/outputs/sync-delta-pilot-20260913-v11/geant/shared/masks/masks_train_seed61001_epoch067.npz",
+      "sha256": "eae5551089c253b080c478a84664736bb61eb269fc1aed39389394a357e4aaca"
+    },
+    "selection_score": 0.17467132694975793,
+    "train_loss": 0.19241611217148602,
+    "training_seconds": 95.71081676427275,
+    "updates": 4352
+  },
+  {
+    "bad_epochs": 3,
+    "best_epoch": 66,
+    "best_score": 0.17341666513942555,
+    "condition_nmae": {
+      "unequal": 0.18340316662225245,
+      "unequal_gap": 0.18563406217454287,
+      "uniform": 0.16615492480610516
+    },
+    "epoch": 69,
+    "evaluation_seconds": 2.514940783381462,
+    "mean_gradient_norm": 3.181689262855798,
+    "schedule": {
+      "epoch_zero_based": 68,
+      "mask_sha256": "358690f71ab11e4a346a2c61f2924ab4be1d354443ed72ca45e17a5925f403ad",
+      "order_sha256": "31cbe8d7ccaa37486fb4ae25fe74bbc9e4e984e0b8c68ba810bef3e3a51cc833",
+      "path": "/mnt/suzikun/CalibTM/outputs/sync-delta-pilot-20260913-v11/geant/shared/masks/masks_train_seed61001_epoch068.npz",
+      "sha256": "3114001a79edb045f2c282581d6a15a518ef234d9e156567126f9f1c2369cf9f"
+    },
+    "selection_score": 0.17839738453430018,
+    "train_loss": 0.19299837574362755,
+    "training_seconds": 95.6943960916251,
+    "updates": 4416
+  },
+  {
+    "bad_epochs": 4,
+    "best_epoch": 66,
+    "best_score": 0.17341666513942555,
+    "condition_nmae": {
+      "unequal": 0.19126734011021923,
+      "unequal_gap": 0.19388990077662166,
+      "uniform": 0.1719841332589134
+    },
+    "epoch": 70,
+    "evaluation_seconds": 2.517320452257991,
+    "mean_gradient_norm": 2.797671782784164,
+    "schedule": {
+      "epoch_zero_based": 69,
+      "mask_sha256": "305e26ec8493187a60210bc4bc49ab08bbe94f8e594c958c69d1931eda674e45",
+      "order_sha256": "c62fffd24e551052a8a8f94d46b1f48285e5ce65e27a895477c2ea8e0f83fe94",
+      "path": "/mnt/suzikun/CalibTM/outputs/sync-delta-pilot-20260913-v11/geant/shared/masks/masks_train_seed61001_epoch069.npz",
+      "sha256": "2eb44dcc2d415088680caa0f6855cfe3c00971a03af1b3936944df580b86216d"
+    },
+    "selection_score": 0.1857137913819181,
+    "train_loss": 0.19827946252189577,
+    "training_seconds": 95.65630943328142,
+    "updates": 4480
+  },
+  {
+    "bad_epochs": 5,
+    "best_epoch": 66,
+    "best_score": 0.17341666513942555,
+    "condition_nmae": {
+      "unequal": 0.1828289705656735,
+      "unequal_gap": 0.18449464814478625,
+      "uniform": 0.16496202217004471
+    },
+    "epoch": 71,
+    "evaluation_seconds": 2.516146850772202,
+    "mean_gradient_norm": 3.329615761525929,
+    "schedule": {
+      "epoch_zero_based": 70,
+      "mask_sha256": "94fe10d5290eb14f12c81442a61111dc364f8299d2fdcaf11d71b0ccd9404ccc",
+      "order_sha256": "e1ba606f9949e8222b59b33af54779192e5a15112cbbcef5f1fcea93b9a7c238",
+      "path": "/mnt/suzikun/CalibTM/outputs/sync-delta-pilot-20260913-v11/geant/shared/masks/masks_train_seed61001_epoch070.npz",
+      "sha256": "b1acda2636a2349093020e8c5ad8652ff3d2dd2d3b4e48d235a25969376e3dbd"
+    },
+    "selection_score": 0.17742854696016816,
+    "train_loss": 0.19298245199024677,
+    "training_seconds": 95.70355005469173,
+    "updates": 4544
+  },
+  {
+    "bad_epochs": 6,
+    "best_epoch": 66,
+    "best_score": 0.17341666513942555,
+    "condition_nmae": {
+      "unequal": 0.17953290392610316,
+      "unequal_gap": 0.18160047489520317,
+      "uniform": 0.16077307403945498
+    },
+    "epoch": 72,
+    "evaluation_seconds": 2.513931481167674,
+    "mean_gradient_norm": 3.034002318046987,
+    "schedule": {
+      "epoch_zero_based": 71,
+      "mask_sha256": "ba888ef715c421b2916b3e6b04153c32d12a8f61ccc0628e317a307afc35417b",
+      "order_sha256": "88dc0cda3005371ba3ad32d2665b92cb5af5a5c6ff23200097cdb0d153be96a5",
+      "path": "/mnt/suzikun/CalibTM/outputs/sync-delta-pilot-20260913-v11/geant/shared/masks/masks_train_seed61001_epoch071.npz",
+      "sha256": "1de776f8ed2874f2826999a6498ffacc5897c10d045c57261be210869a9883b3"
+    },
+    "selection_score": 0.17396881762025376,
+    "train_loss": 0.19363356719259173,
+    "training_seconds": 95.70852625183761,
+    "updates": 4608
+  },
+  {
+    "bad_epochs": 7,
+    "best_epoch": 66,
+    "best_score": 0.17341666513942555,
+    "condition_nmae": {
+      "unequal": 0.1816353559955795,
+      "unequal_gap": 0.18378718293187574,
+      "uniform": 0.16279794340062873
+    },
+    "epoch": 73,
+    "evaluation_seconds": 2.5160421021282673,
+    "mean_gradient_norm": 3.5903293304145336,
+    "schedule": {
+      "epoch_zero_based": 72,
+      "mask_sha256": "1e72b983995d77edeb102ae27d0f706ab2f1335d4dfd2c7aa6f8e645f3654b50",
+      "order_sha256": "2d7f90a16b7eebe03b3aa25832461d0a652712aac188bddf813747859e0c2b0d",
+      "path": "/mnt/suzikun/CalibTM/outputs/sync-delta-pilot-20260913-v11/geant/shared/masks/masks_train_seed61001_epoch072.npz",
+      "sha256": "250ad61e2b772dbaf2ff66eb750e25c40c1586f68963cf7f1b760ce7613710b3"
+    },
+    "selection_score": 0.17607349410936135,
+    "train_loss": 0.19079554197378457,
+    "training_seconds": 95.68439256306738,
+    "updates": 4672
+  },
+  {
+    "bad_epochs": 8,
+    "best_epoch": 66,
+    "best_score": 0.17341666513942555,
+    "condition_nmae": {
+      "unequal": 0.18904815771452704,
+      "unequal_gap": 0.19104457567605845,
+      "uniform": 0.1713760020899394
+    },
+    "epoch": 74,
+    "evaluation_seconds": 2.5128519237041473,
+    "mean_gradient_norm": 3.390369807370007,
+    "schedule": {
+      "epoch_zero_based": 73,
+      "mask_sha256": "4124697a0a4e6a778c63792ff57c9d6ac2536307c554fe90a785e14ec26f405c",
+      "order_sha256": "42ed1cb7800751d8fbc750a19419d495f66e443884d960a38493e1fb0dc35108",
+      "path": "/mnt/suzikun/CalibTM/outputs/sync-delta-pilot-20260913-v11/geant/shared/masks/masks_train_seed61001_epoch073.npz",
+      "sha256": "33f180ca64a1e1f16feba460bfba08c45ddadf157803d737b7d2d3c7232cb27f"
+    },
+    "selection_score": 0.18382291182684163,
+    "train_loss": 0.19011445809155703,
+    "training_seconds": 95.65996800921857,
+    "updates": 4736
+  },
+  {
+    "bad_epochs": 9,
+    "best_epoch": 66,
+    "best_score": 0.17341666513942555,
+    "condition_nmae": {
+      "unequal": 0.18065282129337182,
+      "unequal_gap": 0.18253209241512314,
+      "uniform": 0.16233010113456348
+    },
+    "epoch": 75,
+    "evaluation_seconds": 2.513554527424276,
+    "mean_gradient_norm": 3.5549870440736413,
+    "schedule": {
+      "epoch_zero_based": 74,
+      "mask_sha256": "ba0dc6afb683ba837ef358af54a683183d51c00d0a5577589c1341b5221bb29c",
+      "order_sha256": "898f2ad3e5301d1d1fa50027709d58bf312755466a9412b36642221bb3697b89",
+      "path": "/mnt/suzikun/CalibTM/outputs/sync-delta-pilot-20260913-v11/geant/shared/masks/masks_train_seed61001_epoch074.npz",
+      "sha256": "a7be01ddf2a989a9a3bef00b9bcebab78739d2cd553af5bbe5e9305af70ea174"
+    },
+    "selection_score": 0.1751716716143528,
+    "train_loss": 0.19409626629203558,
+    "training_seconds": 95.73214612621814,
+    "updates": 4800
+  },
+  {
+    "bad_epochs": 10,
+    "best_epoch": 66,
+    "best_score": 0.17341666513942555,
+    "condition_nmae": {
+      "unequal": 0.18113271994130223,
+      "unequal_gap": 0.1830299717024917,
+      "uniform": 0.16251680746091463
+    },
+    "epoch": 76,
+    "evaluation_seconds": 2.513114020228386,
+    "mean_gradient_norm": 3.153068688698113,
+    "schedule": {
+      "epoch_zero_based": 75,
+      "mask_sha256": "99137474f7883affccc875b10ddb0582b7351f2c93d96e6fa3aa0c83675cdb14",
+      "order_sha256": "e0e48af733bc87177e6edc4052d999fdc08e0b0480de53f684425533fdc4171e",
+      "path": "/mnt/suzikun/CalibTM/outputs/sync-delta-pilot-20260913-v11/geant/shared/masks/masks_train_seed61001_epoch075.npz",
+      "sha256": "ae9379d23946e24746e723f5c35c8a4b1bcf5fd591207de78832a2d6a5ca2d69"
+    },
+    "selection_score": 0.17555983303490286,
+    "train_loss": 0.19027760822791606,
+    "training_seconds": 95.67288971878588,
+    "updates": 4864
+  },
+  {
+    "bad_epochs": 11,
+    "best_epoch": 66,
+    "best_score": 0.17341666513942555,
+    "condition_nmae": {
+      "unequal": 0.184118858122947,
+      "unequal_gap": 0.18593893399499783,
+      "uniform": 0.16568128112091157
+    },
+    "epoch": 77,
+    "evaluation_seconds": 2.5147483544424176,
+    "mean_gradient_norm": 3.0550691364333034,
+    "schedule": {
+      "epoch_zero_based": 76,
+      "mask_sha256": "3108d95c402e79704a357b72a537f9ed45be01b9531a7770e92aabeee94a933b",
+      "order_sha256": "e5ae650ee715f04a8dba07ecbf69e2b2f2d4c4d475e46348f3b26c552f88f012",
+      "path": "/mnt/suzikun/CalibTM/outputs/sync-delta-pilot-20260913-v11/geant/shared/masks/masks_train_seed61001_epoch076.npz",
+      "sha256": "e4c09e74167affb5d7f97c0b47deba2cfc5d114da18489969e0d8f59ffa71e83"
+    },
+    "selection_score": 0.1785796910796188,
+    "train_loss": 0.19013910181820393,
+    "training_seconds": 95.71867556963116,
+    "updates": 4928
+  },
+  {
+    "bad_epochs": 12,
+    "best_epoch": 66,
+    "best_score": 0.17341666513942555,
+    "condition_nmae": {
+      "unequal": 0.18963388285241536,
+      "unequal_gap": 0.19226889081811951,
+      "uniform": 0.17164363331447055
+    },
+    "epoch": 78,
+    "evaluation_seconds": 2.5145761324092746,
+    "mean_gradient_norm": 2.4839851344004273,
+    "schedule": {
+      "epoch_zero_based": 77,
+      "mask_sha256": "be756f58f5f2b9b00983e9105c322cf856d2efdcf12cb407e2bee0963034b9b8",
+      "order_sha256": "29bdaba10b20e232c3c992f456dc9d65bc7d186ee48314f39eeaf326c07ee1c1",
+      "path": "/mnt/suzikun/CalibTM/outputs/sync-delta-pilot-20260913-v11/geant/shared/masks/masks_train_seed61001_epoch077.npz",
+      "sha256": "1f9ae72aeb2df33aa3dd7bdb0c5c3bf9bf03963481e58b75ec05091a9ca11476"
+    },
+    "selection_score": 0.18451546899500182,
+    "train_loss": 0.19300391618162394,
+    "training_seconds": 95.68979017995298,
+    "updates": 4992
+  },
+  {
+    "bad_epochs": 13,
+    "best_epoch": 66,
+    "best_score": 0.17341666513942555,
+    "condition_nmae": {
+      "unequal": 0.18094080971691745,
+      "unequal_gap": 0.18309521127501802,
+      "uniform": 0.16324367475787427
+    },
+    "epoch": 79,
+    "evaluation_seconds": 2.5168530121445656,
+    "mean_gradient_norm": 2.811200875788927,
+    "schedule": {
+      "epoch_zero_based": 78,
+      "mask_sha256": "6ee9efcc38a78c9d2417faa43d28dc264bdaea2b33ecb9b69b0d544f765800ae",
+      "order_sha256": "fe80da261c77acf4ee1b89b153db0c0c58e29ffba227da1a76cbc4f631476c75",
+      "path": "/mnt/suzikun/CalibTM/outputs/sync-delta-pilot-20260913-v11/geant/shared/masks/masks_train_seed61001_epoch078.npz",
+      "sha256": "dc28f8cfebb2f405bd5c4fd2fc030577f361e9d0884a7ad38b864054ca0c7cae"
+    },
+    "selection_score": 0.1757598985832699,
+    "train_loss": 0.19154553906992078,
+    "training_seconds": 95.73944791406393,
+    "updates": 5056
+  },
+  {
+    "bad_epochs": 14,
+    "best_epoch": 66,
+    "best_score": 0.17341666513942555,
+    "condition_nmae": {
+      "unequal": 0.18731925110804865,
+      "unequal_gap": 0.1893082877893824,
+      "uniform": 0.16898908169146856
+    },
+    "epoch": 80,
+    "evaluation_seconds": 2.520584063604474,
+    "mean_gradient_norm": 3.9895796412602067,
+    "schedule": {
+      "epoch_zero_based": 79,
+      "mask_sha256": "2182e2b28270642f1b92736f9a919c04038797f348c8294cf3552eacfcd0ab97",
+      "order_sha256": "4cf9ea562dd4bcce2f34b570e14086bd85e4773b8570bd62805773a58f5b246b",
+      "path": "/mnt/suzikun/CalibTM/outputs/sync-delta-pilot-20260913-v11/geant/shared/masks/masks_train_seed61001_epoch079.npz",
+      "sha256": "7292efa75156d83074be64e7547e12a7a1cec79ce0d74bbd091c424224b2ff91"
+    },
+    "selection_score": 0.18187220686296657,
+    "train_loss": 0.19542532903142273,
+    "training_seconds": 95.68100605066866,
+    "updates": 5120
+  },
+  {
+    "bad_epochs": 0,
+    "best_epoch": 81,
+    "best_score": 0.17336839960758854,
+    "condition_nmae": {
+      "unequal": 0.178858080517168,
+      "unequal_gap": 0.18084985006574564,
+      "uniform": 0.160397268239852
+    },
+    "epoch": 81,
+    "evaluation_seconds": 2.5161049207672477,
+    "mean_gradient_norm": 3.201632295269519,
+    "schedule": {
+      "epoch_zero_based": 80,
+      "mask_sha256": "f9947114a55db11e9f6eb8f0a557cf60256a1514ac6061933a30cdea4e97cbb5",
+      "order_sha256": "e92153af285e459557112533258a43533fa7f0a22fa6de83f81582405f62ebfe",
+      "path": "/mnt/suzikun/CalibTM/outputs/sync-delta-pilot-20260913-v11/geant/shared/masks/masks_train_seed61001_epoch080.npz",
+      "sha256": "cd6736375c677054f015abf1a0bab3457dfef096ced93b6a0511dfc169a516c4"
+    },
+    "selection_score": 0.17336839960758854,
+    "train_loss": 0.18894730880856514,
+    "training_seconds": 95.6698203785345,
+    "updates": 5184
+  },
+  {
+    "bad_epochs": 1,
+    "best_epoch": 81,
+    "best_score": 0.17336839960758854,
+    "condition_nmae": {
+      "unequal": 0.17951702900405053,
+      "unequal_gap": 0.1817715120480623,
+      "uniform": 0.16122633903097885
+    },
+    "epoch": 82,
+    "evaluation_seconds": 2.5119530111551285,
+    "mean_gradient_norm": 3.2949547776952386,
+    "schedule": {
+      "epoch_zero_based": 81,
+      "mask_sha256": "35468a3121e9a0c1a08b2195dfe59a0f467314386322f12af76f6b5f0e0220be",
+      "order_sha256": "6428ffdcde890b692acc3e68e3f72c6d6e1241099f65e14e3ef655937bfc0a4e",
+      "path": "/mnt/suzikun/CalibTM/outputs/sync-delta-pilot-20260913-v11/geant/shared/masks/masks_train_seed61001_epoch081.npz",
+      "sha256": "266fecd68af65d33641ae49933ca81afe17ea9cc58d9c76c90816fb8594ad225"
+    },
+    "selection_score": 0.1741716266943639,
+    "train_loss": 0.1896107904613018,
+    "training_seconds": 95.67048103827983,
+    "updates": 5248
+  },
+  {
+    "bad_epochs": 2,
+    "best_epoch": 81,
+    "best_score": 0.17336839960758854,
+    "condition_nmae": {
+      "unequal": 0.18542283074468338,
+      "unequal_gap": 0.18774585349429226,
+      "uniform": 0.1673832114715541
+    },
+    "epoch": 83,
+    "evaluation_seconds": 2.513664972037077,
+    "mean_gradient_norm": 3.6941600255668163,
+    "schedule": {
+      "epoch_zero_based": 82,
+      "mask_sha256": "820351d01a8cd8f91a44734624a2f4cc8c2aff478939fecaad9c9c0ffdf49aba",
+      "order_sha256": "7a40973f12f0ed4bb06d536ab738d7c9f10a2667df99fbccc39fd0ef26dc80f5",
+      "path": "/mnt/suzikun/CalibTM/outputs/sync-delta-pilot-20260913-v11/geant/shared/masks/masks_train_seed61001_epoch082.npz",
+      "sha256": "4933d8e78b8cf082892580810325cac5e006ead8cd6ac11962c8860ed960618b"
+    },
+    "selection_score": 0.18018396523684324,
+    "train_loss": 0.1902504547033459,
+    "training_seconds": 95.65300869010389,
+    "updates": 5312
+  },
+  {
+    "bad_epochs": 3,
+    "best_epoch": 81,
+    "best_score": 0.17336839960758854,
+    "condition_nmae": {
+      "unequal": 0.17990159531430794,
+      "unequal_gap": 0.18202008580496237,
+      "uniform": 0.1615128670658183
+    },
+    "epoch": 84,
+    "evaluation_seconds": 2.512616779655218,
+    "mean_gradient_norm": 2.74450118932873,
+    "schedule": {
+      "epoch_zero_based": 83,
+      "mask_sha256": "922898c69d241ce35ba29a0c435390b1703d2862723b06aa96e4bebc76182fbb",
+      "order_sha256": "fcab6f7938d3896920a26ee3c0a55bfb105493fb30a00f0284e5c8e10c231a48",
+      "path": "/mnt/suzikun/CalibTM/outputs/sync-delta-pilot-20260913-v11/geant/shared/masks/masks_train_seed61001_epoch083.npz",
+      "sha256": "159cb372df2b57da1de27e1973c8566dfa7f5b4f1226be1eca8218bb210b4c2b"
+    },
+    "selection_score": 0.17447818272836288,
+    "train_loss": 0.1895039671799168,
+    "training_seconds": 95.70057608839124,
+    "updates": 5376
+  },
+  {
+    "bad_epochs": 0,
+    "best_epoch": 85,
+    "best_score": 0.1721486645161814,
+    "condition_nmae": {
+      "unequal": 0.1773346847162556,
+      "unequal_gap": 0.1794702826318088,
+      "uniform": 0.15964102620047985
+    },
+    "epoch": 85,
+    "evaluation_seconds": 2.518193786032498,
+    "mean_gradient_norm": 2.692157206358388,
+    "schedule": {
+      "epoch_zero_based": 84,
+      "mask_sha256": "123bb028e819fe8504c390ae9f6154a94af5fdbf4bbbfff9c9f5ef3a65a34b3f",
+      "order_sha256": "d918bad575ee5fc223d4daa7a2ee2fe5eb6938b1b74c79be2277c2a80c274259",
+      "path": "/mnt/suzikun/CalibTM/outputs/sync-delta-pilot-20260913-v11/geant/shared/masks/masks_train_seed61001_epoch084.npz",
+      "sha256": "832d7770ff77bb825e0ac4647a92d0c75d4a80948e9c3e4514ee349cbea30868"
+    },
+    "selection_score": 0.1721486645161814,
+    "train_loss": 0.18635228334460407,
+    "training_seconds": 95.71257668640465,
+    "updates": 5440
+  },
+  {
+    "bad_epochs": 1,
+    "best_epoch": 85,
+    "best_score": 0.1721486645161814,
+    "condition_nmae": {
+      "unequal": 0.1856382072495111,
+      "unequal_gap": 0.18749808124669556,
+      "uniform": 0.16808129044071252
+    },
+    "epoch": 86,
+    "evaluation_seconds": 2.513098911382258,
+    "mean_gradient_norm": 3.019342069514096,
+    "schedule": {
+      "epoch_zero_based": 85,
+      "mask_sha256": "605d863af0a69315f69eca6238d7532311381288e64f9c2501eb127e6f335018",
+      "order_sha256": "90aa8fd495e99aafe6f157cfb97a068159ea882afaa8c5803e8cc8e41039d3b6",
+      "path": "/mnt/suzikun/CalibTM/outputs/sync-delta-pilot-20260913-v11/geant/shared/masks/masks_train_seed61001_epoch085.npz",
+      "sha256": "b873a9a8fb355a39c7c455b053b2da8e91335ca2a5587ea152c9b12db5797b71"
+    },
+    "selection_score": 0.1804058596456397,
+    "train_loss": 0.18737684225197881,
+    "training_seconds": 95.70846048835665,
+    "updates": 5504
+  },
+  {
+    "bad_epochs": 2,
+    "best_epoch": 85,
+    "best_score": 0.1721486645161814,
+    "condition_nmae": {
+      "unequal": 0.1798533218542243,
+      "unequal_gap": 0.18219112207344973,
+      "uniform": 0.16117580109600302
+    },
+    "epoch": 87,
+    "evaluation_seconds": 2.5134127233177423,
+    "mean_gradient_norm": 3.0512685338035226,
+    "schedule": {
+      "epoch_zero_based": 86,
+      "mask_sha256": "1cdd021ae6e74476eea5d4301030d11f437eaaf78b48a662a81682b24a1175e4",
+      "order_sha256": "97ec374324a3ec7746f3e266e6dd4594c450d886fca521513dee341e0bf502be",
+      "path": "/mnt/suzikun/CalibTM/outputs/sync-delta-pilot-20260913-v11/geant/shared/masks/masks_train_seed61001_epoch086.npz",
+      "sha256": "3513ba0c0eed61ad101913bf4a01224b51c487c13da0b8415f7c0e81b97d546e"
+    },
+    "selection_score": 0.17440674834122571,
+    "train_loss": 0.1887149119284004,
+    "training_seconds": 95.73710195999593,
+    "updates": 5568
+  },
+  {
+    "bad_epochs": 3,
+    "best_epoch": 85,
+    "best_score": 0.1721486645161814,
+    "condition_nmae": {
+      "unequal": 0.1863752302085472,
+      "unequal_gap": 0.18819398236677143,
+      "uniform": 0.16826970507653605
+    },
+    "epoch": 88,
+    "evaluation_seconds": 2.519078659825027,
+    "mean_gradient_norm": 3.469349667429924,
+    "schedule": {
+      "epoch_zero_based": 87,
+      "mask_sha256": "95222ad0d5704f72343aa276a63962ad07d8a1ef1c476112d64d031239be301e",
+      "order_sha256": "b85f144f6a741e7ab5f18ba198ec83b800af42a4aa1631110f0f2cb483366216",
+      "path": "/mnt/suzikun/CalibTM/outputs/sync-delta-pilot-20260913-v11/geant/shared/masks/masks_train_seed61001_epoch087.npz",
+      "sha256": "16dca0f02a5a3a169086a73f93f105e27c98fb07df3ddb9ff13842320edb2eaa"
+    },
+    "selection_score": 0.18094630588395155,
+    "train_loss": 0.18861793167889118,
+    "training_seconds": 95.69949383474886,
+    "updates": 5632
+  },
+  {
+    "bad_epochs": 4,
+    "best_epoch": 85,
+    "best_score": 0.1721486645161814,
+    "condition_nmae": {
+      "unequal": 0.18123845134044528,
+      "unequal_gap": 0.18324577010363172,
+      "uniform": 0.1633909684336183
+    },
+    "epoch": 89,
+    "evaluation_seconds": 2.521322635933757,
+    "mean_gradient_norm": 3.1163765527307987,
+    "schedule": {
+      "epoch_zero_based": 88,
+      "mask_sha256": "81a6fe8537c85ab30842b08592a8fdcc08577fc31696db482123e619c135393b",
+      "order_sha256": "485e95a5b2f3162750fb17b75ee7d0f4c080fbffcadafb360ff25cc62035fc1a",
+      "path": "/mnt/suzikun/CalibTM/outputs/sync-delta-pilot-20260913-v11/geant/shared/masks/masks_train_seed61001_epoch088.npz",
+      "sha256": "53d3243d527535df63e8963576c4dbba579ba92f7a4273764e939d69ff741e99"
+    },
+    "selection_score": 0.17595839662589843,
+    "train_loss": 0.1915307833114639,
+    "training_seconds": 95.73390986584127,
+    "updates": 5696
+  },
+  {
+    "bad_epochs": 5,
+    "best_epoch": 85,
+    "best_score": 0.1721486645161814,
+    "condition_nmae": {
+      "unequal": 0.18241670313677286,
+      "unequal_gap": 0.18461729825189488,
+      "uniform": 0.16394034124986964
+    },
+    "epoch": 90,
+    "evaluation_seconds": 2.5155839920043945,
+    "mean_gradient_norm": 3.3045284720137715,
+    "schedule": {
+      "epoch_zero_based": 89,
+      "mask_sha256": "a55252a58e5aabde0d5fba6e20b4d82d4638d463d224af9a0519e1ccd9bb4980",
+      "order_sha256": "27bd49cc34d44f106db03592e7a34c441db7bb9832ccba14334967a6d2fe477f",
+      "path": "/mnt/suzikun/CalibTM/outputs/sync-delta-pilot-20260913-v11/geant/shared/masks/masks_train_seed61001_epoch089.npz",
+      "sha256": "4363965e4ed4bf17da121624c1687014f3e3f3eff21d85a804310fb843b68520"
+    },
+    "selection_score": 0.17699144754617913,
+    "train_loss": 0.19048535428009927,
+    "training_seconds": 95.73423345852643,
+    "updates": 5760
+  },
+  {
+    "bad_epochs": 6,
+    "best_epoch": 85,
+    "best_score": 0.1721486645161814,
+    "condition_nmae": {
+      "unequal": 0.17937474929023772,
+      "unequal_gap": 0.18151362307820687,
+      "uniform": 0.16136810268498528
+    },
+    "epoch": 91,
+    "evaluation_seconds": 2.515294713899493,
+    "mean_gradient_norm": 3.261880790349096,
+    "schedule": {
+      "epoch_zero_based": 90,
+      "mask_sha256": "34d2b83de7a19d4b9c60c77ad2f0e5725a36fda3c4748aba3a67a17e1d22bfad",
+      "order_sha256": "25dde13d896d2dc51458ab3619d3b681e93092b2678b9f4f677f531c443d3623",
+      "path": "/mnt/suzikun/CalibTM/outputs/sync-delta-pilot-20260913-v11/geant/shared/masks/masks_train_seed61001_epoch090.npz",
+      "sha256": "a94f962d9e6de8435b890dc6cce87fd27daff3fe2b4909174eb4dc3428ce25e0"
+    },
+    "selection_score": 0.17408549168447662,
+    "train_loss": 0.19154083682224154,
+    "training_seconds": 95.74202937167138,
+    "updates": 5824
+  },
+  {
+    "bad_epochs": 0,
+    "best_epoch": 92,
+    "best_score": 0.17139299835693836,
+    "condition_nmae": {
+      "unequal": 0.17685865712183524,
+      "unequal_gap": 0.1789001861509306,
+      "uniform": 0.15842015179804922
+    },
+    "epoch": 92,
+    "evaluation_seconds": 2.5157178370282054,
+    "mean_gradient_norm": 2.8066760653164238,
+    "schedule": {
+      "epoch_zero_based": 91,
+      "mask_sha256": "6f3edfec1684c46a3cbefeeba722376d45a031e8b2699c17909f207d5e46de70",
+      "order_sha256": "80d8a4625fab0061f8e6223959bd7974172a813e5798efaadbde6a2f8b987232",
+      "path": "/mnt/suzikun/CalibTM/outputs/sync-delta-pilot-20260913-v11/geant/shared/masks/masks_train_seed61001_epoch091.npz",
+      "sha256": "12ce847242415109555fc399d5ef84e3af046118abd9a9b207a3ed14cf598122"
+    },
+    "selection_score": 0.17139299835693836,
+    "train_loss": 0.18648216780275106,
+    "training_seconds": 95.69875658210367,
+    "updates": 5888
+  },
+  {
+    "bad_epochs": 1,
+    "best_epoch": 92,
+    "best_score": 0.17139299835693836,
+    "condition_nmae": {
+      "unequal": 0.18113439934377007,
+      "unequal_gap": 0.18311795839003314,
+      "uniform": 0.16337228236763257
+    },
+    "epoch": 93,
+    "evaluation_seconds": 2.5133005250245333,
+    "mean_gradient_norm": 2.108298249542713,
+    "schedule": {
+      "epoch_zero_based": 92,
+      "mask_sha256": "bd7e41d6f92317e2ee78a006ee45e3fcb415b83e4750b07ecf9becdea9dedf0a",
+      "order_sha256": "2952f5663d5c61bff3596d277ff95158760d533dfb0cfdf5bd0bcc2a7d3272f2",
+      "path": "/mnt/suzikun/CalibTM/outputs/sync-delta-pilot-20260913-v11/geant/shared/masks/masks_train_seed61001_epoch092.npz",
+      "sha256": "ec21445b4636c6142b5053da515c2c50d2b6d66028759f90c5372801cffdd8d8"
+    },
+    "selection_score": 0.1758748800338119,
+    "train_loss": 0.1832397694233805,
+    "training_seconds": 95.7286506742239,
+    "updates": 5952
+  },
+  {
+    "bad_epochs": 2,
+    "best_epoch": 92,
+    "best_score": 0.17139299835693836,
+    "condition_nmae": {
+      "unequal": 0.17862529133522972,
+      "unequal_gap": 0.1805917513144909,
+      "uniform": 0.16011668037689022
+    },
+    "epoch": 94,
+    "evaluation_seconds": 2.5196468206122518,
+    "mean_gradient_norm": 2.7229888525325805,
+    "schedule": {
+      "epoch_zero_based": 93,
+      "mask_sha256": "4af26688e418a162f0401d02ceb0a7510e2fa050ee81f9da3a7fcb2ea4962086",
+      "order_sha256": "2fb2163acf964fcc22bc986053180bd80e39c3ca829a4897c80181a1b524602c",
+      "path": "/mnt/suzikun/CalibTM/outputs/sync-delta-pilot-20260913-v11/geant/shared/masks/masks_train_seed61001_epoch093.npz",
+      "sha256": "c189978b756f7221fe213c9810aa1ba3dd24251d4e54845439e84a94a2a70faf"
+    },
+    "selection_score": 0.1731112410088703,
+    "train_loss": 0.18790108221583068,
+    "training_seconds": 95.73858048859984,
+    "updates": 6016
+  },
+  {
+    "bad_epochs": 3,
+    "best_epoch": 92,
+    "best_score": 0.17139299835693836,
+    "condition_nmae": {
+      "unequal": 0.1817826998310262,
+      "unequal_gap": 0.18402308162762102,
+      "uniform": 0.16313229257603978
+    },
+    "epoch": 95,
+    "evaluation_seconds": 2.5134343011304736,
+    "mean_gradient_norm": 3.238177635706961,
+    "schedule": {
+      "epoch_zero_based": 94,
+      "mask_sha256": "7dae713f1b9749119be9bc2e3db1b371e697f37f257712e4a4b5f73e4c52999b",
+      "order_sha256": "071dcbe788d5a5133930d591cf78d4758daf267ec335f3040c52d85fc274fbf9",
+      "path": "/mnt/suzikun/CalibTM/outputs/sync-delta-pilot-20260913-v11/geant/shared/masks/masks_train_seed61001_epoch094.npz",
+      "sha256": "c641e03f5fb1b73d04c64c5f74ba8d6a07c8c8ec0819c08ad55879635d173c05"
+    },
+    "selection_score": 0.1763126913448957,
+    "train_loss": 0.18607257260009646,
+    "training_seconds": 95.71397055219859,
+    "updates": 6080
+  },
+  {
+    "bad_epochs": 4,
+    "best_epoch": 92,
+    "best_score": 0.17139299835693836,
+    "condition_nmae": {
+      "unequal": 0.17965971793686494,
+      "unequal_gap": 0.1812080486411411,
+      "uniform": 0.16094168442193188
+    },
+    "epoch": 96,
+    "evaluation_seconds": 2.5174415493384004,
+    "mean_gradient_norm": 2.815359248779714,
+    "schedule": {
+      "epoch_zero_based": 95,
+      "mask_sha256": "12f4b0df85f364db814b273f1556a7a3e283f32470d0131f8c67b3bc12105204",
+      "order_sha256": "0ca0535e7c4d09ab4e2cff668692998ca572989c5ee18701620134153dc97e22",
+      "path": "/mnt/suzikun/CalibTM/outputs/sync-delta-pilot-20260913-v11/geant/shared/masks/masks_train_seed61001_epoch095.npz",
+      "sha256": "0e3a1afd86c817e14629cd14ebd7bab1c438019424c54369b5f89bf386cb8533"
+    },
+    "selection_score": 0.17393648366664596,
+    "train_loss": 0.1869819792918861,
+    "training_seconds": 95.68626663833857,
+    "updates": 6144
+  },
+  {
+    "bad_epochs": 5,
+    "best_epoch": 92,
+    "best_score": 0.17139299835693836,
+    "condition_nmae": {
+      "unequal": 0.17992620048764155,
+      "unequal_gap": 0.1815558057587836,
+      "uniform": 0.16247181130439384
+    },
+    "epoch": 97,
+    "evaluation_seconds": 2.5190920755267143,
+    "mean_gradient_norm": 3.1983841811306775,
+    "schedule": {
+      "epoch_zero_based": 96,
+      "mask_sha256": "36a7784fe77c5aceb8cb54d5937a8013cd81bfaa1ab0dd92c6eb356b5d5a60eb",
+      "order_sha256": "413587e0605ba0c6cb64d6dc811fc612e772475d1ec02c3b1ebdb0a3db1334d8",
+      "path": "/mnt/suzikun/CalibTM/outputs/sync-delta-pilot-20260913-v11/geant/shared/masks/masks_train_seed61001_epoch096.npz",
+      "sha256": "5d857716bc30d2b9c13088190a8f3fe4646cebbdf35f84ee5ed773d534242462"
+    },
+    "selection_score": 0.17465127251693965,
+    "train_loss": 0.18865425023250282,
+    "training_seconds": 95.70699966605753,
+    "updates": 6208
+  },
+  {
+    "bad_epochs": 6,
+    "best_epoch": 92,
+    "best_score": 0.17139299835693836,
+    "condition_nmae": {
+      "unequal": 0.18141144544781276,
+      "unequal_gap": 0.18315214451468043,
+      "uniform": 0.162799143325167
+    },
+    "epoch": 98,
+    "evaluation_seconds": 2.5168215157464147,
+    "mean_gradient_norm": 3.0508716544136405,
+    "schedule": {
+      "epoch_zero_based": 97,
+      "mask_sha256": "5245b2a58040f3bb8ec2282e55458e9df30d95ddae4ce5ed18467db03c40bbba",
+      "order_sha256": "55d107c34e33df8d64e48f8587aff27c638905ea6fe615745445c8805a6a1c38",
+      "path": "/mnt/suzikun/CalibTM/outputs/sync-delta-pilot-20260913-v11/geant/shared/masks/masks_train_seed61001_epoch097.npz",
+      "sha256": "1b33068c9f5f41d5f0dd4d573e6d7c021ffcdb416ad19639a81eab3b7a0a9f49"
+    },
+    "selection_score": 0.1757875777625534,
+    "train_loss": 0.18524903303477913,
+    "training_seconds": 95.75223638489842,
+    "updates": 6272
+  },
+  {
+    "bad_epochs": 7,
+    "best_epoch": 92,
+    "best_score": 0.17139299835693836,
+    "condition_nmae": {
+      "unequal": 0.18263319051876944,
+      "unequal_gap": 0.18430435954871904,
+      "uniform": 0.16477590756357113
+    },
+    "epoch": 99,
+    "evaluation_seconds": 2.517976217903197,
+    "mean_gradient_norm": 2.6269752038642764,
+    "schedule": {
+      "epoch_zero_based": 98,
+      "mask_sha256": "76b9f6ac51f3c119df6834082e0bbb3a2edf07bb568ba516b6dc3a325bd1c3b1",
+      "order_sha256": "d656609a3ebfc74bb0245e03fce0ad2160afc39cadf6bcd86c25d017c9fdb451",
+      "path": "/mnt/suzikun/CalibTM/outputs/sync-delta-pilot-20260913-v11/geant/shared/masks/masks_train_seed61001_epoch098.npz",
+      "sha256": "ec546c947b9773156208ce63f56d7afc56fbbe20498dac715ec7849d8e21566b"
+    },
+    "selection_score": 0.1772378192103532,
+    "train_loss": 0.18151812837459147,
+    "training_seconds": 95.68781666178256,
+    "updates": 6336
+  },
+  {
+    "bad_epochs": 8,
+    "best_epoch": 92,
+    "best_score": 0.17139299835693836,
+    "condition_nmae": {
+      "unequal": 0.18066978969969963,
+      "unequal_gap": 0.18205001734081086,
+      "uniform": 0.16313986491016416
+    },
+    "epoch": 100,
+    "evaluation_seconds": 2.511661476455629,
+    "mean_gradient_norm": 3.2812147615477443,
+    "schedule": {
+      "epoch_zero_based": 99,
+      "mask_sha256": "2e47c79cb549be36c0b130a695e99c9c63a6aa3858fda1ca65368e9b446ce567",
+      "order_sha256": "0c254e50b27df0293119c330f8e8ee11c42367f9e0af08ee6417f614066865c3",
+      "path": "/mnt/suzikun/CalibTM/outputs/sync-delta-pilot-20260913-v11/geant/shared/masks/masks_train_seed61001_epoch099.npz",
+      "sha256": "551ee8981fb31ddd4c571c7516642d3ffbfde5ad6391a12cb6e6ec1b3784f7d0"
+    },
+    "selection_score": 0.17528655731689155,
+    "train_loss": 0.18334219383541495,
+    "training_seconds": 95.69928740896285,
+    "updates": 6400
+  },
+  {
+    "bad_epochs": 9,
+    "best_epoch": 92,
+    "best_score": 0.17139299835693836,
+    "condition_nmae": {
+      "unequal": 0.17811050748293425,
+      "unequal_gap": 0.17997207852176803,
+      "uniform": 0.1596545874587751
+    },
+    "epoch": 101,
+    "evaluation_seconds": 2.518850571475923,
+    "mean_gradient_norm": 2.9532189648598433,
+    "schedule": {
+      "epoch_zero_based": 100,
+      "mask_sha256": "9f43aebde960ec4ef7483af25f7a2e8371bcb6486f653f3a37c058e1117e25c6",
+      "order_sha256": "4166c3e391973f674594575ca3415f88271912764a06c0b0243be7c37ec3dddf",
+      "path": "/mnt/suzikun/CalibTM/outputs/sync-delta-pilot-20260913-v11/geant/shared/masks/masks_train_seed61001_epoch100.npz",
+      "sha256": "5a6d6f2dabc1f7c4d05d7b27c58c59211b3e9c73ee47e4c859044a10efbdfb62"
+    },
+    "selection_score": 0.17257905782115912,
+    "train_loss": 0.18273795931600034,
+    "training_seconds": 95.71829205751419,
+    "updates": 6464
+  },
+  {
+    "bad_epochs": 10,
+    "best_epoch": 92,
+    "best_score": 0.17139299835693836,
+    "condition_nmae": {
+      "unequal": 0.17731535123062425,
+      "unequal_gap": 0.17931624825877104,
+      "uniform": 0.15911737828906045
+    },
+    "epoch": 102,
+    "evaluation_seconds": 2.514513277448714,
+    "mean_gradient_norm": 2.846325898543,
+    "schedule": {
+      "epoch_zero_based": 101,
+      "mask_sha256": "8d4a42f7b1a48b3df643ba86b51366065cd2faa6e8d9ad5f8644ec2149dc8df1",
+      "order_sha256": "56f04b2b76208fbc99e338a61b8cba741954486e72bfe8317694cb072e899fc5",
+      "path": "/mnt/suzikun/CalibTM/outputs/sync-delta-pilot-20260913-v11/geant/shared/masks/masks_train_seed61001_epoch101.npz",
+      "sha256": "2f7919765213764d439cbea2268118a170d64060702d36943627cbc6a9bac3de"
+    },
+    "selection_score": 0.17191632592615191,
+    "train_loss": 0.18226315453648567,
+    "training_seconds": 95.71088127978146,
+    "updates": 6528
+  },
+  {
+    "bad_epochs": 0,
+    "best_epoch": 103,
+    "best_score": 0.17073728864036755,
+    "condition_nmae": {
+      "unequal": 0.1763093059666376,
+      "unequal_gap": 0.1780548482827163,
+      "uniform": 0.1578477116717488
+    },
+    "epoch": 103,
+    "evaluation_seconds": 2.5155368093401194,
+    "mean_gradient_norm": 3.519131390377879,
+    "schedule": {
+      "epoch_zero_based": 102,
+      "mask_sha256": "75f2a119dc08ce5e6e732da40df6b34da175ef64be0890f45ead50b1be8c7fe1",
+      "order_sha256": "98f1149f74dd4e25ef47c8435399ba273fe03244ac568e9b7e7c9135af64bc6c",
+      "path": "/mnt/suzikun/CalibTM/outputs/sync-delta-pilot-20260913-v11/geant/shared/masks/masks_train_seed61001_epoch102.npz",
+      "sha256": "90d654b98b732c556a755f5d46ed8e38c44a0a28b0de05db4a22f07191a78a21"
+    },
+    "selection_score": 0.17073728864036755,
+    "train_loss": 0.18499141605570912,
+    "training_seconds": 95.73816185351461,
+    "updates": 6592
+  },
+  {
+    "bad_epochs": 1,
+    "best_epoch": 103,
+    "best_score": 0.17073728864036755,
+    "condition_nmae": {
+      "unequal": 0.17665282743763272,
+      "unequal_gap": 0.17849068459849488,
+      "uniform": 0.15854868756783663
+    },
+    "epoch": 104,
+    "evaluation_seconds": 2.5170849952846766,
+    "mean_gradient_norm": 2.5486234705895185,
+    "schedule": {
+      "epoch_zero_based": 103,
+      "mask_sha256": "c73526b3bd6eb7be800e1f70335cc19c92bcfc5f3bc00bcda38b835ab6e8b647",
+      "order_sha256": "34ba0ff7a7ca4be590212f6cbf4a19e9bcef3c5426361070e6f30085e0ca592b",
+      "path": "/mnt/suzikun/CalibTM/outputs/sync-delta-pilot-20260913-v11/geant/shared/masks/masks_train_seed61001_epoch103.npz",
+      "sha256": "ebbd7580b21b3273649ea47e495b93367a326094e21d2fd8c61ef0a978299b12"
+    },
+    "selection_score": 0.17123073320132143,
+    "train_loss": 0.18206686456687748,
+    "training_seconds": 95.74437494389713,
+    "updates": 6656
+  },
+  {
+    "bad_epochs": 2,
+    "best_epoch": 103,
+    "best_score": 0.17073728864036755,
+    "condition_nmae": {
+      "unequal": 0.1794201976972317,
+      "unequal_gap": 0.18092936619289357,
+      "uniform": 0.16098935983821905
+    },
+    "epoch": 105,
+    "evaluation_seconds": 2.5141734927892685,
+    "mean_gradient_norm": 3.5851047299802303,
+    "schedule": {
+      "epoch_zero_based": 104,
+      "mask_sha256": "7d99a5a95ef9fd58d495a2d43ad4ad734a3a8b38be76ef066da5f1cb112e6f3e",
+      "order_sha256": "d2308240a21286970a7b496a2a926e32f940c75f298c4a4e68f95ea2a5a97cdc",
+      "path": "/mnt/suzikun/CalibTM/outputs/sync-delta-pilot-20260913-v11/geant/shared/masks/masks_train_seed61001_epoch104.npz",
+      "sha256": "b608887bc760c61b71326df7b4c7f0520acac4d85e013dd1ebc49255ab156620"
+    },
+    "selection_score": 0.17377964124278145,
+    "train_loss": 0.18204235972370952,
+    "training_seconds": 95.69508324284106,
+    "updates": 6720
+  },
+  {
+    "bad_epochs": 3,
+    "best_epoch": 103,
+    "best_score": 0.17073728864036755,
+    "condition_nmae": {
+      "unequal": 0.17889209758986682,
+      "unequal_gap": 0.1807525312504922,
+      "uniform": 0.16051444687947974
+    },
+    "epoch": 106,
+    "evaluation_seconds": 2.5147535046562552,
+    "mean_gradient_norm": 3.1832062220200896,
+    "schedule": {
+      "epoch_zero_based": 105,
+      "mask_sha256": "b1f5823862aab2e23a3a838d963d79ebded16684535730bf84945dce260dbdb3",
+      "order_sha256": "8e629f499a0ef2930f5bf9489915bf110cf6b13f07bee4bdbe8bb52a62c4baf8",
+      "path": "/mnt/suzikun/CalibTM/outputs/sync-delta-pilot-20260913-v11/geant/shared/masks/masks_train_seed61001_epoch105.npz",
+      "sha256": "e991be91143cd369163b876ce54a5c42529ecdafd69758fc84876f8313e7976c"
+    },
+    "selection_score": 0.17338635857327958,
+    "train_loss": 0.1838653669692576,
+    "training_seconds": 95.69163378700614,
+    "updates": 6784
+  },
+  {
+    "bad_epochs": 4,
+    "best_epoch": 103,
+    "best_score": 0.17073728864036755,
+    "condition_nmae": {
+      "unequal": 0.1898750539234626,
+      "unequal_gap": 0.1916473498604537,
+      "uniform": 0.17270963610883486
+    },
+    "epoch": 107,
+    "evaluation_seconds": 2.5155455600470304,
+    "mean_gradient_norm": 2.8226592717692256,
+    "schedule": {
+      "epoch_zero_based": 106,
+      "mask_sha256": "a21fe262c2d15d9ef1fc2d8312e7539093cab56a4e1ab6b0c4471043de9e649c",
+      "order_sha256": "95b440dd7349c5299bcfc3e5f0fe741e65b01eedc233d301a46a4c8d9052b1ff",
+      "path": "/mnt/suzikun/CalibTM/outputs/sync-delta-pilot-20260913-v11/geant/shared/masks/masks_train_seed61001_epoch106.npz",
+      "sha256": "f5503472f32fc148b5cdfffcbb2359c106ffbae6c22289a75d0d3b0260bc4b8b"
+    },
+    "selection_score": 0.18474401329758372,
+    "train_loss": 0.18375736440066248,
+    "training_seconds": 95.72419651597738,
+    "updates": 6848
+  },
+  {
+    "bad_epochs": 0,
+    "best_epoch": 108,
+    "best_score": 0.1701400718890761,
+    "condition_nmae": {
+      "unequal": 0.17577205182379044,
+      "unequal_gap": 0.17762853509630905,
+      "uniform": 0.1570196287471288
+    },
+    "epoch": 108,
+    "evaluation_seconds": 2.516442120075226,
+    "mean_gradient_norm": 3.250300326384604,
+    "schedule": {
+      "epoch_zero_based": 107,
+      "mask_sha256": "b0b0d3ff9fc3f7dcdb099505593958af634fc8b73dc68bb89ecd6dba77b716b8",
+      "order_sha256": "cf9020ee8be341f13070cb4767b36acaffeb08565bac445a3bf48d4c2211ffbf",
+      "path": "/mnt/suzikun/CalibTM/outputs/sync-delta-pilot-20260913-v11/geant/shared/masks/masks_train_seed61001_epoch107.npz",
+      "sha256": "7347dea4843eead5cb27d24ccbeb762a178ef53422c8519805efd93e157f4d61"
+    },
+    "selection_score": 0.1701400718890761,
+    "train_loss": 0.19383895071223378,
+    "training_seconds": 95.70911997370422,
+    "updates": 6912
+  },
+  {
+    "bad_epochs": 1,
+    "best_epoch": 108,
+    "best_score": 0.1701400718890761,
+    "condition_nmae": {
+      "unequal": 0.17902377728919033,
+      "unequal_gap": 0.18053179686974546,
+      "uniform": 0.16049159494947288
+    },
+    "epoch": 109,
+    "evaluation_seconds": 2.5141085581853986,
+    "mean_gradient_norm": 2.920234637334943,
+    "schedule": {
+      "epoch_zero_based": 108,
+      "mask_sha256": "e73d27d2e0438b3982c8f35b94cd291f1dcd9a413406de7734c0884efeaed1d3",
+      "order_sha256": "a4bb2441b630e54a4f3fdc4d6d748730f79abb92a4385fa8a8a196bbafbdfb42",
+      "path": "/mnt/suzikun/CalibTM/outputs/sync-delta-pilot-20260913-v11/geant/shared/masks/masks_train_seed61001_epoch108.npz",
+      "sha256": "b7bda2e98e38383f0b274db24a1af9c9f2890f5c4b43463ca8a31ca1db36818e"
+    },
+    "selection_score": 0.1733490563694696,
+    "train_loss": 0.18673502816818655,
+    "training_seconds": 95.72984121367335,
+    "updates": 6976
+  },
+  {
+    "bad_epochs": 2,
+    "best_epoch": 108,
+    "best_score": 0.1701400718890761,
+    "condition_nmae": {
+      "unequal": 0.17576152299782555,
+      "unequal_gap": 0.17736604968632702,
+      "uniform": 0.1574649302033721
+    },
+    "epoch": 110,
+    "evaluation_seconds": 2.522044281475246,
+    "mean_gradient_norm": 3.1000688076019287,
+    "schedule": {
+      "epoch_zero_based": 109,
+      "mask_sha256": "8898d7121da1b056a60a3b12fb774da6d8ebc8284efaf1c16c5250233e07dd72",
+      "order_sha256": "a73d612a64e1152de841e03618fb45deb90f4338e2b2c599f1ae6273d64f3ab2",
+      "path": "/mnt/suzikun/CalibTM/outputs/sync-delta-pilot-20260913-v11/geant/shared/masks/masks_train_seed61001_epoch109.npz",
+      "sha256": "2cde468b83251ee38ff9b06a40dca8170cf2160daee51dcc8f3815189eb2c597"
+    },
+    "selection_score": 0.1701975009625082,
+    "train_loss": 0.1863053513225168,
+    "training_seconds": 95.7743176445365,
+    "updates": 7040
+  },
+  {
+    "bad_epochs": 3,
+    "best_epoch": 108,
+    "best_score": 0.1701400718890761,
+    "condition_nmae": {
+      "unequal": 0.17870264942043737,
+      "unequal_gap": 0.18041054517443014,
+      "uniform": 0.16065166563580308
+    },
+    "epoch": 111,
+    "evaluation_seconds": 2.5179697796702385,
+    "mean_gradient_norm": 3.4661230528727174,
+    "schedule": {
+      "epoch_zero_based": 110,
+      "mask_sha256": "74ab39e5542c6ae8d1d3044b0dd9351a0e9f47c974991714507aa807d54c19aa",
+      "order_sha256": "17ddfd3c9f59b670578eca16fe6a773d2311e735e23cc7cc6300f2a7cab9bda5",
+      "path": "/mnt/suzikun/CalibTM/outputs/sync-delta-pilot-20260913-v11/geant/shared/masks/masks_train_seed61001_epoch110.npz",
+      "sha256": "18c93b2bb4de8ba7d5ec0a6a6ef7eabec192248ea61fca02d66c42da2485a2db"
+    },
+    "selection_score": 0.17325495341022354,
+    "train_loss": 0.1850835457444191,
+    "training_seconds": 95.71775817498565,
+    "updates": 7104
+  },
+  {
+    "bad_epochs": 4,
+    "best_epoch": 108,
+    "best_score": 0.1701400718890761,
+    "condition_nmae": {
+      "unequal": 0.17684640201169538,
+      "unequal_gap": 0.17821899495561633,
+      "uniform": 0.15871670467206073
+    },
+    "epoch": 112,
+    "evaluation_seconds": 2.5151714272797108,
+    "mean_gradient_norm": 3.5348278107121587,
+    "schedule": {
+      "epoch_zero_based": 111,
+      "mask_sha256": "5fa5f30a16dfbaa6af4fc473166760b548dc41ddfca4e1c58d9176e9a3a44e9a",
+      "order_sha256": "4c0b3b328aedf9fe2e7f7e5ba3aa9f8b9cdebb8491ca48c3a0577b6b3ecfe359",
+      "path": "/mnt/suzikun/CalibTM/outputs/sync-delta-pilot-20260913-v11/geant/shared/masks/masks_train_seed61001_epoch111.npz",
+      "sha256": "42296a60a17b0aef157518247806a35841872a1d8d8107676095ecba514a065e"
+    },
+    "selection_score": 0.17126070054645748,
+    "train_loss": 0.18154612416401505,
+    "training_seconds": 95.7494653109461,
+    "updates": 7168
+  },
+  {
+    "bad_epochs": 5,
+    "best_epoch": 108,
+    "best_score": 0.1701400718890761,
+    "condition_nmae": {
+      "unequal": 0.1780975767414119,
+      "unequal_gap": 0.17972128662314862,
+      "uniform": 0.15995990767521284
+    },
+    "epoch": 113,
+    "evaluation_seconds": 2.5209993282333016,
+    "mean_gradient_norm": 3.015619756653905,
+    "schedule": {
+      "epoch_zero_based": 112,
+      "mask_sha256": "55ff5a2f9f4776732aea40bfa4212e12c303b39c38665d0699e8c74355a3ac46",
+      "order_sha256": "55c2f660e3f369e3a71299dce77d4dee49e9625b53d16906fbaa76101cae5447",
+      "path": "/mnt/suzikun/CalibTM/outputs/sync-delta-pilot-20260913-v11/geant/shared/masks/masks_train_seed61001_epoch112.npz",
+      "sha256": "89fb8b7108661566c9b0f34c9f1025a58f141248afd17ccc6240446070f0be47"
+    },
+    "selection_score": 0.1725929236799245,
+    "train_loss": 0.18253802112303674,
+    "training_seconds": 95.75299288704991,
+    "updates": 7232
+  },
+  {
+    "bad_epochs": 6,
+    "best_epoch": 108,
+    "best_score": 0.1701400718890761,
+    "condition_nmae": {
+      "unequal": 0.1800095048541202,
+      "unequal_gap": 0.1816378233146885,
+      "uniform": 0.1619271428363438
+    },
+    "epoch": 114,
+    "evaluation_seconds": 2.5165622448548675,
+    "mean_gradient_norm": 3.456305510364473,
+    "schedule": {
+      "epoch_zero_based": 113,
+      "mask_sha256": "1b1bc9f56ea99ea478322d2f5a68fc1acd7bcf4672b6a3499a35cdc050373206",
+      "order_sha256": "2373c4ba73473aa58450f722229ae8439cf0373cff0a405e8f55531f5595faa0",
+      "path": "/mnt/suzikun/CalibTM/outputs/sync-delta-pilot-20260913-v11/geant/shared/masks/masks_train_seed61001_epoch113.npz",
+      "sha256": "2a196bdebea9b25c624fd3d1875f1c406c3018b4bb831e733c019b30b3513278"
+    },
+    "selection_score": 0.17452482366838418,
+    "train_loss": 0.18646679003722966,
+    "training_seconds": 95.6975794872269,
+    "updates": 7296
+  },
+  {
+    "bad_epochs": 7,
+    "best_epoch": 108,
+    "best_score": 0.1701400718890761,
+    "condition_nmae": {
+      "unequal": 0.1759856166585464,
+      "unequal_gap": 0.17759978438034518,
+      "uniform": 0.15770840373638886
+    },
+    "epoch": 115,
+    "evaluation_seconds": 2.5160541934892535,
+    "mean_gradient_norm": 3.645316205918789,
+    "schedule": {
+      "epoch_zero_based": 114,
+      "mask_sha256": "76183a015a19e6ceb2c29f2f4619dc5f3c0590700b9b09326676278781283c26",
+      "order_sha256": "f6f214ec64c00ee9275677dba30d96047534d460d2d26a2139b36fd8cb1bf8eb",
+      "path": "/mnt/suzikun/CalibTM/outputs/sync-delta-pilot-20260913-v11/geant/shared/masks/masks_train_seed61001_epoch114.npz",
+      "sha256": "621bc1f56219797ff885ab7bc86269137eb7d26ad127cfb721c60b32f2fceb2f"
+    },
+    "selection_score": 0.1704312682584268,
+    "train_loss": 0.18000367563217878,
+    "training_seconds": 95.7013902971521,
+    "updates": 7360
+  },
+  {
+    "bad_epochs": 8,
+    "best_epoch": 108,
+    "best_score": 0.1701400718890761,
+    "condition_nmae": {
+      "unequal": 0.18330383119174276,
+      "unequal_gap": 0.18494566496531364,
+      "uniform": 0.16589218874655282
+    },
+    "epoch": 116,
+    "evaluation_seconds": 2.5160977002233267,
+    "mean_gradient_norm": 3.0500498339533806,
+    "schedule": {
+      "epoch_zero_based": 115,
+      "mask_sha256": "501382fc7dd420791b884609f16060d7e8671865e7788ae2703a0ca5b2db0e12",
+      "order_sha256": "8f9b33b833aebbe0b983e0ad29604d23428b7f70d4f8ba5d0530b2e8138420e0",
+      "path": "/mnt/suzikun/CalibTM/outputs/sync-delta-pilot-20260913-v11/geant/shared/masks/masks_train_seed61001_epoch115.npz",
+      "sha256": "ec4cfeb09db2834713bf4e294c307dc4bf63bccee682e408905f71abf1df6653"
+    },
+    "selection_score": 0.1780472283012031,
+    "train_loss": 0.1834657988511026,
+    "training_seconds": 95.77377384342253,
+    "updates": 7424
+  },
+  {
+    "bad_epochs": 9,
+    "best_epoch": 108,
+    "best_score": 0.1701400718890761,
+    "condition_nmae": {
+      "unequal": 0.18022749290940154,
+      "unequal_gap": 0.18170350406431,
+      "uniform": 0.16281617355846772
+    },
+    "epoch": 117,
+    "evaluation_seconds": 2.5159930447116494,
+    "mean_gradient_norm": 3.0673572649247944,
+    "schedule": {
+      "epoch_zero_based": 116,
+      "mask_sha256": "cc473fd0435dbfb91cc50a5251eca27380894b2729326f41c8788d354d48549e",
+      "order_sha256": "e4e12ece4c19c8c52c50c91b53bfe702cf9af6a874324d790536018a63dc03d8",
+      "path": "/mnt/suzikun/CalibTM/outputs/sync-delta-pilot-20260913-v11/geant/shared/masks/masks_train_seed61001_epoch116.npz",
+      "sha256": "11a0b4a2aa00dc0cf0e350cd6ba36106a088942b8f581cddaa699a1eba61cda3"
+    },
+    "selection_score": 0.1749157235107264,
+    "train_loss": 0.18190741864964366,
+    "training_seconds": 95.73007861804217,
+    "updates": 7488
+  },
+  {
+    "bad_epochs": 10,
+    "best_epoch": 108,
+    "best_score": 0.1701400718890761,
+    "condition_nmae": {
+      "unequal": 0.18227647592797458,
+      "unequal_gap": 0.18392445789165657,
+      "uniform": 0.1638008889080942
+    },
+    "epoch": 118,
+    "evaluation_seconds": 2.516542357392609,
+    "mean_gradient_norm": 2.9841434764675796,
+    "schedule": {
+      "epoch_zero_based": 117,
+      "mask_sha256": "5811a348b569fb9314a0bef5a04380969261087737d54b7b657a0e6f9fc44fbf",
+      "order_sha256": "4e88428d3d5c1d0c82b55a9bffc6160c275497259647173100d09e5cc0ffb3b2",
+      "path": "/mnt/suzikun/CalibTM/outputs/sync-delta-pilot-20260913-v11/geant/shared/masks/masks_train_seed61001_epoch117.npz",
+      "sha256": "6400c6b94d927c1fd0c308799dfc3cd1168ed9dc487e89ae630eb1bce8438a71"
+    },
+    "selection_score": 0.1766672742425751,
+    "train_loss": 0.1800600339192897,
+    "training_seconds": 95.76027190964669,
+    "updates": 7552
+  },
+  {
+    "bad_epochs": 11,
+    "best_epoch": 108,
+    "best_score": 0.1701400718890761,
+    "condition_nmae": {
+      "unequal": 0.17765427184760177,
+      "unequal_gap": 0.17964172622262473,
+      "uniform": 0.15855726593353286
+    },
+    "epoch": 119,
+    "evaluation_seconds": 2.5153460558503866,
+    "mean_gradient_norm": 3.0526384944096208,
+    "schedule": {
+      "epoch_zero_based": 118,
+      "mask_sha256": "28da3411c696f3931d1b893edbee9b6825d161f7532597f6c966e69f4ce8bed2",
+      "order_sha256": "07d0554c22458d6f4a0f786ab13a791a4ad3491088e441a40735313a96151e92",
+      "path": "/mnt/suzikun/CalibTM/outputs/sync-delta-pilot-20260913-v11/geant/shared/masks/masks_train_seed61001_epoch118.npz",
+      "sha256": "9160e2ab8fdd6106e8f9e019226094a091a77692b21161bb14c5b73151535a8d"
+    },
+    "selection_score": 0.17195108800125314,
+    "train_loss": 0.18172366672661155,
+    "training_seconds": 95.74967920035124,
+    "updates": 7616
+  },
+  {
+    "bad_epochs": 12,
+    "best_epoch": 108,
+    "best_score": 0.1701400718890761,
+    "condition_nmae": {
+      "unequal": 0.18179258096757184,
+      "unequal_gap": 0.1836074152107947,
+      "uniform": 0.16347540803949806
+    },
+    "epoch": 120,
+    "evaluation_seconds": 2.5214510913938284,
+    "mean_gradient_norm": 2.4433025270700455,
+    "schedule": {
+      "epoch_zero_based": 119,
+      "mask_sha256": "c511643fc1c737bb0def16b928bab97a7e97101d4799681b098ba3a7d978f0b2",
+      "order_sha256": "9e8238402130c6e9333c82152ed7b4ed30cddf777c49cc0e1e10672d73d0c8f5",
+      "path": "/mnt/suzikun/CalibTM/outputs/sync-delta-pilot-20260913-v11/geant/shared/masks/masks_train_seed61001_epoch119.npz",
+      "sha256": "795c10055a2adc2cf1fe2daff0c6a22650cce0bd5874889a06cfd57d88e361db"
+    },
+    "selection_score": 0.17629180140595488,
+    "train_loss": 0.1841174764558673,
+    "training_seconds": 95.71065226290375,
+    "updates": 7680
+  }
+]

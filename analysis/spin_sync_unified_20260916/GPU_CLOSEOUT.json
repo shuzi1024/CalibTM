@@ -1,0 +1,107 @@
+{
+  "state": "complete",
+  "observed_utc": "2026-09-16T08:50:55.234433+00:00",
+  "authorization": {
+    "user_instruction": "7H",
+    "started_utc": "2026-09-16T04:33:29+00:00",
+    "deadline_utc": "2026-09-16T11:33:29+00:00",
+    "started_beijing": "2026-09-16T12:33:29+08:00",
+    "deadline_beijing": "2026-09-16T19:33:29+08:00",
+    "deadline_unix": 1789558409,
+    "max_gpu_count": 4,
+    "hosts": {
+      "ksc-h200": "geant",
+      "ksc-h20-extra": "abilene"
+    },
+    "first_seed": 41001,
+    "stop_early_if_sufficient": true,
+    "scope": "unified SPIN / Direct / Sync experiments and review",
+    "old_allocation_reused": false
+  },
+  "within_authorized_deadline": true,
+  "hosts": {
+    "ksc-h200": {
+      "hostname": "d-20260907060201-gt68m",
+      "gpu_processes": [],
+      "own_processes": [],
+      "gpu_state": [
+        "0, GPU-56631519-2edf-fcbc-2dfb-70092068087d, NVIDIA H20, 0 %, 0 MiB",
+        "1, GPU-e6e08566-9a51-425a-81ac-d8af43d299b1, NVIDIA H20, 0 %, 0 MiB"
+      ]
+    },
+    "ksc-h20-extra": {
+      "hostname": "d-20260913095246-v85qm",
+      "gpu_processes": [],
+      "own_processes": [],
+      "gpu_state": [
+        "0, GPU-9c1717c1-947b-c87d-d38d-c0ee5fff848a, NVIDIA H20, 0 %, 0 MiB",
+        "1, GPU-65617023-ac69-623e-5b32-3a6a29de36df, NVIDIA H20, 0 %, 0 MiB"
+      ]
+    }
+  },
+  "local_queue_processes": [],
+  "completed_fixed120_trajectories": 8,
+  "benchmark_complete_cells": 48,
+  "model_sha256": "a9a27086cfec26999cc5749acbab79264504103617c457d61db1a39566b90fcb",
+  "recorded_epoch_time": [
+    {
+      "dataset": "abilene",
+      "variant": "spin_sync_direct",
+      "seed": 41001,
+      "recorded_training_seconds": 3716.561150587164,
+      "recorded_evaluation_seconds": 321.0515226125717
+    },
+    {
+      "dataset": "abilene",
+      "variant": "spin_sync_direct",
+      "seed": 41002,
+      "recorded_training_seconds": 3740.146395598538,
+      "recorded_evaluation_seconds": 323.7360144164413
+    },
+    {
+      "dataset": "abilene",
+      "variant": "spin_direct_no_memory",
+      "seed": 41001,
+      "recorded_training_seconds": 1388.3251793384552,
+      "recorded_evaluation_seconds": 202.70671905949712
+    },
+    {
+      "dataset": "abilene",
+      "variant": "spin_direct_no_memory",
+      "seed": 41002,
+      "recorded_training_seconds": 1391.8001138893887,
+      "recorded_evaluation_seconds": 202.84248068463057
+    },
+    {
+      "dataset": "geant",
+      "variant": "spin_sync_direct",
+      "seed": 41001,
+      "recorded_training_seconds": 11455.327699807473,
+      "recorded_evaluation_seconds": 301.05306612700224
+    },
+    {
+      "dataset": "geant",
+      "variant": "spin_sync_direct",
+      "seed": 41002,
+      "recorded_training_seconds": 11480.101029661484,
+      "recorded_evaluation_seconds": 301.6036349758506
+    },
+    {
+      "dataset": "geant",
+      "variant": "spin_direct_no_memory",
+      "seed": 41001,
+      "recorded_training_seconds": 4345.870382741094,
+      "recorded_evaluation_seconds": 193.57126044947654
+    },
+    {
+      "dataset": "geant",
+      "variant": "spin_direct_no_memory",
+      "seed": 41002,
+      "recorded_training_seconds": 4350.139368778095,
+      "recorded_evaluation_seconds": 193.5929702911526
+    }
+  ],
+  "recorded_train_eval_hours": 12.196785830282865,
+  "time_accounting_note": "One 1-120 history per seed/variant/dataset; parent histories are not added again. Sum of measured epoch training/evaluation seconds only, excluding setup, checkpoint IO, smoke/probes, final scoring, benchmark and unsaved work; not complete GPU occupancy metering.",
+  "new_tasks_queued": false
+}

@@ -1,0 +1,9 @@
+{
+  "passed": true,
+  "expired_deadline_rejected": true,
+  "wrong_checkpoint_identity_rejected_before_model_use": true,
+  "device": "none",
+  "real_data_loaded": false,
+  "gpu_used": false,
+  "runner_sha256": "48487269adfa6110b849e86299106182249b17a72fd5e62fd8e0c89b68ae6621"
+}
