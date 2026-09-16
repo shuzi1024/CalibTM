@@ -1,0 +1,1999 @@
+Third-party attribution: see repository THIRD_PARTY_NOTICES.md and the included SPIN/TSL MIT license files; original source paths and line numbers follow.
+
+训练、固定120轮接续、数据／掩码／评价与成本源码
+
+只读源码快照，非可独立运行的完整仓库。Lxxxx 是原文件行号。历史依赖中包含其它变体，不代表当前 Full 全部使用它们；当前入口是第一个模型文件。
+
+
+========================================================================
+FILE: experiments/spin_sync_unified_v1/runner.py
+SHA256: 48487269adfa6110b849e86299106182249b17a72fd5e62fd8e0c89b68ae6621
+========================================================================
+L0001: """Joint from-scratch training of unified SPIN/Sync/Direct and no-memory ablation.
+L0002: 
+L0003: Only original fit/development rows are accessible here. An explicitly supplied
+L0004: future deadline bounds an externally authorized invocation; renewal does not
+L0005: change scientific configuration or initialization. Smoke outputs are separate
+L0006: from formal results. Interrupting a partial epoch rolls every update in that
+L0007: epoch back to the last committed epoch on resume, including optimizer and RNG.
+L0008: """
+L0009: from __future__ import annotations
+L0010: import argparse
+L0011: import math
+L0012: import os
+L0013: from pathlib import Path
+L0014: import signal
+L0015: import socket
+L0016: import time
+L0017: 
+L0018: ROOT = Path(__file__).resolve().parents[2]
+L0019: PROTOCOL = "spin-sync-unified-development-20260916-v1"
+L0020: VARIANTS = ("spin_sync_direct", "spin_direct_no_memory")
+L0021: STOP_REQUESTED = False
+L0022: TRAINING = {"max_epochs": 120, "batch": 8, "evaluation_batch": 8, "node_chunk": 32,
+L0023:     "gradient_checkpointing": True, "optimizer": "AdamW", "lr": .001,
+L0024:     "weight_decay": .0001, "betas": [.9, .999], "gradient_clip": 1., "scheduler": None,
+L0025:     "patience": 10, "patience_starts_epoch": 16, "earliest_stop_epoch": 25,
+L0026:     "data_order_seed": 51001, "training_mask_seed": 61001, "selection_mask_seed": 71001,
+L0027:     "loss": "unclamped raw missing absolute sum / (fit C * batch missing count)",
+L0028:     "selection": "equal mean of three condition global missing-only NMAE; strict improvement",
+L0029:     "initialization": "all parameters jointly trained from scratch", "precision": "FP32; TF32 disabled"}
+L0030: 
+L0031: 
+L0032: class Stopped(RuntimeError):
+L0033:     pass
+L0034: 
+L0035: 
+L0036: def request_stop(signum, frame):
+L0037:     global STOP_REQUESTED
+L0038:     STOP_REQUESTED = True
+L0039: 
+L0040: 
+L0041: def check_stop(args):
+L0042:     if STOP_REQUESTED or time.time() >= args.deadline_unix - 60:
+L0043:         raise Stopped("signal" if STOP_REQUESTED else "allocation_cutoff")
+L0044: 
+L0045: 
+L0046: def sources():
+L0047:     files = [Path(__file__), Path(__file__).with_name("models.py")]
+L0048:     if Path(__file__).with_name("__init__.py").exists():
+L0049:         files.append(Path(__file__).with_name("__init__.py"))
+L0050:     for package in ("spin_comparison_v1", "sync_delta_v1", "llm_candidates_v1"):
+L0051:         files += sorted((ROOT / "experiments" / package).glob("*.py"))
+L0052:     files += [ROOT / "experiments/direct_only_runtime_v1/run.py"]
+L0053:     return {str(path.relative_to(ROOT)): io.file_sha(path) for path in sorted(set(files))}
+L0054: 
+L0055: 
+L0056: def status(context, state, **fields):
+L0057:     io.write_json(context["status_path"], {**context["identity"], "state": state,
+L0058:         "updated": io.utc(), "deadline_unix": context["args"].deadline_unix, **fields})
+L0059: 
+L0060: 
+L0061: def setup(args, job):
+L0062:     check_stop(args)
+L0063:     engine.seed_runtime(args.seed)
+L0064:     device = torch.device(args.device)
+L0065:     if device.type != "cuda" or not torch.cuda.is_available():
+L0066:         raise RuntimeError("Formal execution and fit smoke require an authorized CUDA device")
+L0067:     original = base.verify_parent(base.DEFAULT_PARENT)
+L0068:     bundle = io.verified_bundle(original, args.dataset)
+L0069:     masks = engine.make_dev_masks(bundle, 71001)
+L0070:     data = base.data_identity(bundle, masks)
+L0071:     if len(bundle.train_windows) != 512:
+L0072:         raise RuntimeError("Original 512 fit windows are required")
+L0073:     full = base.read_json(base.DEFAULT_FULL / "registry.json")
+L0074:     if data != full["data"][args.dataset] or io.file_sha(base.DEFAULT_FULL / "registry.json") != base.FULL_SHA:
+L0075:         raise RuntimeError("Original Direct data or reference registry differs")
+L0076:     reference_paths = {
+L0077:         "linear": Path(full["references"][args.dataset]["linear"]["path"]),
+L0078:         "direct_sync": base.DEFAULT_FULL / args.dataset / "direct_sync/seed41001/result.json",
+L0079:         "spin_adapted": ROOT / "outputs/spin-comparison-20260914-v1" / args.dataset / "spin_adapted/seed41001/result.json"}
+L0080:     references, evaluations = {}, {}
+L0081:     for name, path in reference_paths.items():
+L0082:         record = base.read_json(path)
+L0083:         evaluation = record if name == "linear" else record["primary_eval"]
+L0084:         if evaluation["role"] != "development_only" or evaluation["mask_seed"] != 71001:
+L0085:             raise RuntimeError(f"Wrong original development reference: {name}")
+L0086:         if name == "linear":
+L0087:             if io.file_sha(path) != full["references"][args.dataset]["linear"]["sha256"]:
+L0088:                 raise RuntimeError("Original Linear reference changed")
+L0089:         elif (record["dataset"] != args.dataset or record["variant"] != name or record["seed"] != 41001
+L0090:               or io.file_sha(path.with_name("best.pt")) != record["best_checkpoint_sha256"]
+L0091:               or record["registry_sha256"] != io.file_sha(path.parents[3] / "registry.json")
+L0092:               or base.read_json(path.parents[3] / "registry.json")["data"][args.dataset] != data):
+L0093:             raise RuntimeError(f"Original checkpoint identity differs: {name}")
+L0094:         references[name] = {"path": str(path), "sha256": io.file_sha(path),
+L0095:                             "selection_score": evaluation["selection_score"]}
+L0096:         evaluations[name] = evaluation
+L0097:     rows = []
+L0098:     for condition in CONDITIONS:
+L0099:         rows += engine.score_predictions(bundle, condition, np.zeros_like(bundle.dev_windows), masks[0][condition], masks[1])
+L0100:     for evaluation in evaluations.values():
+L0101:         base.paired({"rows": rows}, evaluation)
+L0102:     models = {variant: build_model(bundle.flows, init_seed=args.seed, variant=variant) for variant in VARIANTS}
+L0103:     for model in models.values():
+L0104:         model.configure_from_bundle(bundle)
+L0105:         model.set_execution(node_chunk=32, gradient_checkpointing=True)
+L0106:         if not all(parameter.requires_grad for parameter in model.parameters()):
+L0107:             raise RuntimeError("Every unified-model parameter must be trainable from scratch")
+L0108:     full_params, reduced_params = [dict(models[variant].named_parameters()) for variant in VARIANTS]
+L0109:     if not reduced_params.keys() < full_params.keys():
+L0110:         raise RuntimeError("No-memory parameters must be a strict subset of the full model")
+L0111:     if any(not torch.equal(parameter, full_params[name]) for name, parameter in reduced_params.items()):
+L0112:         raise RuntimeError("Shared named parameters do not initialize exactly equally")
+L0113:     model = models[args.variant]
+L0114:     initial = io.cpu_state(model)
+L0115:     initial_path = job / "initial.pt"
+L0116:     if initial_path.exists():
+L0117:         if io.state_sha(torch.load(initial_path, map_location="cpu", weights_only=False)) != io.state_sha(initial):
+L0118:             raise RuntimeError("Frozen initialization changed")
+L0119:     else:
+L0120:         io.save_torch(initial_path, initial)
+L0121:     config = {"protocol": PROTOCOL, "dataset": args.dataset, "variant": args.variant, "seed": args.seed,
+L0122:         "training": TRAINING, "model_config": MODEL_CONFIG, "data": data,
+L0123:         "runtime": base.runtime(), "source_files": sources(),
+L0124:         "parent": str(base.DEFAULT_PARENT), "parent_registry_sha256": io.file_sha(base.DEFAULT_PARENT / "registry.json"),
+L0125:         "references": references, "initial_state_sha256": io.state_sha(initial),
+L0126:         "initial_file_sha256": io.file_sha(initial_path), "parameter_count": sum(p.numel() for p in model.parameters()),
+L0127:         "shared_named_parameters_exact": True, "shared_parameter_tensors": len(reduced_params),
+L0128:         "no_memory_removed_parameters": sorted(full_params.keys() - reduced_params.keys()),
+L0129:         "role": "development_only", "parent_checkpoint_weights_loaded": False}
+L0130:     config_path = job / "config.json"
+L0131:     if config_path.exists() and base.read_json(config_path) != config:
+L0132:         raise RuntimeError("Immutable model/source/data/training configuration changed")
+L0133:     if not config_path.exists():
+L0134:         io.write_json(config_path, config)
+L0135:     identity = {"protocol": PROTOCOL, "config_sha256": io.file_sha(config_path),
+L0136:                 "dataset": args.dataset, "variant": args.variant, "seed": args.seed}
+L0137:     model = model.to(device)
+L0138:     optimizer = torch.optim.AdamW(model.parameters(), lr=.001, betas=(.9, .999), weight_decay=.0001)
+L0139:     stats, neighbors = engine.device_inputs(bundle, device)
+L0140:     return {"args": args, "job": job, "device": device, "bundle": bundle, "masks": masks,
+L0141:         "config": config, "identity": identity, "model": model, "optimizer": optimizer,
+L0142:         "stats": stats, "neighbors": neighbors, "reference": evaluations["linear"],
+L0143:         "status_path": job / ("smoke/status.json" if args.smoke else "status.json")}
+L0144: 
+L0145: 
+L0146: def step(context, order, masks, offset, epoch):
+L0147:     check_stop(context["args"])
+L0148:     bundle = context["bundle"]
+L0149:     indices = order[offset:offset + 8]
+L0150:     return engine.train_step(context["model"], bundle.train_windows[indices], masks[offset:offset + len(indices)],
+L0151:         bundle.train_starts[indices], context["stats"], context["neighbors"], bundle.C, context["optimizer"],
+L0152:         dataset=bundle.dataset, epoch=epoch, physical_batch=8, target_block=bundle.flows)
+L0153: 
+L0154: 
+L0155: def evaluate(context):
+L0156:     bundle, (masks, families) = context["bundle"], context["masks"]
+L0157:     metrics, rows, begin = {}, [], time.perf_counter()
+L0158:     for condition in CONDITIONS:
+L0159:         final, raw = np.empty_like(bundle.dev_windows), np.empty_like(bundle.dev_windows)
+L0160:         for first in range(0, len(raw), 8):
+L0161:             check_stop(context["args"])
+L0162:             sl = slice(first, first + 8)
+L0163:             final[sl], raw[sl] = engine.predict_windows(context["model"], bundle.dev_windows[sl], masks[condition][sl],
+L0164:                 bundle.dev_starts[sl], context["stats"], context["neighbors"], dataset=bundle.dataset,
+L0165:                 physical_batch=8, target_block=bundle.flows)
+L0166:         condition_rows = engine.score_predictions(bundle, condition, final, masks[condition], families, raw)
+L0167:         rows.extend(condition_rows)
+L0168:         metrics[condition] = engine.aggregate(condition_rows)
+L0169:         metrics[condition]["groups"] = {name: engine.aggregate([row["groups"][name] for row in condition_rows])
+L0170:                                        for name in condition_rows[0]["groups"]}
+L0171:         metrics[condition]["negative_raw_fraction"] = sum(r["negative_raw_count"] for r in condition_rows) / metrics[condition]["count"]
+L0172:     score = sum(metrics[c]["nmae"] for c in CONDITIONS) / 3
+L0173:     if not math.isfinite(score):
+L0174:         raise FloatingPointError("Undefined development score")
+L0175:     result = {"role": "development_only", "mask_seed": 71001, "serial_order_seed": 81002,
+L0176:         "selection_score": score, "metrics": metrics, "rows": rows, "intervention": None,
+L0177:         "mask_array_sha256": {c: array_sha256(masks[c]) for c in CONDITIONS},
+L0178:         "elapsed_seconds": time.perf_counter() - begin}
+L0179:     base.paired(result, context["reference"])
+L0180:     return result
+L0181: 
+L0182: 
+L0183: def checkpoint(context, progress, path):
+L0184:     io.save_torch(path, {**context["identity"], **progress, "model": io.cpu_state(context["model"]),
+L0185:         "optimizer": context["optimizer"].state_dict(), "rng": io.capture_rng(),
+L0186:         "invocation_deadline_unix": context["args"].deadline_unix, "committed": io.utc()})
+L0187: 
+L0188: 
+L0189: def restore(context, path):
+L0190:     saved = torch.load(path, map_location="cpu", weights_only=False)
+L0191:     for key, expected in context["identity"].items():
+L0192:         if saved[key] != expected:
+L0193:             raise RuntimeError(f"Checkpoint identity differs: {key}")
+L0194:     context["model"].load_state_dict(saved["model"], strict=True)
+L0195:     context["optimizer"].load_state_dict(saved["optimizer"])
+L0196:     io.restore_rng(saved["rng"])
+L0197:     return {key: saved[key] for key in ("next_epoch", "history", "best_model", "best_eval", "best_epoch",
+L0198:                                       "best_score", "bad_epochs", "stopped_early", "training_seconds", "peak_training_allocated_bytes")}
+L0199: 
+L0200: 
+L0201: def publish_best(context, progress):
+L0202:     io.save_torch(context["job"] / "best.pt", {**context["identity"], "model": progress["best_model"],
+L0203:         "epoch": progress["best_epoch"], "score": progress["best_score"]})
+L0204: 
+L0205: 
+L0206: def train(context):
+L0207:     args, job = context["args"], context["job"]
+L0208:     if (job / "result.json").exists():
+L0209:         result = base.read_json(job / "result.json")
+L0210:         if any(result.get(k) != v for k, v in context["identity"].items()) or result.get("state") != "complete":
+L0211:             raise RuntimeError("Existing result identity/completion differs")
+L0212:         if io.file_sha(job / "best.pt") != result["best_checkpoint_sha256"]:
+L0213:             raise RuntimeError("Completed best checkpoint changed")
+L0214:         io.emit("already_complete", **context["identity"])
+L0215:         return
+L0216:     last = job / "last.pt"
+L0217:     smoke_report = base.read_json(job / "smoke/SMOKE.json")
+L0218:     if (any(smoke_report.get(k) != v for k, v in context["identity"].items())
+L0219:             or not smoke_report.get("passed") or not smoke_report.get("exact_checkpoint_continuation")
+L0220:             or not smoke_report.get("fit_evaluation_path_checked")):
+L0221:         raise RuntimeError("A matching fit training/resume/evaluation smoke must pass before formal training")
+L0222:     if last.exists() and not args.resume:
+L0223:         raise RuntimeError("Committed checkpoint exists; explicitly pass --resume")
+L0224:     progress = {"next_epoch": 0, "history": [], "best_model": None, "best_eval": None, "best_epoch": 0,
+L0225:         "best_score": float("inf"), "bad_epochs": 0, "stopped_early": False, "training_seconds": 0.,
+L0226:         "peak_training_allocated_bytes": 0}
+L0227:     if last.exists():
+L0228:         progress = restore(context, last)
+L0229:     else:
+L0230:         if (job / "history.json").exists() or (job / "best.pt").exists():
+L0231:             raise RuntimeError("Formal artifacts exist without an authoritative checkpoint")
+L0232:         checkpoint(context, progress, last)
+L0233:     try:
+L0234:         for epoch in range(progress["next_epoch"], 120):
+L0235:             if progress["stopped_early"]:
+L0236:                 break
+L0237:             check_stop(args)
+L0238:             order, masks, schedule = base.epoch_schedule(context["config"], context["bundle"], epoch)
+L0239:             status(context, "training", epoch=epoch + 1, epochs_committed=progress["next_epoch"])
+L0240:             torch.cuda.reset_peak_memory_stats(context["device"])
+L0241:             begin, steps = time.perf_counter(), []
+L0242:             for offset in range(0, 512, 8):
+L0243:                 steps.append(step(context, order, masks, offset, epoch))
+L0244:             seconds = time.perf_counter() - begin
+L0245:             peak = torch.cuda.max_memory_allocated(context["device"])
+L0246:             status(context, "evaluating", epoch=epoch + 1, epochs_committed=progress["next_epoch"])
+L0247:             evaluation = evaluate(context)
+L0248:             if evaluation["selection_score"] < progress["best_score"]:
+L0249:                 progress.update(best_model=io.cpu_state(context["model"]), best_eval=evaluation,
+L0250:                     best_epoch=epoch + 1, best_score=evaluation["selection_score"], bad_epochs=0)
+L0251:             elif epoch + 1 >= 16:
+L0252:                 progress["bad_epochs"] += 1
+L0253:             else:
+L0254:                 progress["bad_epochs"] = 0
+L0255:             progress["next_epoch"] = epoch + 1
+L0256:             progress["stopped_early"] = epoch + 1 >= 25 and progress["bad_epochs"] >= 10
+L0257:             progress["training_seconds"] += seconds
+L0258:             progress["peak_training_allocated_bytes"] = max(peak, progress["peak_training_allocated_bytes"])
+L0259:             row = {"epoch": epoch + 1, "updates": (epoch + 1) * 64,
+L0260:                 "train_loss": float(np.mean([s["loss"] for s in steps])),
+L0261:                 "mean_gradient_norm": float(np.mean([s["gradient_norm"] for s in steps])),
+L0262:                 "selection_score": evaluation["selection_score"], "best_score": progress["best_score"],
+L0263:                 "best_epoch": progress["best_epoch"], "bad_epochs": progress["bad_epochs"],
+L0264:                 "condition_nmae": {c: evaluation["metrics"][c]["nmae"] for c in CONDITIONS},
+L0265:                 "training_seconds": seconds, "evaluation_seconds": evaluation["elapsed_seconds"], "schedule": schedule}
+L0266:             progress["history"].append(row)
+L0267:             checkpoint(context, progress, last)
+L0268:             publish_best(context, progress)
+L0269:             io.write_json(job / "history.json", progress["history"])
+L0270:             status(context, "epoch_complete", epochs_completed=epoch + 1, best_epoch=progress["best_epoch"], best_score=progress["best_score"])
+L0271:             io.emit("epoch_complete", **context["identity"], **{k: v for k, v in row.items() if k != "schedule"})
+L0272:         check_stop(args)
+L0273:         if not progress["history"] or progress["best_model"] is None:
+L0274:             raise RuntimeError("No committed training epoch")
+L0275:         publish_best(context, progress)
+L0276:         best = torch.load(job / "best.pt", map_location="cpu", weights_only=False)
+L0277:         context["model"].load_state_dict(best["model"], strict=True)
+L0278:         final = evaluate(context)
+L0279:         if any(final[field] != progress["best_eval"][field] for field in ("selection_score", "metrics", "rows")):
+L0280:             raise RuntimeError("Best checkpoint reload evaluation differs")
+L0281:         if context["config"]["source_files"] != sources():
+L0282:             raise RuntimeError("Frozen source changed during training")
+L0283:         if any(io.file_sha(ref["path"]) != ref["sha256"] for ref in context["config"]["references"].values()):
+L0284:             raise RuntimeError("Reference result changed during training")
+L0285:         check_stop(args)
+L0286:         result = {**context["identity"], "state": "complete", "role": "development_only", "independent_test": False,
+L0287:             "epochs_completed": progress["next_epoch"], "optimizer_updates": progress["next_epoch"] * 64,
+L0288:             "best_epoch": progress["best_epoch"], "stopped_early": progress["stopped_early"], "training_cap": 120,
+L0289:             "stop_reason": "early_stop" if progress["stopped_early"] else "epoch_cap",
+L0290:             "training_seconds": progress["training_seconds"], "parameter_count": context["config"]["parameter_count"],
+L0291:             "trainable_parameter_count": sum(p.numel() for p in context["model"].parameters() if p.requires_grad),
+L0292:             "best_state_sha256": io.state_sha(context["model"].state_dict()),
+L0293:             "best_checkpoint_sha256": io.file_sha(job / "best.pt"), "primary_eval": final,
+L0294:             "peak_training_allocated_bytes": progress["peak_training_allocated_bytes"],
+L0295:             "batch": 8, "effective_batch": 8, "physical_batch": 8, "evaluation_batch": 8,
+L0296:             "target_block": context["bundle"].flows, "node_chunk": 32,
+L0297:             "gradient_checkpointing": True, "all_parameters_jointly_trained_from_scratch": True,
+L0298:             "device_name": torch.cuda.get_device_name(context["device"]), "finished": io.utc(),
+L0299:             "invocation_deadline_unix": args.deadline_unix}
+L0300:         io.write_json(job / "history.json", progress["history"])
+L0301:         io.write_json(job / "result.json", result)
+L0302:         status(context, "complete", epochs_completed=progress["next_epoch"], best_epoch=progress["best_epoch"], best_score=progress["best_score"])
+L0303:         io.emit("complete", **context["identity"], best_epoch=progress["best_epoch"], score=progress["best_score"])
+L0304:     except Stopped as error:
+L0305:         saved = torch.load(last, map_location="cpu", weights_only=False)
+L0306:         status(context, "stopped", reason=str(error), epochs_committed=saved["next_epoch"],
+L0307:                eligible_as_completed_result=False, resume_required=True)
+L0308:         io.emit("stopped", **context["identity"], reason=str(error), epochs_committed=saved["next_epoch"])
+L0309: 
+L0310: 
+L0311: def smoke(context):
+L0312:     order, masks, schedule = base.epoch_schedule(context["config"], context["bundle"], 0)
+L0313:     torch.cuda.reset_peak_memory_stats(context["device"])
+L0314:     begin = time.perf_counter()
+L0315:     first = step(context, order, masks, 0, 0)
+L0316:     path = context["job"] / "smoke/resume_probe.pt"
+L0317:     io.save_torch(path, {**context["identity"], "model": io.cpu_state(context["model"]),
+L0318:         "optimizer": context["optimizer"].state_dict(), "rng": io.capture_rng()})
+L0319:     second = step(context, order, masks, 8, 0)
+L0320:     expected = io.state_sha(context["model"].state_dict())
+L0321:     saved = torch.load(path, map_location="cpu", weights_only=False)
+L0322:     context["model"].load_state_dict(saved["model"], strict=True)
+L0323:     context["optimizer"].load_state_dict(saved["optimizer"])
+L0324:     io.restore_rng(saved["rng"])
+L0325:     replay = step(context, order, masks, 8, 0)
+L0326:     if second != replay or io.state_sha(context["model"].state_dict()) != expected:
+L0327:         raise RuntimeError("Fit smoke checkpoint continuation is not exact")
+L0328:     check_stop(context["args"])
+L0329:     update_seconds = (time.perf_counter() - begin) / 3
+L0330:     training_peak = torch.cuda.max_memory_allocated(context["device"])
+L0331:     torch.cuda.synchronize(context["device"])
+L0332:     torch.cuda.reset_peak_memory_stats(context["device"])
+L0333:     indices = order[:8]
+L0334:     bundle = context["bundle"]
+L0335:     begin = time.perf_counter()
+L0336:     final, raw = engine.predict_windows(context["model"], bundle.train_windows[indices], masks[:8],
+L0337:         bundle.train_starts[indices], context["stats"], context["neighbors"], dataset=bundle.dataset,
+L0338:         physical_batch=8, target_block=bundle.flows)
+L0339:     torch.cuda.synchronize(context["device"])
+L0340:     evaluation_seconds = time.perf_counter() - begin
+L0341:     if (final.shape != raw.shape or final.shape != bundle.train_windows[indices].shape
+L0342:             or not np.isfinite(final).all() or np.any(final < 0)
+L0343:             or not np.array_equal(final[masks[:8]], bundle.train_windows[indices][masks[:8]])):
+L0344:         raise RuntimeError("Fit evaluation output shape, finiteness, clamp or observation copy differs")
+L0345:     check_stop(context["args"])
+L0346:     io.write_json(path.with_name("SMOKE.json"), {**context["identity"], "passed": True,
+L0347:         "role": "fit_runner_smoke_not_formal_result", "unique_updates": 2, "replayed_updates": 1,
+L0348:         "exact_checkpoint_continuation": True, "first_step": first, "second_step": second,
+L0349:         "fit_evaluation_path_checked": True, "fit_evaluation_output_sha256": array_sha256(final),
+L0350:         "development_scores_computed": False,
+L0351:         "batch": 8, "node_chunk": 32, "target_block": context["bundle"].flows, "schedule": schedule,
+L0352:         "seconds_per_update_including_resume_io": update_seconds,
+L0353:         "seconds_per_evaluation_batch": evaluation_seconds, "peak_training_allocated_bytes": training_peak,
+L0354:         "peak_evaluation_allocated_bytes_including_training_state": torch.cuda.max_memory_allocated(context["device"]),
+L0355:         "rough_epoch_seconds_from_smoke": 64 * update_seconds + 3 * math.ceil(len(bundle.dev_windows) / 8) * evaluation_seconds,
+L0356:         "parameter_count": context["config"]["parameter_count"], "finished": io.utc()})
+L0357:     status(context, "smoke_passed", eligible_as_completed_result=False)
+L0358:     io.emit("smoke_passed", **context["identity"])
+L0359: 
+L0360: 
+L0361: def main():
+L0362:     parser = argparse.ArgumentParser(description=__doc__)
+L0363:     parser.add_argument("--dataset", choices=("abilene", "geant"), required=True)
+L0364:     parser.add_argument("--variant", choices=VARIANTS, required=True)
+L0365:     parser.add_argument("--seed", type=int, choices=(41001, 41002, 41003), default=41001)
+L0366:     parser.add_argument("--deadline-unix", type=float, required=True)
+L0367:     parser.add_argument("--output", type=Path, default=ROOT / "outputs/spin-sync-unified-20260916-v1")
+L0368:     parser.add_argument("--device", default="cuda:0")
+L0369:     parser.add_argument("--resume", action="store_true")
+L0370:     parser.add_argument("--smoke", action="store_true")
+L0371:     args = parser.parse_args()
+L0372:     if not math.isfinite(args.deadline_unix) or args.deadline_unix <= time.time() + 60:
+L0373:         parser.error("An explicit future --deadline-unix with more than 60 seconds remaining is required")
+L0374:     if args.smoke and args.resume:
+L0375:         parser.error("--smoke and --resume are mutually exclusive")
+L0376:     global torch, np, base, engine, io, CONDITIONS, array_sha256, build_model, MODEL_CONFIG
+L0377:     import torch
+L0378:     import numpy as np
+L0379:     from experiments.direct_only_runtime_v1 import run as base
+L0380:     from experiments.sync_delta_v1 import engine, run as io
+L0381:     from experiments.sync_delta_v1.data import CONDITIONS, array_sha256
+L0382:     from .models import build_model, MODEL_CONFIG
+L0383:     signal.signal(signal.SIGTERM, request_stop)
+L0384:     signal.signal(signal.SIGINT, request_stop)
+L0385:     job = args.output.resolve() / args.dataset / args.variant / f"seed{args.seed}"
+L0386:     context = None
+L0387:     with base.job_lock(job / "active.lock"):
+L0388:         try:
+L0389:             context = setup(args, job)
+L0390:             invocation = {**context["identity"], "started": io.utc(), "pid": os.getpid(), "hostname": socket.gethostname(),
+L0391:                 "deadline_unix": args.deadline_unix, "device": args.device, "smoke": args.smoke, "resume": args.resume,
+L0392:                 "cuda_visible_devices": os.environ.get("CUDA_VISIBLE_DEVICES")}
+L0393:             io.write_json(job / "invocations" / f"{time.time_ns()}-{os.getpid()}.json", invocation)
+L0394:             (smoke if args.smoke else train)(context)
+L0395:         except Stopped as error:
+L0396:             if context is not None:
+L0397:                 status(context, "stopped", reason=str(error), eligible_as_completed_result=False)
+L0398:         except BaseException as error:
+L0399:             if context is not None:
+L0400:                 status(context, "failed", error=f"{type(error).__name__}: {error}", eligible_as_completed_result=False)
+L0401:             raise
+L0402: 
+L0403: 
+L0404: if __name__ == "__main__":
+L0405:     main()
+
+
+========================================================================
+FILE: experiments/spin_sync_fixed120_v1/runner.py
+SHA256: bde70881be8ea1ef026768dc8f04d6d29c6af729abf85f72d51b3529efbbc07f
+========================================================================
+L0001: """Post-hoc fixed-120 continuation of completed unified SPIN/Sync/Direct jobs.
+L0002: 
+L0003: Only original fit/development rows are used. Parent artifacts stay read-only.
+L0004: Resume from the parent's LAST optimizer state, never its selected best weights.
+L0005: The original verified fit smoke is inherited; this runner creates no new smoke.
+L0006: A future deadline bounds an externally authorized invocation. Interrupting a
+L0007: partial epoch rolls back to the last committed epoch, including optimizer/RNG.
+L0008: """
+L0009: from __future__ import annotations
+L0010: import argparse
+L0011: import math
+L0012: import os
+L0013: from pathlib import Path
+L0014: import signal
+L0015: import socket
+L0016: import time
+L0017: 
+L0018: ROOT = Path(__file__).resolve().parents[2]
+L0019: PROTOCOL = "spin-sync-unified-fixed120-development-20260916-v1"
+L0020: PARENT_OUTPUT = ROOT / "outputs/spin-sync-unified-20260916-v1"
+L0021: VARIANTS = ("spin_sync_direct", "spin_direct_no_memory")
+L0022: STOP_REQUESTED = False
+L0023: TRAINING = {"max_epochs": 120, "batch": 8, "evaluation_batch": 8, "node_chunk": 32,
+L0024:     "gradient_checkpointing": True, "optimizer": "AdamW", "lr": .001,
+L0025:     "weight_decay": .0001, "betas": [.9, .999], "gradient_clip": 1., "scheduler": None,
+L0026:     "patience": None, "patience_starts_epoch": None, "earliest_stop_epoch": None,
+L0027:     "early_stopping": False, "stop_rule": "fixed_120_epochs",
+L0028:     "data_order_seed": 51001, "training_mask_seed": 61001, "selection_mask_seed": 71001,
+L0029:     "loss": "unclamped raw missing absolute sum / (fit C * batch missing count)",
+L0030:     "selection": "equal mean of three condition global missing-only NMAE; strict improvement",
+L0031:     "initialization": "all parameters jointly trained from scratch", "precision": "FP32; TF32 disabled"}
+L0032: 
+L0033: 
+L0034: class Stopped(RuntimeError):
+L0035:     pass
+L0036: 
+L0037: 
+L0038: def request_stop(signum, frame):
+L0039:     global STOP_REQUESTED
+L0040:     STOP_REQUESTED = True
+L0041: 
+L0042: 
+L0043: def check_stop(args):
+L0044:     if STOP_REQUESTED or time.time() >= args.deadline_unix - 60:
+L0045:         raise Stopped("signal" if STOP_REQUESTED else "allocation_cutoff")
+L0046: 
+L0047: 
+L0048: def parent_sources():
+L0049:     package = ROOT / "experiments/spin_sync_unified_v1"
+L0050:     files = [package / name for name in ("runner.py", "models.py", "__init__.py")]
+L0051:     for name in ("spin_comparison_v1", "sync_delta_v1", "llm_candidates_v1"):
+L0052:         files += sorted((ROOT / "experiments" / name).glob("*.py"))
+L0053:     files.append(ROOT / "experiments/direct_only_runtime_v1/run.py")
+L0054:     return {str(path.relative_to(ROOT)): io.file_sha(path) for path in sorted(set(files))}
+L0055: 
+L0056: 
+L0057: def sources():
+L0058:     return {**parent_sources(), **{str(path.relative_to(ROOT)): io.file_sha(path)
+L0059:         for path in (Path(__file__), Path(__file__).with_name("__init__.py"))}}
+L0060: 
+L0061: 
+L0062: def require_identity(record, identity, label):
+L0063:     if any(record.get(key) != value for key, value in identity.items()):
+L0064:         raise RuntimeError(f"{label} identity differs")
+L0065: 
+L0066: 
+L0067: def verify_parent_unchanged(ledger):
+L0068:     for name, digest in ledger["files_sha256"].items():
+L0069:         if io.file_sha(Path(ledger["path"]) / name) != digest:
+L0070:             raise RuntimeError(f"Frozen continuation parent changed: {name}")
+L0071: 
+L0072: 
+L0073: def completed_parent(args):
+L0074:     path = PARENT_OUTPUT / args.dataset / args.variant / f"seed{args.seed}"
+L0075:     result = base.read_json(path / "result.json")
+L0076:     if result.get("state") != "complete" or result.get("role") != "development_only":
+L0077:         raise RuntimeError("Parent must already have a complete development result")
+L0078:     config = base.read_json(path / "config.json")
+L0079:     identity = {"protocol": PARENT_PROTOCOL, "config_sha256": io.file_sha(path / "config.json"),
+L0080:                 "dataset": args.dataset, "variant": args.variant, "seed": args.seed}
+L0081:     require_identity(result, identity, "Parent result")
+L0082:     require_identity(config, {k: v for k, v in identity.items() if k != "config_sha256"}, "Parent config")
+L0083:     if (config["training"] != PARENT_TRAINING or config["model_config"] != MODEL_CONFIG
+L0084:             or config["source_files"] != parent_sources() or config["role"] != "development_only"):
+L0085:         raise RuntimeError("Parent scientific configuration or frozen source differs")
+L0086:     smoke = base.read_json(path / "smoke/SMOKE.json")
+L0087:     require_identity(smoke, identity, "Parent smoke")
+L0088:     if not all(smoke.get(k) is True for k in ("passed", "exact_checkpoint_continuation", "fit_evaluation_path_checked")):
+L0089:         raise RuntimeError("A verified parent training/resume/evaluation smoke is required")
+L0090:     if io.file_sha(path / "best.pt") != result["best_checkpoint_sha256"]:
+L0091:         raise RuntimeError("Parent selected checkpoint hash differs")
+L0092:     last = torch.load(path / "last.pt", map_location="cpu", weights_only=False)
+L0093:     best = torch.load(path / "best.pt", map_location="cpu", weights_only=False)
+L0094:     require_identity(last, identity, "Parent last checkpoint")
+L0095:     require_identity(best, identity, "Parent best checkpoint")
+L0096:     history = base.read_json(path / "history.json")
+L0097:     epochs = last["next_epoch"]
+L0098:     if (not 1 <= epochs <= 120 or epochs != result["epochs_completed"] or len(history) != epochs
+L0099:             or last["history"] != history or result["optimizer_updates"] != epochs * 64
+L0100:             or any(row["epoch"] != i + 1 or row["updates"] != (i + 1) * 64 for i, row in enumerate(history))):
+L0101:         raise RuntimeError("Parent committed epochs/history/update counts differ")
+L0102:     selected = min(history, key=lambda row: row["selection_score"])
+L0103:     if (last["best_epoch"] != best["epoch"] or best["epoch"] != result["best_epoch"]
+L0104:             or best["epoch"] != selected["epoch"] or last["best_score"] != best["score"]
+L0105:             or best["score"] != selected["selection_score"]
+L0106:             or any(last["best_eval"][key] != result["primary_eval"][key] for key in ("selection_score", "metrics", "rows"))
+L0107:             or last["best_score"] != last["best_eval"]["selection_score"]
+L0108:             or io.state_sha(best["model"]) != result["best_state_sha256"]
+L0109:             or io.state_sha(last["best_model"]) != result["best_state_sha256"]):
+L0110:         raise RuntimeError("Parent best selection/checkpoint/evaluation differs")
+L0111:     if (last["training_seconds"] != result["training_seconds"]
+L0112:             or last["peak_training_allocated_bytes"] != result["peak_training_allocated_bytes"]
+L0113:             or last["stopped_early"] != result["stopped_early"]
+L0114:             or (epochs < 120 and not last["stopped_early"])):
+L0115:         raise RuntimeError("Parent stopping or cumulative runtime differs")
+L0116:     if (not last["optimizer"]["state"] or set(last["rng"]) != {"python", "numpy", "torch", "cuda"}
+L0117:             or io.file_sha(path / "initial.pt") != config["initial_file_sha256"]):
+L0118:         raise RuntimeError("Parent optimizer/RNG/initialization is incomplete")
+L0119:     for group in last["optimizer"]["param_groups"]:
+L0120:         if (group["lr"] != .001 or group["weight_decay"] != .0001 or tuple(group["betas"]) != (.9, .999)):
+L0121:             raise RuntimeError("Parent AdamW hyperparameters differ")
+L0122:     ledger = {"path": str(path), "identity": identity, "epochs_completed": epochs,
+L0123:         "imported_checkpoint": "last.pt", "last_model_state_sha256": io.state_sha(last["model"]),
+L0124:         "files_sha256": {name: io.file_sha(path / name) for name in
+L0125:             ("config.json", "result.json", "last.pt", "best.pt", "history.json", "initial.pt", "smoke/SMOKE.json")}}
+L0126:     return config, last, ledger
+L0127: 
+L0128: 
+L0129: def status(context, state, **fields):
+L0130:     io.write_json(context["status_path"], {**context["identity"], "state": state,
+L0131:         "updated": io.utc(), "deadline_unix": context["args"].deadline_unix, **fields})
+L0132: 
+L0133: 
+L0134: def setup(args, job):
+L0135:     check_stop(args)
+L0136:     parent_config, parent_last, parent_ledger = completed_parent(args)
+L0137:     engine.seed_runtime(args.seed)
+L0138:     device = torch.device(args.device)
+L0139:     if device.type != "cuda" or not torch.cuda.is_available():
+L0140:         raise RuntimeError("Formal continuation requires an authorized CUDA device")
+L0141:     original = base.verify_parent(base.DEFAULT_PARENT)
+L0142:     bundle = io.verified_bundle(original, args.dataset)
+L0143:     masks = engine.make_dev_masks(bundle, 71001)
+L0144:     data = base.data_identity(bundle, masks)
+L0145:     if len(bundle.train_windows) != 512:
+L0146:         raise RuntimeError("Original 512 fit windows are required")
+L0147:     full = base.read_json(base.DEFAULT_FULL / "registry.json")
+L0148:     if data != full["data"][args.dataset] or io.file_sha(base.DEFAULT_FULL / "registry.json") != base.FULL_SHA:
+L0149:         raise RuntimeError("Original Direct data or reference registry differs")
+L0150:     reference_paths = {
+L0151:         "linear": Path(full["references"][args.dataset]["linear"]["path"]),
+L0152:         "direct_sync": base.DEFAULT_FULL / args.dataset / "direct_sync/seed41001/result.json",
+L0153:         "spin_adapted": ROOT / "outputs/spin-comparison-20260914-v1" / args.dataset / "spin_adapted/seed41001/result.json"}
+L0154:     references, evaluations = {}, {}
+L0155:     for name, path in reference_paths.items():
+L0156:         record = base.read_json(path)
+L0157:         evaluation = record if name == "linear" else record["primary_eval"]
+L0158:         if evaluation["role"] != "development_only" or evaluation["mask_seed"] != 71001:
+L0159:             raise RuntimeError(f"Wrong original development reference: {name}")
+L0160:         if name == "linear":
+L0161:             if io.file_sha(path) != full["references"][args.dataset]["linear"]["sha256"]:
+L0162:                 raise RuntimeError("Original Linear reference changed")
+L0163:         elif (record["dataset"] != args.dataset or record["variant"] != name or record["seed"] != 41001
+L0164:               or io.file_sha(path.with_name("best.pt")) != record["best_checkpoint_sha256"]
+L0165:               or record["registry_sha256"] != io.file_sha(path.parents[3] / "registry.json")
+L0166:               or base.read_json(path.parents[3] / "registry.json")["data"][args.dataset] != data):
+L0167:             raise RuntimeError(f"Original checkpoint identity differs: {name}")
+L0168:         references[name] = {"path": str(path), "sha256": io.file_sha(path),
+L0169:                             "selection_score": evaluation["selection_score"]}
+L0170:         evaluations[name] = evaluation
+L0171:     rows = []
+L0172:     for condition in CONDITIONS:
+L0173:         rows += engine.score_predictions(bundle, condition, np.zeros_like(bundle.dev_windows), masks[0][condition], masks[1])
+L0174:     for evaluation in evaluations.values():
+L0175:         base.paired({"rows": rows}, evaluation)
+L0176:     models = {variant: build_model(bundle.flows, init_seed=args.seed, variant=variant) for variant in VARIANTS}
+L0177:     for model in models.values():
+L0178:         model.configure_from_bundle(bundle)
+L0179:         model.set_execution(node_chunk=32, gradient_checkpointing=True)
+L0180:         if not all(parameter.requires_grad for parameter in model.parameters()):
+L0181:             raise RuntimeError("Every unified-model parameter must be trainable from scratch")
+L0182:     full_params, reduced_params = [dict(models[variant].named_parameters()) for variant in VARIANTS]
+L0183:     if not reduced_params.keys() < full_params.keys():
+L0184:         raise RuntimeError("No-memory parameters must be a strict subset of the full model")
+L0185:     if any(not torch.equal(parameter, full_params[name]) for name, parameter in reduced_params.items()):
+L0186:         raise RuntimeError("Shared named parameters do not initialize exactly equally")
+L0187:     model = models[args.variant]
+L0188:     initial = io.cpu_state(model)
+L0189:     initial_path = Path(parent_ledger["path"]) / "initial.pt"
+L0190:     if (io.state_sha(torch.load(initial_path, map_location="cpu", weights_only=False)) != io.state_sha(initial)
+L0191:             or io.state_sha(initial) != parent_config["initial_state_sha256"]):
+L0192:         raise RuntimeError("Original shared initialization differs")
+L0193:     config = {"protocol": PROTOCOL, "dataset": args.dataset, "variant": args.variant, "seed": args.seed,
+L0194:         "training": TRAINING, "model_config": MODEL_CONFIG, "data": data,
+L0195:         "runtime": base.runtime(), "source_files": sources(),
+L0196:         "parent": str(base.DEFAULT_PARENT), "parent_registry_sha256": io.file_sha(base.DEFAULT_PARENT / "registry.json"),
+L0197:         "references": references, "initial_state_sha256": io.state_sha(initial),
+L0198:         "initial_file_sha256": io.file_sha(initial_path), "parameter_count": sum(p.numel() for p in model.parameters()),
+L0199:         "shared_named_parameters_exact": True, "shared_parameter_tensors": len(reduced_params),
+L0200:         "no_memory_removed_parameters": sorted(full_params.keys() - reduced_params.keys()),
+L0201:         "role": "development_only", "parent_checkpoint_weights_loaded": False,
+L0202:         "reference_checkpoint_weights_loaded": False, "continuation_checkpoint_loaded": True,
+L0203:         "parent_checkpoint_weights_loaded_scope": "pretrained SPIN/Direct reference weights only",
+L0204:         "independent_training_repeat": False,
+L0205:         "posthoc_training_duration_diagnostic": True, "continuation_parent": parent_ledger,
+L0206:         "inherited_smoke": {"path": str(Path(parent_ledger["path"]) / "smoke/SMOKE.json"),
+L0207:             "sha256": parent_ledger["files_sha256"]["smoke/SMOKE.json"], "new_smoke_performed": False}}
+L0208:     parent_expected = {key: value for key, value in config.items()
+L0209:         if key not in ("posthoc_training_duration_diagnostic", "continuation_parent", "inherited_smoke",
+L0210:             "reference_checkpoint_weights_loaded", "continuation_checkpoint_loaded",
+L0211:             "parent_checkpoint_weights_loaded_scope", "independent_training_repeat")}
+L0212:     parent_expected.update(protocol=PARENT_PROTOCOL, training=PARENT_TRAINING,
+L0213:                            source_files=parent_sources(), parent_checkpoint_weights_loaded=False)
+L0214:     if parent_config != parent_expected:
+L0215:         raise RuntimeError("Original parent model/data/runtime/reference configuration differs")
+L0216:     if len(parent_last["rng"]["cuda"]) != torch.cuda.device_count():
+L0217:         raise RuntimeError("Preserve parent visible-CUDA-device count for exact RNG continuation")
+L0218:     verify_parent_unchanged(parent_ledger)
+L0219:     config_path = job / "config.json"
+L0220:     if config_path.exists() and base.read_json(config_path) != config:
+L0221:         raise RuntimeError("Immutable model/source/data/training configuration changed")
+L0222:     if not config_path.exists():
+L0223:         io.write_json(config_path, config)
+L0224:     identity = {"protocol": PROTOCOL, "config_sha256": io.file_sha(config_path),
+L0225:                 "dataset": args.dataset, "variant": args.variant, "seed": args.seed}
+L0226:     model = model.to(device)
+L0227:     optimizer = torch.optim.AdamW(model.parameters(), lr=.001, betas=(.9, .999), weight_decay=.0001)
+L0228:     stats, neighbors = engine.device_inputs(bundle, device)
+L0229:     return {"args": args, "job": job, "device": device, "bundle": bundle, "masks": masks,
+L0230:         "config": config, "identity": identity, "model": model, "optimizer": optimizer,
+L0231:         "stats": stats, "neighbors": neighbors, "reference": evaluations["linear"],
+L0232:         "status_path": job / "status.json", "parent_last": parent_last}
+L0233: 
+L0234: 
+L0235: def step(context, order, masks, offset, epoch):
+L0236:     check_stop(context["args"])
+L0237:     bundle = context["bundle"]
+L0238:     indices = order[offset:offset + 8]
+L0239:     return engine.train_step(context["model"], bundle.train_windows[indices], masks[offset:offset + len(indices)],
+L0240:         bundle.train_starts[indices], context["stats"], context["neighbors"], bundle.C, context["optimizer"],
+L0241:         dataset=bundle.dataset, epoch=epoch, physical_batch=8, target_block=bundle.flows)
+L0242: 
+L0243: 
+L0244: def evaluate(context):
+L0245:     bundle, (masks, families) = context["bundle"], context["masks"]
+L0246:     metrics, rows, begin = {}, [], time.perf_counter()
+L0247:     for condition in CONDITIONS:
+L0248:         final, raw = np.empty_like(bundle.dev_windows), np.empty_like(bundle.dev_windows)
+L0249:         for first in range(0, len(raw), 8):
+L0250:             check_stop(context["args"])
+L0251:             sl = slice(first, first + 8)
+L0252:             final[sl], raw[sl] = engine.predict_windows(context["model"], bundle.dev_windows[sl], masks[condition][sl],
+L0253:                 bundle.dev_starts[sl], context["stats"], context["neighbors"], dataset=bundle.dataset,
+L0254:                 physical_batch=8, target_block=bundle.flows)
+L0255:         condition_rows = engine.score_predictions(bundle, condition, final, masks[condition], families, raw)
+L0256:         rows.extend(condition_rows)
+L0257:         metrics[condition] = engine.aggregate(condition_rows)
+L0258:         metrics[condition]["groups"] = {name: engine.aggregate([row["groups"][name] for row in condition_rows])
+L0259:                                        for name in condition_rows[0]["groups"]}
+L0260:         metrics[condition]["negative_raw_fraction"] = sum(r["negative_raw_count"] for r in condition_rows) / metrics[condition]["count"]
+L0261:     score = sum(metrics[c]["nmae"] for c in CONDITIONS) / 3
+L0262:     if not math.isfinite(score):
+L0263:         raise FloatingPointError("Undefined development score")
+L0264:     result = {"role": "development_only", "mask_seed": 71001, "serial_order_seed": 81002,
+L0265:         "selection_score": score, "metrics": metrics, "rows": rows, "intervention": None,
+L0266:         "mask_array_sha256": {c: array_sha256(masks[c]) for c in CONDITIONS},
+L0267:         "elapsed_seconds": time.perf_counter() - begin}
+L0268:     base.paired(result, context["reference"])
+L0269:     return result
+L0270: 
+L0271: 
+L0272: def checkpoint(context, progress, path):
+L0273:     io.save_torch(path, {**context["identity"], **progress, "model": io.cpu_state(context["model"]),
+L0274:         "optimizer": context["optimizer"].state_dict(), "rng": io.capture_rng(),
+L0275:         "invocation_deadline_unix": context["args"].deadline_unix, "committed": io.utc()})
+L0276: 
+L0277: 
+L0278: def restore(context, path):
+L0279:     saved = torch.load(path, map_location="cpu", weights_only=False)
+L0280:     for key, expected in context["identity"].items():
+L0281:         if saved[key] != expected:
+L0282:             raise RuntimeError(f"Checkpoint identity differs: {key}")
+L0283:     context["model"].load_state_dict(saved["model"], strict=True)
+L0284:     context["optimizer"].load_state_dict(saved["optimizer"])
+L0285:     io.restore_rng(saved["rng"])
+L0286:     return {key: saved[key] for key in ("next_epoch", "history", "best_model", "best_eval", "best_epoch",
+L0287:                                       "best_score", "bad_epochs", "stopped_early", "training_seconds", "peak_training_allocated_bytes")}
+L0288: 
+L0289: 
+L0290: def publish_best(context, progress):
+L0291:     io.save_torch(context["job"] / "best.pt", {**context["identity"], "model": progress["best_model"],
+L0292:         "epoch": progress["best_epoch"], "score": progress["best_score"]})
+L0293: 
+L0294: 
+L0295: def train(context):
+L0296:     args, job = context["args"], context["job"]
+L0297:     if (job / "result.json").exists():
+L0298:         result = base.read_json(job / "result.json")
+L0299:         if any(result.get(k) != v for k, v in context["identity"].items()) or result.get("state") != "complete":
+L0300:             raise RuntimeError("Existing result identity/completion differs")
+L0301:         if io.file_sha(job / "best.pt") != result["best_checkpoint_sha256"]:
+L0302:             raise RuntimeError("Completed best checkpoint changed")
+L0303:         io.emit("already_complete", **context["identity"])
+L0304:         return
+L0305:     last = job / "last.pt"
+L0306:     if last.exists() and not args.resume:
+L0307:         raise RuntimeError("Committed checkpoint exists; explicitly pass --resume")
+L0308:     if last.exists():
+L0309:         progress = restore(context, last)
+L0310:         if progress["stopped_early"] or not context["config"]["continuation_parent"]["epochs_completed"] <= progress["next_epoch"] <= 120:
+L0311:             raise RuntimeError("Continuation checkpoint stopping/epoch identity differs")
+L0312:     else:
+L0313:         if (job / "history.json").exists() or (job / "best.pt").exists():
+L0314:             raise RuntimeError("Formal artifacts exist without an authoritative checkpoint")
+L0315:         saved = context["parent_last"]
+L0316:         context["model"].load_state_dict(saved["model"], strict=True)
+L0317:         context["optimizer"].load_state_dict(saved["optimizer"])
+L0318:         io.restore_rng(saved["rng"])
+L0319:         progress = {key: saved[key] for key in ("next_epoch", "history", "best_model", "best_eval", "best_epoch",
+L0320:             "best_score", "bad_epochs", "training_seconds", "peak_training_allocated_bytes")}
+L0321:         progress["stopped_early"] = False
+L0322:         checkpoint(context, progress, last)
+L0323:         publish_best(context, progress)
+L0324:         io.write_json(job / "history.json", progress["history"])
+L0325:         io.emit("parent_last_imported", **context["identity"], epochs_completed=progress["next_epoch"])
+L0326:     del context["parent_last"]
+L0327:     try:
+L0328:         for epoch in range(progress["next_epoch"], 120):
+L0329:             check_stop(args)
+L0330:             order, masks, schedule = base.epoch_schedule(context["config"], context["bundle"], epoch)
+L0331:             status(context, "training", epoch=epoch + 1, epochs_committed=progress["next_epoch"])
+L0332:             torch.cuda.reset_peak_memory_stats(context["device"])
+L0333:             begin, steps = time.perf_counter(), []
+L0334:             for offset in range(0, 512, 8):
+L0335:                 steps.append(step(context, order, masks, offset, epoch))
+L0336:             seconds = time.perf_counter() - begin
+L0337:             peak = torch.cuda.max_memory_allocated(context["device"])
+L0338:             status(context, "evaluating", epoch=epoch + 1, epochs_committed=progress["next_epoch"])
+L0339:             evaluation = evaluate(context)
+L0340:             if evaluation["selection_score"] < progress["best_score"]:
+L0341:                 progress.update(best_model=io.cpu_state(context["model"]), best_eval=evaluation,
+L0342:                     best_epoch=epoch + 1, best_score=evaluation["selection_score"], bad_epochs=0)
+L0343:             elif epoch + 1 >= 16:
+L0344:                 progress["bad_epochs"] += 1
+L0345:             else:
+L0346:                 progress["bad_epochs"] = 0
+L0347:             progress["next_epoch"] = epoch + 1
+L0348:             progress["stopped_early"] = False  # Only stopping rule differs; bad_epochs remains descriptive.
+L0349:             progress["training_seconds"] += seconds
+L0350:             progress["peak_training_allocated_bytes"] = max(peak, progress["peak_training_allocated_bytes"])
+L0351:             row = {"epoch": epoch + 1, "updates": (epoch + 1) * 64,
+L0352:                 "train_loss": float(np.mean([s["loss"] for s in steps])),
+L0353:                 "mean_gradient_norm": float(np.mean([s["gradient_norm"] for s in steps])),
+L0354:                 "selection_score": evaluation["selection_score"], "best_score": progress["best_score"],
+L0355:                 "best_epoch": progress["best_epoch"], "bad_epochs": progress["bad_epochs"],
+L0356:                 "condition_nmae": {c: evaluation["metrics"][c]["nmae"] for c in CONDITIONS},
+L0357:                 "training_seconds": seconds, "evaluation_seconds": evaluation["elapsed_seconds"], "schedule": schedule}
+L0358:             progress["history"].append(row)
+L0359:             checkpoint(context, progress, last)
+L0360:             publish_best(context, progress)
+L0361:             io.write_json(job / "history.json", progress["history"])
+L0362:             status(context, "epoch_complete", epochs_completed=epoch + 1, best_epoch=progress["best_epoch"], best_score=progress["best_score"])
+L0363:             io.emit("epoch_complete", **context["identity"], **{k: v for k, v in row.items() if k != "schedule"})
+L0364:         check_stop(args)
+L0365:         if progress["next_epoch"] != 120 or progress["best_model"] is None:
+L0366:             raise RuntimeError("Completion requires all 120 committed epochs")
+L0367:         publish_best(context, progress)
+L0368:         best = torch.load(job / "best.pt", map_location="cpu", weights_only=False)
+L0369:         context["model"].load_state_dict(best["model"], strict=True)
+L0370:         final = evaluate(context)
+L0371:         if any(final[field] != progress["best_eval"][field] for field in ("selection_score", "metrics", "rows")):
+L0372:             raise RuntimeError("Best checkpoint reload evaluation differs")
+L0373:         if context["config"]["source_files"] != sources():
+L0374:             raise RuntimeError("Frozen source changed during training")
+L0375:         if any(io.file_sha(ref["path"]) != ref["sha256"] for ref in context["config"]["references"].values()):
+L0376:             raise RuntimeError("Reference result changed during training")
+L0377:         verify_parent_unchanged(context["config"]["continuation_parent"])
+L0378:         check_stop(args)
+L0379:         result = {**context["identity"], "state": "complete", "role": "development_only", "independent_test": False,
+L0380:             "epochs_completed": progress["next_epoch"], "optimizer_updates": progress["next_epoch"] * 64,
+L0381:             "best_epoch": progress["best_epoch"], "stopped_early": progress["stopped_early"], "training_cap": 120,
+L0382:             "stop_reason": "fixed_epoch_cap", "posthoc_training_duration_diagnostic": True,
+L0383:             "continuation_checkpoint_loaded": True, "reference_checkpoint_weights_loaded": False,
+L0384:             "independent_training_repeat": False,
+L0385:             "continuation_parent": context["config"]["continuation_parent"],
+L0386:             "inherited_smoke": context["config"]["inherited_smoke"],
+L0387:             "parent_epochs_completed": context["config"]["continuation_parent"]["epochs_completed"],
+L0388:             "additional_epochs_completed": 120 - context["config"]["continuation_parent"]["epochs_completed"],
+L0389:             "last_checkpoint_sha256": io.file_sha(last),
+L0390:             "training_seconds": progress["training_seconds"], "parameter_count": context["config"]["parameter_count"],
+L0391:             "trainable_parameter_count": sum(p.numel() for p in context["model"].parameters() if p.requires_grad),
+L0392:             "best_state_sha256": io.state_sha(context["model"].state_dict()),
+L0393:             "best_checkpoint_sha256": io.file_sha(job / "best.pt"), "primary_eval": final,
+L0394:             "peak_training_allocated_bytes": progress["peak_training_allocated_bytes"],
+L0395:             "batch": 8, "effective_batch": 8, "physical_batch": 8, "evaluation_batch": 8,
+L0396:             "target_block": context["bundle"].flows, "node_chunk": 32,
+L0397:             "gradient_checkpointing": True, "all_parameters_jointly_trained_from_scratch": True,
+L0398:             "device_name": torch.cuda.get_device_name(context["device"]), "finished": io.utc(),
+L0399:             "invocation_deadline_unix": args.deadline_unix}
+L0400:         io.write_json(job / "history.json", progress["history"])
+L0401:         io.write_json(job / "result.json", result)
+L0402:         status(context, "complete", epochs_completed=progress["next_epoch"], best_epoch=progress["best_epoch"], best_score=progress["best_score"])
+L0403:         io.emit("complete", **context["identity"], best_epoch=progress["best_epoch"], score=progress["best_score"])
+L0404:     except Stopped as error:
+L0405:         saved = torch.load(last, map_location="cpu", weights_only=False)
+L0406:         status(context, "stopped", reason=str(error), epochs_committed=saved["next_epoch"],
+L0407:                eligible_as_completed_result=False, resume_required=True)
+L0408:         io.emit("stopped", **context["identity"], reason=str(error), epochs_committed=saved["next_epoch"])
+L0409: 
+L0410: 
+L0411: 
+L0412: def main():
+L0413:     parser = argparse.ArgumentParser(description=__doc__)
+L0414:     parser.add_argument("--dataset", choices=("abilene", "geant"), required=True)
+L0415:     parser.add_argument("--variant", choices=VARIANTS, required=True)
+L0416:     parser.add_argument("--seed", type=int, choices=(41001, 41002, 41003), default=41001)
+L0417:     parser.add_argument("--deadline-unix", type=float, required=True)
+L0418:     parser.add_argument("--output", type=Path, default=ROOT / "outputs/spin-sync-unified-fixed120-20260916-v1")
+L0419:     parser.add_argument("--device", default="cuda:0")
+L0420:     parser.add_argument("--resume", action="store_true")
+L0421:     args = parser.parse_args()
+L0422:     if not math.isfinite(args.deadline_unix) or args.deadline_unix <= time.time() + 60:
+L0423:         parser.error("An explicit future --deadline-unix with more than 60 seconds remaining is required")
+L0424:     global torch, np, base, engine, io, CONDITIONS, array_sha256, build_model, MODEL_CONFIG, PARENT_TRAINING, PARENT_PROTOCOL
+L0425:     import torch
+L0426:     import numpy as np
+L0427:     from experiments.direct_only_runtime_v1 import run as base
+L0428:     from experiments.sync_delta_v1 import engine, run as io
+L0429:     from experiments.sync_delta_v1.data import CONDITIONS, array_sha256
+L0430:     from experiments.spin_sync_unified_v1.models import build_model, MODEL_CONFIG
+L0431:     from experiments.spin_sync_unified_v1.runner import TRAINING as PARENT_TRAINING, PROTOCOL as PARENT_PROTOCOL
+L0432:     signal.signal(signal.SIGTERM, request_stop)
+L0433:     signal.signal(signal.SIGINT, request_stop)
+L0434:     job = (args.output.resolve() / args.dataset / args.variant / f"seed{args.seed}").resolve()
+L0435:     if job.is_relative_to(PARENT_OUTPUT.resolve()) or PARENT_OUTPUT.resolve().is_relative_to(job):
+L0436:         parser.error("Continuation output must not overwrite the parent namespace")
+L0437:     context = None
+L0438:     with base.job_lock(job / "active.lock"):
+L0439:         try:
+L0440:             context = setup(args, job)
+L0441:             invocation = {**context["identity"], "started": io.utc(), "pid": os.getpid(), "hostname": socket.gethostname(),
+L0442:                 "deadline_unix": args.deadline_unix, "device": args.device, "inherited_parent_smoke": True, "resume": args.resume,
+L0443:                 "cuda_visible_devices": os.environ.get("CUDA_VISIBLE_DEVICES")}
+L0444:             io.write_json(job / "invocations" / f"{time.time_ns()}-{os.getpid()}.json", invocation)
+L0445:             train(context)
+L0446:         except Stopped as error:
+L0447:             if context is not None:
+L0448:                 status(context, "stopped", reason=str(error), eligible_as_completed_result=False)
+L0449:         except BaseException as error:
+L0450:             if context is not None:
+L0451:                 status(context, "failed", error=f"{type(error).__name__}: {error}", eligible_as_completed_result=False)
+L0452:             raise
+L0453: 
+L0454: 
+L0455: if __name__ == "__main__":
+L0456:     main()
+
+
+========================================================================
+FILE: experiments/sync_delta_v1/data.py
+SHA256: ae70e0131ef0017e3df76208bc8d123776955f68d6f8fa7e9de31f7985d263a0
+========================================================================
+L0001: """Fit-only preprocessing and reproducible masks for Sync-Delta v1.1.
+L0002: 
+L0003: Canonical parents are memory mapped, but only fit/source-dev/tune rows are
+L0004: read or hashed. Historical fit truth is fully supervised; the 20% observation
+L0005: budget applies to the input of each imputation window, not to offline fit data.
+L0006: """
+L0007: 
+L0008: from __future__ import annotations
+L0009: 
+L0010: from dataclasses import dataclass
+L0011: import hashlib
+L0012: import json
+L0013: import os
+L0014: from pathlib import Path
+L0015: import tempfile
+L0016: from typing import Any
+L0017: 
+L0018: import numpy as np
+L0019: 
+L0020: 
+L0021: PROTOCOL = "sync-delta-v1.1"
+L0022: WINDOW_LENGTH = 50
+L0023: CONDITIONS = ("uniform", "unequal", "unequal_gap")
+L0024: DATA_ORDER_SEED = 51001
+L0025: TRAINING_MASK_SEED = 61001
+L0026: SELECTION_MASK_SEED = 71001
+L0027: POSTFREEZE_MASK_SEEDS = (71002, 71003)
+L0028: DATASET_SPECS = {
+L0029:     "abilene": {
+L0030:         "flows": 144, "fit": (0, 33335), "source_dev": (33384, 33884),
+L0031:         "tune": (33884, 37484), "train_parent": (0, 33884),
+L0032:         "val_parent": (33884, 41134),
+L0033:     },
+L0034:     "geant": {
+L0035:         "flows": 462, "fit": (0, 7023), "source_dev": (7072, 7572),
+L0036:         "tune": (7572, 8322), "train_parent": (0, 7572),
+L0037:         "val_parent": (7572, 9172),
+L0038:     },
+L0039: }
+L0040: _DEFAULT_CANONICAL = Path(__file__).resolve().parents[1] / "acil_innovation_v1" / "canonical"
+L0041: 
+L0042: 
+L0043: def _json_bytes(value: Any) -> bytes:
+L0044:     return json.dumps(value, sort_keys=True, separators=(",", ":"),
+L0045:                       ensure_ascii=True, allow_nan=False).encode("ascii")
+L0046: 
+L0047: 
+L0048: def stable_seed(domain: str, **identity: Any) -> int:
+L0049:     """A domain-separated 128-bit seed, independent of Python hash/process state."""
+L0050:     digest = hashlib.sha256(
+L0051:         PROTOCOL.encode("ascii") + b"\0" + domain.encode("ascii") + b"\0" + _json_bytes(identity)
+L0052:     ).digest()
+L0053:     return int.from_bytes(digest[:16], "big")
+L0054: 
+L0055: 
+L0056: def _rng(domain: str, **identity: Any) -> np.random.Generator:
+L0057:     return np.random.Generator(np.random.PCG64DXSM(stable_seed(domain, **identity)))
+L0058: 
+L0059: 
+L0060: def array_sha256(values: np.ndarray) -> str:
+L0061:     array = np.ascontiguousarray(values)
+L0062:     metadata = _json_bytes({"dtype": array.dtype.str, "shape": list(array.shape), "order": "C"})
+L0063:     digest = hashlib.sha256(PROTOCOL.encode("ascii") + b":array\0" + metadata + b"\0")
+L0064:     digest.update(array.tobytes(order="C"))
+L0065:     return digest.hexdigest()
+L0066: 
+L0067: 
+L0068: def _arrays_sha256(arrays: dict[str, np.ndarray]) -> str:
+L0069:     return hashlib.sha256(_json_bytes({name: array_sha256(value)
+L0070:                                      for name, value in sorted(arrays.items())})).hexdigest()
+L0071: 
+L0072: 
+L0073: def _spec(dataset: str) -> dict[str, Any]:
+L0074:     if dataset not in DATASET_SPECS:
+L0075:         raise ValueError("dataset must be 'abilene' or 'geant'")
+L0076:     return DATASET_SPECS[dataset]
+L0077: 
+L0078: 
+L0079: def window_starts(dataset: str, split: str) -> np.ndarray:
+L0080:     spec = _spec(dataset)
+L0081:     if split in ("fit", "train"):
+L0082:         start, stop = spec["fit"]
+L0083:         return start + np.arange(512, dtype=np.int64) * (stop - start - WINDOW_LENGTH) // 511
+L0084:     if split == "dev":
+L0085:         return np.concatenate([np.arange(*spec[name], WINDOW_LENGTH, dtype=np.int64)
+L0086:                                for name in ("source_dev", "tune")])
+L0087:     if split in ("source_dev", "tune"):
+L0088:         return np.arange(*spec[split], WINDOW_LENGTH, dtype=np.int64)
+L0089:     raise ValueError("only fit/train, source_dev, tune, and dev windows are available")
+L0090: 
+L0091: 
+L0092: def _validate_traffic(values: np.ndarray, label: str) -> None:
+L0093:     if values.ndim != 2 or not np.isfinite(values).all() or np.any(values < 0):
+L0094:         raise ValueError(f"{label} must be a finite, nonnegative 2D traffic matrix")
+L0095: 
+L0096: 
+L0097: def fit_statistics(fit: np.ndarray) -> dict[str, Any]:
+L0098:     """Population (ddof=0) fit statistics, computed in float64 and used in FP32."""
+L0099:     values = np.asarray(fit, dtype=np.float64)
+L0100:     _validate_traffic(values, "fit")
+L0101:     if min(values.shape) == 0:
+L0102:         raise ValueError("fit cannot be empty")
+L0103:     mu = values.mean(axis=0, dtype=np.float64)
+L0104:     sigma = values.std(axis=0, ddof=0, dtype=np.float64)
+L0105:     global_scale = float(np.sqrt(np.mean(sigma * sigma, dtype=np.float64)))
+L0106:     scale = np.maximum(sigma, max(1e-3 * global_scale, 1e-8))
+L0107:     c = float(np.mean(np.abs(values), dtype=np.float64))
+L0108:     if not np.isfinite(c) or c <= 0:
+L0109:         raise ValueError("fit loss constant C=mean(abs(fit)) must be finite and positive")
+L0110:     result = {
+L0111:         "mu": mu.astype(np.float32), "sigma": sigma.astype(np.float32),
+L0112:         "scale": scale.astype(np.float32), "C": c,
+L0113:         "global_scale": global_scale, "ddof": 0,
+L0114:     }
+L0115:     if not all(np.isfinite(result[name]).all() for name in ("mu", "sigma", "scale")):
+L0116:         raise ValueError("fit statistics are not representable as finite float32")
+L0117:     return result
+L0118: 
+L0119: 
+L0120: def fit_neighbors(fit: np.ndarray, max_neighbors: int = 8) -> tuple[np.ndarray, np.ndarray]:
+L0121:     """Self plus strictly positive Pearson neighbors, ties broken by flow ID."""
+L0122:     values = np.asarray(fit, dtype=np.float64)
+L0123:     _validate_traffic(values, "fit")
+L0124:     if max_neighbors < 0:
+L0125:         raise ValueError("max_neighbors must be nonnegative")
+L0126:     centered = values - values.mean(axis=0, dtype=np.float64)
+L0127:     ss = np.einsum("tf,tf->f", centered, centered)
+L0128:     denominator = np.sqrt(ss[:, None] * ss[None, :])
+L0129:     corr = np.zeros_like(denominator)
+L0130:     np.divide(centered.T @ centered, denominator, out=corr, where=denominator > 0)
+L0131:     np.clip(corr, -1.0, 1.0, out=corr)
+L0132:     flows = values.shape[1]
+L0133:     neighbors = np.full((flows, max_neighbors + 1), -1, dtype=np.int64)
+L0134:     ids = np.arange(flows, dtype=np.int64)
+L0135:     for target in range(flows):
+L0136:         neighbors[target, 0] = target
+L0137:         if ss[target] <= 0:
+L0138:             continue
+L0139:         eligible = ids[(ss > 0) & (corr[target] > 0) & (ids != target)]
+L0140:         order = np.lexsort((eligible, -corr[target, eligible]))
+L0141:         selected = eligible[order[:max_neighbors]]
+L0142:         neighbors[target, 1:1 + len(selected)] = selected
+L0143:     return neighbors, corr
+L0144: 
+L0145: 
+L0146: def _load_cohort(dataset: str, cohort: str, canonical_dir: Path) -> tuple[np.ndarray, dict[str, Any]]:
+L0147:     spec = _spec(dataset)
+L0148:     if cohort not in ("fit", "source_dev", "tune"):
+L0149:         raise ValueError("unregistered cohort")
+L0150:     split = "val" if cohort == "tune" else "train"
+L0151:     parent_bounds = spec[f"{split}_parent"]
+L0152:     bounds = spec[cohort]
+L0153:     path = canonical_dir / f"{dataset}_{split}.npy"
+L0154:     parent = np.load(path, allow_pickle=False, mmap_mode="r")
+L0155:     expected_shape = (parent_bounds[1] - parent_bounds[0], spec["flows"])
+L0156:     if parent.shape != expected_shape or parent.dtype != np.dtype("<f4") or not parent.flags.c_contiguous:
+L0157:         raise ValueError(f"canonical parent header drift: {path}")
+L0158:     # Deliberately do not materialize/hash the full val parent, which includes gate rows.
+L0159:     values = np.array(parent[bounds[0] - parent_bounds[0]:bounds[1] - parent_bounds[0]],
+L0160:                       dtype="<f4", order="C", copy=True)
+L0161:     _validate_traffic(values, f"{dataset}/{cohort}")
+L0162:     record = {"cohort": cohort, "bounds": list(bounds), "source": str(path.resolve()),
+L0163:               "parent_header_shape": list(expected_shape), "shape": list(values.shape),
+L0164:               "dtype": values.dtype.str, "array_sha256": array_sha256(values),
+L0165:               "hash_scope": "cohort_rows_only"}
+L0166:     return values, record
+L0167: 
+L0168: 
+L0169: def _take_windows(values: np.ndarray, absolute_starts: np.ndarray, offset: int) -> np.ndarray:
+L0170:     indices = absolute_starts[:, None] - offset + np.arange(WINDOW_LENGTH, dtype=np.int64)[None, :]
+L0171:     if indices.min() < 0 or indices.max() >= values.shape[0]:
+L0172:         raise ValueError("window escapes its registered cohort")
+L0173:     return np.ascontiguousarray(values[indices], dtype=np.float32)
+L0174: 
+L0175: 
+L0176: @dataclass(frozen=True)
+L0177: class DataBundle:
+L0178:     dataset: str
+L0179:     train_windows: np.ndarray
+L0180:     dev_windows: np.ndarray
+L0181:     train_starts: np.ndarray
+L0182:     dev_starts: np.ndarray
+L0183:     dev_cohorts: np.ndarray
+L0184:     mu: np.ndarray
+L0185:     sigma: np.ndarray
+L0186:     scale: np.ndarray
+L0187:     C: float
+L0188:     neighbors: np.ndarray
+L0189:     neighbor_valid: np.ndarray
+L0190:     metadata: dict[str, Any]
+L0191: 
+L0192:     @property
+L0193:     def flows(self) -> int:
+L0194:         return int(self.mu.size)
+L0195: 
+L0196:     @property
+L0197:     def stats(self) -> dict[str, np.ndarray]:
+L0198:         return {"mu": self.mu, "scale": self.scale}
+L0199: 
+L0200: 
+L0201: def load_dataset(dataset: str, canonical_dir: str | Path | None = None) -> DataBundle:
+L0202:     spec = _spec(dataset)
+L0203:     canonical_dir = Path(canonical_dir) if canonical_dir is not None else _DEFAULT_CANONICAL
+L0204:     fit, fit_record = _load_cohort(dataset, "fit", canonical_dir)
+L0205:     statistics = fit_statistics(fit)
+L0206:     neighbors, corr = fit_neighbors(fit)
+L0207:     train_starts = window_starts(dataset, "fit")
+L0208:     train_windows = _take_windows(fit, train_starts, spec["fit"][0])
+L0209:     dev_rows, records, labels = [], [fit_record], []
+L0210:     for cohort in ("source_dev", "tune"):
+L0211:         values, record = _load_cohort(dataset, cohort, canonical_dir)
+L0212:         starts = window_starts(dataset, cohort)
+L0213:         dev_rows.append(_take_windows(values, starts, spec[cohort][0]))
+L0214:         records.append(record)
+L0215:         labels.extend([cohort] * len(starts))
+L0216:     stats_arrays = {name: statistics[name] for name in ("mu", "sigma", "scale")}
+L0217:     stats_arrays["C"] = np.asarray(statistics["C"], dtype="<f8")
+L0218:     stats_arrays["global_scale"] = np.asarray(statistics["global_scale"], dtype="<f8")
+L0219:     metadata = {
+L0220:         "protocol": PROTOCOL, "dataset": dataset, "window_length": WINDOW_LENGTH,
+L0221:         "fit_full_truth_for_offline_statistics_and_supervision": True,
+L0222:         "online_window_observation_fraction": 0.2, "dev_is_selection_not_test": True,
+L0223:         "cohort_sources": records, "ddof": 0, "global_scale": statistics["global_scale"],
+L0224:         "stats_sha256": _arrays_sha256(stats_arrays), "neighbors_sha256": array_sha256(neighbors),
+L0225:         "pearson_sha256": array_sha256(corr), "train_starts_sha256": array_sha256(train_starts),
+L0226:         "dev_starts_sha256": array_sha256(window_starts(dataset, "dev")),
+L0227:     }
+L0228:     metadata["data_sha256"] = hashlib.sha256(_json_bytes({
+L0229:         "protocol": PROTOCOL, "dataset": dataset,
+L0230:         "cohorts": [{key: record[key] for key in ("cohort", "bounds", "array_sha256")}
+L0231:                     for record in records],
+L0232:         "stats_sha256": metadata["stats_sha256"], "neighbors_sha256": metadata["neighbors_sha256"],
+L0233:         "train_starts_sha256": metadata["train_starts_sha256"],
+L0234:         "dev_starts_sha256": metadata["dev_starts_sha256"],
+L0235:     })).hexdigest()
+L0236:     return DataBundle(dataset, train_windows, np.concatenate(dev_rows, axis=0), train_starts,
+L0237:                       window_starts(dataset, "dev"), np.asarray(labels), statistics["mu"],
+L0238:                       statistics["sigma"], statistics["scale"], statistics["C"],
+L0239:                       neighbors, neighbors >= 0, metadata)
+L0240: 
+L0241: 
+L0242: def load_fit_windows(dataset: str, indices: tuple[int, ...] = (0, 1),
+L0243:                      canonical_dir: str | Path | None = None) -> tuple[np.ndarray, np.ndarray, dict[str, Any], np.ndarray]:
+L0244:     """Fit-only entry point for real-shape preflight; no dev parent is opened."""
+L0245:     canonical_dir = Path(canonical_dir) if canonical_dir is not None else _DEFAULT_CANONICAL
+L0246:     fit, _ = _load_cohort(dataset, "fit", canonical_dir)
+L0247:     index_array = np.asarray(indices, dtype=np.int64)
+L0248:     if index_array.ndim != 1 or not len(index_array) or np.any((index_array < 0) | (index_array >= 512)):
+L0249:         raise ValueError("fit window indices must be nonempty and in [0,512)")
+L0250:     starts = window_starts(dataset, "fit")[index_array]
+L0251:     windows = _take_windows(fit, starts, DATASET_SPECS[dataset]["fit"][0])
+L0252:     neighbors, _ = fit_neighbors(fit)
+L0253:     return windows, starts, fit_statistics(fit), neighbors
+L0254: 
+L0255: 
+L0256: @dataclass(frozen=True)
+L0257: class MaskFamily:
+L0258:     uniform: np.ndarray
+L0259:     unequal: np.ndarray
+L0260:     unequal_gap: np.ndarray
+L0261:     sparse_group: np.ndarray
+L0262:     gap_affected: np.ndarray
+L0263:     gap_start: int
+L0264:     seed: int
+L0265:     window_start: int
+L0266:     epoch: int | None
+L0267:     dataset: str
+L0268:     mask_hashes: dict[str, str]
+L0269:     family_hash: str
+L0270: 
+L0271:     @property
+L0272:     def masks(self) -> dict[str, np.ndarray]:
+L0273:         return {name: getattr(self, name) for name in CONDITIONS}
+L0274: 
+L0275:     def __getitem__(self, condition: str) -> np.ndarray:
+L0276:         if condition not in CONDITIONS:
+L0277:             raise KeyError(condition)
+L0278:         return getattr(self, condition)
+L0279: 
+L0280: 
+L0281: def make_mask_family(flows: int, window_start: int, seed: int, *, dataset: str,
+L0282:                      epoch: int | None = None) -> MaskFamily:
+L0283:     """Generate all three paired global masks before selecting target chunks."""
+L0284:     if flows <= 0 or flows % 2 or int(flows) != flows:
+L0285:         raise ValueError("mask family requires a positive even flow count")
+L0286:     if epoch is not None and (int(epoch) != epoch or epoch < 0):
+L0287:         raise ValueError("epoch must be None or a nonnegative integer")
+L0288:     flows, window_start, seed = int(flows), int(window_start), int(seed)
+L0289:     identity = {"dataset": str(dataset), "flows": flows, "window_start": window_start,
+L0290:                 "seed": seed, "epoch": None if epoch is None else int(epoch)}
+L0291:     permutations = _rng("mask-positions", **identity).permuted(
+L0292:         np.broadcast_to(np.arange(WINDOW_LENGTH, dtype=np.int16), (flows, WINDOW_LENGTH)), axis=1)
+L0293:     group_order = _rng("sparse-group", **identity).permutation(flows)
+L0294:     sparse = np.zeros(flows, dtype=bool)
+L0295:     sparse[group_order[:flows // 2]] = True
+L0296:     counts = np.where(sparse, 4, 16)
+L0297:     affected = np.zeros(flows, dtype=bool)
+L0298:     sparse_count = flows // 4
+L0299:     if (flows // 2) % 2:
+L0300:         sparse_count += int(_rng("gap-balance", **identity).integers(0, 2))
+L0301:     affected_rng = _rng("gap-affected", **identity)
+L0302:     affected[affected_rng.permutation(np.flatnonzero(sparse))[:sparse_count]] = True
+L0303:     dense_count = flows // 2 - sparse_count
+L0304:     affected[affected_rng.permutation(np.flatnonzero(~sparse))[:dense_count]] = True
+L0305:     gap_start = int(_rng("gap-start", **identity).integers(0, WINDOW_LENGTH - 10 + 1))
+L0306:     flow_ids = np.broadcast_to(np.arange(flows)[:, None], permutations.shape)
+L0307:     rank = np.arange(WINDOW_LENGTH)[None, :]
+L0308:     uniform = np.zeros((WINDOW_LENGTH, flows), dtype=bool)
+L0309:     uniform[permutations[:, :10], flow_ids[:, :10]] = True
+L0310:     unequal = np.zeros_like(uniform)
+L0311:     selected = np.broadcast_to(rank, permutations.shape) < counts[:, None]
+L0312:     unequal[permutations[selected], flow_ids[selected]] = True
+L0313:     allowed = (~affected[:, None]) | (permutations < gap_start) | (permutations >= gap_start + 10)
+L0314:     selected_gap = allowed & (np.cumsum(allowed, axis=1) <= counts[:, None])
+L0315:     unequal_gap = np.zeros_like(uniform)
+L0316:     unequal_gap[permutations[selected_gap], flow_ids[selected_gap]] = True
+L0317:     masks = dict(zip(CONDITIONS, (uniform, unequal, unequal_gap)))
+L0318:     assert int(sparse.sum()) == flows // 2 and int(affected.sum()) == flows // 2
+L0319:     assert abs(int((affected & sparse).sum()) - int((affected & ~sparse).sum())) <= 1
+L0320:     assert np.all(uniform.sum(axis=0) == 10)
+L0321:     assert np.array_equal(unequal.sum(axis=0), counts)
+L0322:     assert np.array_equal(unequal_gap.sum(axis=0), counts)
+L0323:     assert not unequal_gap[gap_start:gap_start + 10, affected].any()
+L0324:     assert np.array_equal(unequal[:, ~affected], unequal_gap[:, ~affected])
+L0325:     assert all(int(mask.sum()) == 10 * flows and int((~mask).sum()) == 40 * flows
+L0326:                for mask in masks.values())
+L0327:     hashes = {name: array_sha256(np.packbits(mask.reshape(-1), bitorder="little"))
+L0328:               for name, mask in masks.items()}
+L0329:     family_hash = hashlib.sha256(_json_bytes({
+L0330:         **identity, "mask_hashes": hashes, "gap_start": gap_start,
+L0331:         "sparse_group_sha256": array_sha256(sparse), "gap_affected_sha256": array_sha256(affected),
+L0332:     })).hexdigest()
+L0333:     return MaskFamily(uniform, unequal, unequal_gap, sparse, affected, gap_start, seed,
+L0334:                       window_start, epoch, str(dataset), hashes, family_hash)
+L0335: 
+L0336: 
+L0337: @dataclass(frozen=True)
+L0338: class EpochMasks:
+L0339:     epoch: int
+L0340:     order: np.ndarray
+L0341:     conditions: tuple[str, ...]
+L0342:     masks: np.ndarray
+L0343:     families: tuple[MaskFamily, ...]
+L0344:     data_order_seed: int
+L0345:     mask_seed: int
+L0346: 
+L0347: 
+L0348: def training_epoch(bundle: DataBundle, epoch: int, data_order_seed: int = DATA_ORDER_SEED,
+L0349:                    mask_seed: int = TRAINING_MASK_SEED) -> EpochMasks:
+L0350:     if int(epoch) != epoch or epoch < 0:
+L0351:         raise ValueError("epoch must be a nonnegative integer")
+L0352:     count = len(bundle.train_starts)
+L0353:     order = _rng("training-window-order", dataset=bundle.dataset, seed=int(data_order_seed),
+L0354:                  epoch=int(epoch)).permutation(count).astype(np.int64)
+L0355:     conditions = tuple(CONDITIONS[(int(epoch) * count + position) % 3] for position in range(count))
+L0356:     families = tuple(make_mask_family(bundle.flows, int(bundle.train_starts[index]), mask_seed,
+L0357:                                      dataset=bundle.dataset, epoch=int(epoch)) for index in order)
+L0358:     masks = np.stack([family[condition] for family, condition in zip(families, conditions)])
+L0359:     return EpochMasks(int(epoch), order, conditions, masks, families, int(data_order_seed), int(mask_seed))
+L0360: 
+L0361: 
+L0362: def linear_fill(values: np.ndarray, observed: np.ndarray, fit_mean: np.ndarray) -> np.ndarray:
+L0363:     """Piecewise linear interpolation with constant edges, using observations only."""
+L0364:     values, observed = np.asarray(values), np.asarray(observed)
+L0365:     if values.shape != observed.shape or values.ndim not in (2, 3) or observed.dtype != np.bool_:
+L0366:         raise ValueError("values/mask must match as [T,F] or [B,T,F], with a boolean mask")
+L0367:     fit_mean = np.asarray(fit_mean)
+L0368:     if fit_mean.shape != (values.shape[-1],) or not np.isfinite(fit_mean).all():
+L0369:         raise ValueError("fit_mean must be finite with shape [F]")
+L0370:     if not np.isfinite(values[observed]).all() or np.any(values[observed] < 0) or np.any(fit_mean < 0):
+L0371:         raise ValueError("observed values and fit means must be finite and nonnegative")
+L0372:     single = values.ndim == 2
+L0373:     values_batch = values[None] if single else values
+L0374:     masks_batch = observed[None] if single else observed
+L0375:     output = np.empty(values_batch.shape, dtype=np.float32)
+L0376:     times = np.arange(values.shape[-2])
+L0377:     for batch in range(len(values_batch)):
+L0378:         for flow in range(values.shape[-1]):
+L0379:             positions = np.flatnonzero(masks_batch[batch, :, flow])
+L0380:             output[batch, :, flow] = (np.interp(times, positions, values_batch[batch, positions, flow])
+L0381:                                       if len(positions) else fit_mean[flow])
+L0382:     # np.interp gives a constant for a single observation and constant edge extrapolation.
+L0383:     output[masks_batch] = values_batch[masks_batch]
+L0384:     return output[0] if single else output
+L0385: 
+L0386: 
+L0387: def _atomic_npz(path: Path, arrays: dict[str, np.ndarray]) -> None:
+L0388:     path.parent.mkdir(parents=True, exist_ok=True)
+L0389:     with tempfile.NamedTemporaryFile(dir=path.parent, prefix=path.name + ".", delete=False) as handle:
+L0390:         temporary = Path(handle.name)
+L0391:         try:
+L0392:             np.savez_compressed(handle, **arrays)
+L0393:             handle.flush()
+L0394:             os.fsync(handle.fileno())
+L0395:         except BaseException:
+L0396:             temporary.unlink(missing_ok=True)
+L0397:             raise
+L0398:     os.replace(temporary, path)
+L0399: 
+L0400: 
+L0401: def _atomic_json(path: Path, payload: dict[str, Any]) -> None:
+L0402:     path.parent.mkdir(parents=True, exist_ok=True)
+L0403:     with tempfile.NamedTemporaryFile(dir=path.parent, prefix=path.name + ".", delete=False) as handle:
+L0404:         temporary = Path(handle.name)
+L0405:         handle.write(json.dumps(payload, sort_keys=True, indent=2, allow_nan=False).encode("utf-8") + b"\n")
+L0406:     os.replace(temporary, path)
+L0407: 
+L0408: 
+L0409: def save_data_manifest(outdir: str | Path, bundle: DataBundle) -> dict[str, Any]:
+L0410:     outdir = Path(outdir)
+L0411:     arrays = {"mu": bundle.mu, "sigma": bundle.sigma, "scale": bundle.scale,
+L0412:               "C": np.asarray(bundle.C, dtype="<f8"),
+L0413:               "global_scale": np.asarray(bundle.metadata["global_scale"], dtype="<f8"),
+L0414:               "neighbors": bundle.neighbors, "neighbor_valid": bundle.neighbor_valid,
+L0415:               "train_starts": bundle.train_starts, "dev_starts": bundle.dev_starts,
+L0416:               "dev_cohorts": bundle.dev_cohorts}
+L0417:     path = outdir / "data_arrays.npz"
+L0418:     _atomic_npz(path, arrays)
+L0419:     payload = {**bundle.metadata, "arrays_path": path.name,
+L0420:                "arrays_sha256": _arrays_sha256(arrays),
+L0421:                "npz_file_sha256": hashlib.sha256(path.read_bytes()).hexdigest(),
+L0422:                "train_window_count": len(bundle.train_starts), "dev_window_count": len(bundle.dev_starts),
+L0423:                "flows": bundle.flows, "selection_mask_seed": SELECTION_MASK_SEED,
+L0424:                "postfreeze_mask_seeds": list(POSTFREEZE_MASK_SEEDS)}
+L0425:     _atomic_json(outdir / "data_manifest.json", payload)
+L0426:     return payload
+L0427: 
+L0428: 
+L0429: def save_mask_registry(outdir: str | Path, bundle: DataBundle, seed: int = SELECTION_MASK_SEED,
+L0430:                        split: str = "dev", epoch: int | None = None,
+L0431:                        epoch_masks: EpochMasks | None = None) -> dict[str, Any]:
+L0432:     """Save actual packed masks/groups, not just the RNG seed recipe."""
+L0433:     if split == "dev":
+L0434:         if epoch is not None or epoch_masks is not None:
+L0435:             raise ValueError("dev masks have no epoch")
+L0436:         starts = bundle.dev_starts
+L0437:         families = tuple(make_mask_family(bundle.flows, int(start), seed, dataset=bundle.dataset)
+L0438:                          for start in starts)
+L0439:         order = np.arange(len(starts), dtype=np.int64)
+L0440:         selected_conditions = np.full(len(starts), "all")
+L0441:     elif split == "train":
+L0442:         if epoch is None:
+L0443:             raise ValueError("training registry requires epoch")
+L0444:         schedule = epoch_masks if epoch_masks is not None else training_epoch(bundle, epoch, mask_seed=seed)
+L0445:         if schedule.epoch != epoch or schedule.mask_seed != seed:
+L0446:             raise ValueError("supplied epoch schedule does not match registry identity")
+L0447:         order, families = schedule.order, schedule.families
+L0448:         starts = bundle.train_starts[order]
+L0449:         selected_conditions = np.asarray(schedule.conditions)
+L0450:     else:
+L0451:         raise ValueError("mask registry split must be dev or train")
+L0452:     packed = np.stack([np.stack([np.packbits(family[name].reshape(-1), bitorder="little")
+L0453:                                  for name in CONDITIONS]) for family in families])
+L0454:     arrays = {
+L0455:         "window_starts": starts, "window_order": order, "selected_conditions": selected_conditions,
+L0456:         "condition_names": np.asarray(CONDITIONS), "packed_masks": packed,
+L0457:         "packed_sparse_group": np.stack([np.packbits(f.sparse_group, bitorder="little") for f in families]),
+L0458:         "packed_gap_affected": np.stack([np.packbits(f.gap_affected, bitorder="little") for f in families]),
+L0459:         "gap_starts": np.asarray([f.gap_start for f in families], dtype=np.int16),
+L0460:         "mask_sha256": np.asarray([[f.mask_hashes[name] for name in CONDITIONS] for f in families]),
+L0461:         "family_sha256": np.asarray([f.family_hash for f in families]),
+L0462:         "seed": np.asarray(seed, dtype=np.int64), "epoch": np.asarray(-1 if epoch is None else epoch, dtype=np.int64),
+L0463:     }
+L0464:     suffix = f"{split}_seed{seed}" + ("" if epoch is None else f"_epoch{epoch:03d}")
+L0465:     path = Path(outdir) / f"masks_{suffix}.npz"
+L0466:     _atomic_npz(path, arrays)
+L0467:     payload = {
+L0468:         "protocol": PROTOCOL, "dataset": bundle.dataset, "split": split, "seed": int(seed), "epoch": epoch,
+L0469:         "rng": "PCG64DXSM", "seed_derivation": "domain-separated SHA256 first 128 bits big endian",
+L0470:         "bitorder": "little", "mask_unpacked_shape": [WINDOW_LENGTH, bundle.flows],
+L0471:         "mask_flatten_order": "C (time,flow)", "condition_order": list(CONDITIONS),
+L0472:         "window_count": len(starts), "arrays_path": path.name, "arrays_sha256": _arrays_sha256(arrays),
+L0473:         "npz_file_sha256": hashlib.sha256(path.read_bytes()).hexdigest(),
+L0474:         "data_sha256": bundle.metadata["data_sha256"],
+L0475:         "postfreeze_only": split == "dev" and seed in POSTFREEZE_MASK_SEEDS,
+L0476:         "data_order_seed": None if split == "dev" else schedule.data_order_seed,
+L0477:     }
+L0478:     _atomic_json(path.with_suffix(".json"), payload)
+L0479:     return payload
+L0480: 
+L0481: 
+L0482: __all__ = [
+L0483:     "PROTOCOL", "WINDOW_LENGTH", "CONDITIONS", "DATASET_SPECS", "DATA_ORDER_SEED",
+L0484:     "TRAINING_MASK_SEED", "SELECTION_MASK_SEED", "POSTFREEZE_MASK_SEEDS",
+L0485:     "DataBundle", "MaskFamily", "EpochMasks", "load_dataset", "load_fit_windows",
+L0486:     "window_starts", "fit_statistics", "fit_neighbors", "make_mask_family", "training_epoch",
+L0487:     "linear_fill", "stable_seed", "array_sha256", "save_data_manifest", "save_mask_registry",
+L0488: ]
+
+
+========================================================================
+FILE: experiments/sync_delta_v1/engine.py
+SHA256: 8651504ec08225f09edd52d59a482f8fec5f861486c2a72efbfa0bd6bbd17726
+========================================================================
+L0001: """Shared training mathematics, deterministic orders, and development scoring."""
+L0002: 
+L0003: from __future__ import annotations
+L0004: 
+L0005: import hashlib
+L0006: import math
+L0007: import random
+L0008: import time
+L0009: from typing import Any
+L0010: 
+L0011: import numpy as np
+L0012: import torch
+L0013: 
+L0014: from .data import CONDITIONS, DataBundle, linear_fill, make_mask_family
+L0015: 
+L0016: 
+L0017: def seed_runtime(seed: int = 41001) -> None:
+L0018:     random.seed(seed)
+L0019:     np.random.seed(seed)
+L0020:     torch.manual_seed(seed)
+L0021:     if torch.cuda.is_available():
+L0022:         torch.cuda.manual_seed_all(seed)
+L0023:     torch.set_num_threads(4)
+L0024:     torch.backends.cuda.matmul.allow_tf32 = False
+L0025:     torch.backends.cudnn.allow_tf32 = False
+L0026:     torch.backends.cudnn.benchmark = False
+L0027:     torch.use_deterministic_algorithms(True)
+L0028: 
+L0029: 
+L0030: def build_serial_order(
+L0031:     window_starts, target_ids, *, dataset: str, epoch: int | None,
+L0032:     seed: int, slots: int = 9, length: int = 50,
+L0033: ) -> np.ndarray:
+L0034:     """Stateless slot priorities: invariant to batching, target chunking, and init seed."""
+L0035:     domain = int.from_bytes(hashlib.sha256(
+L0036:         ("sync-delta-v1.1:serial:" + dataset).encode()).digest()[:8], "little")
+L0037:     starts = np.asarray(window_starts, dtype=np.uint64)[:, None, None, None]
+L0038:     targets = np.asarray(target_ids, dtype=np.uint64)[None, None, :, None]
+L0039:     times = np.arange(length, dtype=np.uint64)[None, :, None, None]
+L0040:     slot = np.arange(slots, dtype=np.uint64)[None, None, None, :]
+L0041:     epoch_token = 0 if epoch is None else int(epoch) + 1
+L0042:     with np.errstate(over="ignore"):
+L0043:         z = (np.uint64(domain) ^ np.uint64(seed)
+L0044:              ^ starts * np.uint64(0x9E3779B97F4A7C15)
+L0045:              ^ targets * np.uint64(0xBF58476D1CE4E5B9)
+L0046:              ^ times * np.uint64(0x94D049BB133111EB)
+L0047:              ^ slot * np.uint64(0xD6E8FEB86659FD93)
+L0048:              ^ np.uint64(epoch_token) * np.uint64(0xA0761D6478BD642F))
+L0049:         z = z + np.uint64(0x9E3779B97F4A7C15)
+L0050:         z = (z ^ (z >> np.uint64(30))) * np.uint64(0xBF58476D1CE4E5B9)
+L0051:         z = (z ^ (z >> np.uint64(27))) * np.uint64(0x94D049BB133111EB)
+L0052:         z = z ^ (z >> np.uint64(31))
+L0053:     return np.argsort(z, axis=-1, kind="stable").astype(np.int64)
+L0054: 
+L0055: 
+L0056: def device_inputs(bundle: DataBundle, device: torch.device):
+L0057:     stats = {name: torch.tensor(value, device=device, dtype=torch.float32)
+L0058:              for name, value in bundle.stats.items()}
+L0059:     neighbors = torch.tensor(bundle.neighbors, device=device, dtype=torch.long)
+L0060:     return stats, neighbors
+L0061: 
+L0062: 
+L0063: def train_step(
+L0064:     model, batch_values: np.ndarray, batch_masks: np.ndarray, window_starts,
+L0065:     stats, neighbors, C: float, optimizer, *, dataset: str, epoch: int,
+L0066:     physical_batch: int = 2, target_block: int = 64, order_seed: int = 81001,
+L0067: ) -> dict[str, float]:
+L0068:     """One full effective-batch update, with one denominator, clip, and step."""
+L0069:     if batch_values.shape != batch_masks.shape or batch_values.ndim != 3:
+L0070:         raise ValueError("values/masks must share [B,T,F]")
+L0071:     batch, length, flows = batch_values.shape
+L0072:     missing_count = int((~batch_masks).sum())
+L0073:     if length != 50 or missing_count != batch * 40 * flows or C <= 0:
+L0074:         raise ValueError("effective batch violates the frozen 20% mask budget")
+L0075:     if physical_batch < 1 or target_block < 1:
+L0076:         raise ValueError("chunk sizes must be positive")
+L0077:     device = next(model.parameters()).device
+L0078:     denominator = float(C) * missing_count
+L0079:     optimizer.zero_grad(set_to_none=True)
+L0080:     model.train()
+L0081:     detached_loss = torch.zeros((), device=device)
+L0082:     for b0 in range(0, batch, physical_batch):
+L0083:         b1 = min(batch, b0 + physical_batch)
+L0084:         truth = torch.as_tensor(batch_values[b0:b1], dtype=torch.float32, device=device)
+L0085:         mask = torch.as_tensor(batch_masks[b0:b1], dtype=torch.bool, device=device)
+L0086:         observed = torch.where(mask, truth, torch.zeros_like(truth))
+L0087:         for f0 in range(0, flows, target_block):
+L0088:             ids = torch.arange(f0, min(flows, f0 + target_block), device=device)
+L0089:             context = None
+L0090:             if model.variant == "serial_delta":
+L0091:                 order = build_serial_order(window_starts[b0:b1], ids.cpu().numpy(),
+L0092:                     dataset=dataset, epoch=epoch, seed=order_seed, slots=neighbors.shape[1])
+L0093:                 context = {"order": torch.as_tensor(order, device=device)}
+L0094:             raw = model.predict_block(observed, mask, stats, neighbors, ids,
+L0095:                                       serial_order_context=context)
+L0096:             missing = ~mask.index_select(2, ids)
+L0097:             error = (raw - truth.index_select(2, ids)).abs()
+L0098:             block_loss = error.masked_select(missing).sum() / denominator
+L0099:             if not torch.isfinite(block_loss).item():
+L0100:                 raise FloatingPointError("non-finite unclamped training loss")
+L0101:             block_loss.backward()
+L0102:             detached_loss += block_loss.detach()
+L0103:             del raw, error, block_loss
+L0104:     grad_norm = torch.nn.utils.clip_grad_norm_(model.parameters(), 1.0,
+L0105:                                                error_if_nonfinite=True)
+L0106:     optimizer.step()
+L0107:     return {"loss": float(detached_loss.item()), "gradient_norm": float(grad_norm.item()),
+L0108:             "missing_targets": missing_count}
+L0109: 
+L0110: 
+L0111: def make_dev_masks(bundle: DataBundle, seed: int):
+L0112:     families = [make_mask_family(bundle.flows, int(start), seed, dataset=bundle.dataset)
+L0113:                 for start in bundle.dev_starts]
+L0114:     masks = {condition: np.stack([family.masks[condition] for family in families])
+L0115:              for condition in CONDITIONS}
+L0116:     return masks, families
+L0117: 
+L0118: 
+L0119: @torch.no_grad()
+L0120: def predict_windows(
+L0121:     model, values: np.ndarray, masks: np.ndarray, window_starts, stats, neighbors, *,
+L0122:     dataset: str, physical_batch: int = 2, target_block: int = 64,
+L0123:     order_seed: int = 81002, intervention: str | None = None,
+L0124: ) -> tuple[np.ndarray, np.ndarray]:
+L0125:     model.eval()
+L0126:     device = next(model.parameters()).device
+L0127:     raw_all = np.empty_like(values, dtype=np.float32)
+L0128:     for b0 in range(0, len(values), physical_batch):
+L0129:         b1 = min(len(values), b0 + physical_batch)
+L0130:         truth = torch.as_tensor(values[b0:b1], device=device, dtype=torch.float32)
+L0131:         mask = torch.as_tensor(masks[b0:b1], device=device, dtype=torch.bool)
+L0132:         observed = torch.where(mask, truth, torch.zeros_like(truth))
+L0133:         for f0 in range(0, values.shape[2], target_block):
+L0134:             ids = torch.arange(f0, min(values.shape[2], f0 + target_block), device=device)
+L0135:             context = None
+L0136:             if model.variant == "serial_delta":
+L0137:                 order = build_serial_order(window_starts[b0:b1], ids.cpu().numpy(),
+L0138:                     dataset=dataset, epoch=None, seed=order_seed, slots=neighbors.shape[1])
+L0139:                 context = {"order": torch.as_tensor(order, device=device)}
+L0140:             raw = model.predict_block(observed, mask, stats, neighbors, ids,
+L0141:                 serial_order_context=context, intervention=intervention)
+L0142:             raw_all[b0:b1, :, f0:f0 + len(ids)] = raw.cpu().numpy()
+L0143:     if not np.isfinite(raw_all).all():
+L0144:         raise FloatingPointError("non-finite evaluation prediction")
+L0145:     final = np.where(masks, values, np.maximum(raw_all, 0)).astype(np.float32)
+L0146:     return final, raw_all
+L0147: 
+L0148: 
+L0149: def error_sums(prediction, truth, target):
+L0150:     error = prediction.astype(np.float64) - truth.astype(np.float64)
+L0151:     value = truth.astype(np.float64)
+L0152:     return {"abs_error": float(np.abs(error[target]).sum()),
+L0153:             "abs_truth": float(np.abs(value[target]).sum()),
+L0154:             "sq_error": float(np.square(error[target]).sum()),
+L0155:             "sq_truth": float(np.square(value[target]).sum()),
+L0156:             "count": int(target.sum())}
+L0157: 
+L0158: 
+L0159: def ratios(sums):
+L0160:     return {**sums,
+L0161:             "nmae": sums["abs_error"] / sums["abs_truth"] if sums["abs_truth"] > 0 else None,
+L0162:             "nrmse": math.sqrt(sums["sq_error"] / sums["sq_truth"]) if sums["sq_truth"] > 0 else None}
+L0163: 
+L0164: 
+L0165: def aggregate(rows):
+L0166:     sums = {name: sum(row[name] for row in rows)
+L0167:             for name in ("abs_error", "abs_truth", "sq_error", "sq_truth", "count")}
+L0168:     return ratios(sums)
+L0169: 
+L0170: 
+L0171: def score_predictions(bundle, condition, predictions, masks, families, raw=None):
+L0172:     rows = []
+L0173:     grid = np.arange(50)[:, None]
+L0174:     for i, (prediction, truth, observed, family) in enumerate(
+L0175:             zip(predictions, bundle.dev_windows, masks, families)):
+L0176:         missing = ~observed
+L0177:         first = np.where(observed, grid, 50).min(axis=0)
+L0178:         last = np.where(observed, grid, -1).max(axis=0)
+L0179:         boundary = missing & ((grid < first) | (grid > last))
+L0180:         groups = {"internal": missing & ~boundary, "boundary": boundary}
+L0181:         if condition != "uniform":
+L0182:             groups.update(sparse=missing & family.sparse_group[None],
+L0183:                           dense=missing & ~family.sparse_group[None])
+L0184:         if condition == "unequal_gap":
+L0185:             gap = (grid >= family.gap_start) & (grid < family.gap_start + 10) & family.gap_affected[None]
+L0186:             groups.update(shared_gap=missing & gap, outside_shared_gap=missing & ~gap)
+L0187:         rows.append({"window_start": int(bundle.dev_starts[i]),
+L0188:             "cohort": str(bundle.dev_cohorts[i]), "condition": condition,
+L0189:             **error_sums(prediction, truth, missing),
+L0190:             "negative_raw_count": int(((raw[i] < 0) & missing).sum()) if raw is not None else 0,
+L0191:             "groups": {name: error_sums(prediction, truth, target) for name, target in groups.items()}})
+L0192:     return rows
+L0193: 
+L0194: 
+L0195: def evaluate(
+L0196:     model, bundle, stats, neighbors, *, seed=71001, physical_batch=2,
+L0197:     target_block=64, order_seed=81002, intervention=None, mask_cache=None,
+L0198: ):
+L0199:     masks, families = mask_cache if mask_cache is not None else make_dev_masks(bundle, seed)
+L0200:     rows, metrics = [], {}
+L0201:     begin = time.perf_counter()
+L0202:     for condition in CONDITIONS:
+L0203:         predictions, raw = predict_windows(model, bundle.dev_windows, masks[condition],
+L0204:             bundle.dev_starts, stats, neighbors, dataset=bundle.dataset,
+L0205:             physical_batch=physical_batch, target_block=target_block,
+L0206:             order_seed=order_seed, intervention=intervention)
+L0207:         condition_rows = score_predictions(bundle, condition, predictions, masks[condition], families, raw)
+L0208:         rows.extend(condition_rows)
+L0209:         metrics[condition] = aggregate(condition_rows)
+L0210:         metrics[condition]["groups"] = {name: aggregate([row["groups"][name] for row in condition_rows])
+L0211:             for name in condition_rows[0]["groups"]}
+L0212:         metrics[condition]["negative_raw_fraction"] = sum(r["negative_raw_count"] for r in condition_rows) / metrics[condition]["count"]
+L0213:     scores = [metrics[condition]["nmae"] for condition in CONDITIONS]
+L0214:     if any(value is None or not math.isfinite(value) for value in scores):
+L0215:         raise FloatingPointError("undefined aggregate development score")
+L0216:     return {"role": "development_only", "mask_seed": seed, "serial_order_seed": order_seed,
+L0217:         "selection_score": sum(scores) / len(scores), "metrics": metrics, "rows": rows,
+L0218:         "intervention": intervention, "elapsed_seconds": time.perf_counter() - begin}
+L0219: 
+L0220: 
+L0221: def evaluate_linear(bundle, seed=71001, mask_cache=None):
+L0222:     masks, families = mask_cache if mask_cache is not None else make_dev_masks(bundle, seed)
+L0223:     rows, metrics = [], {}
+L0224:     for condition in CONDITIONS:
+L0225:         prediction = np.stack([linear_fill(truth, mask, bundle.mu)
+L0226:             for truth, mask in zip(bundle.dev_windows, masks[condition])])
+L0227:         group_rows = score_predictions(bundle, condition, prediction, masks[condition], families)
+L0228:         rows.extend(group_rows)
+L0229:         metrics[condition] = aggregate(group_rows)
+L0230:         metrics[condition]["groups"] = {name: aggregate([row["groups"][name] for row in group_rows])
+L0231:                                         for name in group_rows[0]["groups"]}
+L0232:     return {"method": "linear", "role": "development_only", "mask_seed": seed,
+L0233:         "selection_score": sum(metrics[x]["nmae"] for x in CONDITIONS) / 3,
+L0234:         "metrics": metrics, "rows": rows}
+L0235: 
+L0236: 
+L0237: @torch.no_grad()
+L0238: def fit_diagnostics(model, bundle, stats, neighbors, target_block=16):
+L0239:     """Small fixed FIT subset: key spectra/projections and state/readout scale."""
+L0240:     device = next(model.parameters()).device
+L0241:     values = bundle.train_windows[:1]
+L0242:     family = make_mask_family(bundle.flows, int(bundle.train_starts[0]), 61001,
+L0243:                               dataset=bundle.dataset, epoch=0)
+L0244:     masks = family.unequal_gap[None]
+L0245:     truth = torch.as_tensor(values, device=device)
+L0246:     mask = torch.as_tensor(masks, device=device)
+L0247:     observed = torch.where(mask, truth, torch.zeros_like(truth))
+L0248:     ids_np = np.unique(np.linspace(0, bundle.flows - 1, min(8, bundle.flows)).astype(np.int64))
+L0249:     ids = torch.as_tensor(ids_np, device=device)
+L0250:     context = None
+L0251:     if model.variant == "serial_delta":
+L0252:         order = build_serial_order(bundle.train_starts[:1], ids_np, dataset=bundle.dataset,
+L0253:                                    epoch=None, seed=81002)
+L0254:         context = {"order": torch.as_tensor(order, device=device)}
+L0255:     _, aux = model.predict_block(observed, mask, stats, neighbors, ids,
+L0256:         serial_order_context=context, return_aux=True, trace=model.variant == "attention")
+L0257:     keys = aux["k"]
+L0258:     queries = aux["q"].permute(0, 2, 1, 3).reshape(1, len(ids), 50, 4, 32)
+L0259:     spectra = []
+L0260:     # These loops inspect only eight fixed targets; never part of training.
+L0261:     for g in range(len(ids)):
+L0262:         for head in range(4):
+L0263:             matrix = keys[0, g, :, head].reshape(-1, 32).double().T
+L0264:             u, singular, _ = torch.linalg.svd(matrix, full_matrices=False)
+L0265:             threshold = max(float(singular[0]) * 1e-5, 1e-10)
+L0266:             rank = int((singular > threshold).sum())
+L0267:             query = queries[0, g, :, head].double()
+L0268:             projected = query @ u[:, :rank]
+L0269:             fraction = projected.square().sum(dim=-1) / query.square().sum(dim=-1).clamp_min(1e-12)
+L0270:             spectra.append({"target": int(ids_np[g]), "head": head, "effective_rank": rank,
+L0271:                 "singular_values": singular.cpu().tolist(),
+L0272:                 "mean_query_projection_fraction": float(fraction.mean())})
+L0273:     summaries = {}
+L0274:     for name, value in aux.items():
+L0275:         if isinstance(value, torch.Tensor) and ("norm" in name or name.startswith("c") or "entropy" in name):
+L0276:             summaries[name] = {"mean": float(value.float().mean()),
+L0277:                                "max": float(value.float().max()), "min": float(value.float().min())}
+L0278:     for name in ("hf", "hb"):
+L0279:         norms = aux[name].float().norm(dim=-1)
+L0280:         summaries[name + "_norm"] = {"mean": float(norms.mean()), "max": float(norms.max())}
+L0281:     for name in ("weights_forward", "weights_backward"):
+L0282:         if name in aux:
+L0283:             weight = aux[name]
+L0284:             entropy = -(weight * weight.clamp_min(1e-30).log()).sum(-1)
+L0285:             summaries[name + "_entropy"] = {"mean": float(entropy.mean()),
+L0286:                 "empty_side_fraction": float((weight.sum(-1) == 0).float().mean())}
+L0287:     return {"role": "fit_only_diagnostic", "window_start": int(bundle.train_starts[0]),
+L0288:         "coordinate_key_rank_bound": 17 if model.variant != "attention" else None,
+L0289:         "spectra": spectra, "scales": summaries}
+L0290: 
+L0291: 
+L0292: @torch.no_grad()
+L0293: def latency_probe(model, bundle, stats, neighbors, target_block=64, warmup=20, repeats=100):
+L0294:     """CPU input -> observed construction -> GPU reader -> CPU final output."""
+L0295:     model.eval()
+L0296:     device = next(model.parameters()).device
+L0297:     sample_count = min(5, len(bundle.dev_windows))
+L0298:     families = [make_mask_family(bundle.flows, int(start), 71001, dataset=bundle.dataset)
+L0299:                 for start in bundle.dev_starts[:sample_count]]
+L0300:     # Receive only the allowed observation tensor; truth is never copied to GPU here.
+L0301:     inputs = []
+L0302:     for index, family in enumerate(families):
+L0303:         mask = family.unequal_gap[None]
+L0304:         observed = np.where(mask, bundle.dev_windows[index:index + 1], 0).astype(np.float32)
+L0305:         inputs.append((observed, mask, bundle.dev_starts[index:index + 1]))
+L0306: 
+L0307:     def once(index):
+L0308:         observed_cpu, mask_cpu, starts = inputs[index % sample_count]
+L0309:         x = torch.as_tensor(observed_cpu, device=device)
+L0310:         m = torch.as_tensor(mask_cpu, device=device)
+L0311:         output = []
+L0312:         for f0 in range(0, bundle.flows, target_block):
+L0313:             ids = torch.arange(f0, min(bundle.flows, f0 + target_block), device=device)
+L0314:             context = None
+L0315:             if model.variant == "serial_delta":
+L0316:                 order = build_serial_order(starts, ids.cpu().numpy(), dataset=bundle.dataset,
+L0317:                                            epoch=None, seed=81002)
+L0318:                 context = {"order": torch.as_tensor(order, device=device)}
+L0319:             raw = model.predict_block(x, m, stats, neighbors, ids, serial_order_context=context)
+L0320:             final = torch.where(m.index_select(2, ids), x.index_select(2, ids), raw.clamp_min(0))
+L0321:             output.append(final.cpu())
+L0322:         return torch.cat(output, dim=2)
+L0323: 
+L0324:     for i in range(warmup):
+L0325:         once(i)
+L0326:     if device.type == "cuda":
+L0327:         torch.cuda.synchronize(device)
+L0328:         torch.cuda.reset_peak_memory_stats(device)
+L0329:     elapsed = []
+L0330:     for i in range(repeats):
+L0331:         begin = time.perf_counter()
+L0332:         once(i)
+L0333:         if device.type == "cuda":
+L0334:             torch.cuda.synchronize(device)
+L0335:         elapsed.append(time.perf_counter() - begin)
+L0336:     return {"batch_windows": 1, "input_device": "CPU observed tensor and mask",
+L0337:         "output_device": "CPU completed window", "mask_generation_timed": False,
+L0338:         "includes": ["CPU-to-GPU", "feature construction", "neighbor gather", "all reader operations",
+L0339:                      "decoder", "clamp/copy", "GPU-to-CPU"],
+L0340:         "warmup": warmup, "repeats": repeats, "target_block": target_block,
+L0341:         "mean_ms": 1000 * float(np.mean(elapsed)), "median_ms": 1000 * float(np.median(elapsed)),
+L0342:         "p95_ms": 1000 * float(np.percentile(elapsed, 95)),
+L0343:         "peak_allocated_bytes": torch.cuda.max_memory_allocated(device) if device.type == "cuda" else None}
+
+
+========================================================================
+FILE: analysis/spin_sync_unified_20260916/benchmark_inference.py
+SHA256: d523e8bc84fcb5789a0ca712aea561c4f9fb42129d65bf8c6ab0b42a38c84679
+========================================================================
+L0001: """Read-only FP32 inference benchmark; fit windows only, no accuracy scores.
+L0002: 
+L0003: Run on one idle, externally authorized GPU after training. Every method uses
+L0004: engine.predict_windows, including input transfers, full-flow prediction,
+L0005: GPU-to-CPU raw output, finite checks, and CPU clamp/observed-value copying.
+L0006: The five warmups and fifteen timings per condition/batch exclude loading,
+L0007: mask construction and fit-statistic/graph preparation. Memory includes the
+L0008: resident model and shared GPU fit statistics/neighbor table.
+L0009: """
+L0010: from __future__ import annotations
+L0011: import argparse
+L0012: import gc
+L0013: import hashlib
+L0014: import json
+L0015: import math
+L0016: import os
+L0017: from pathlib import Path
+L0018: import platform
+L0019: import signal
+L0020: import socket
+L0021: import sys
+L0022: import tempfile
+L0023: import time
+L0024: 
+L0025: STOP = False
+L0026: WARMUPS, REPEATS = 5, 15
+L0027: METHODS = ("spin_sync_direct", "spin_direct_no_memory", "spin_adapted", "direct_sync")
+L0028: 
+L0029: 
+L0030: class Stopped(RuntimeError):
+L0031:     pass
+L0032: 
+L0033: 
+L0034: def request_stop(signum, frame):
+L0035:     global STOP
+L0036:     STOP = True
+L0037: 
+L0038: 
+L0039: def check_stop(args):
+L0040:     if STOP or time.time() >= args.deadline_unix - 60:
+L0041:         raise Stopped("signal" if STOP else "allocation_cutoff")
+L0042: 
+L0043: 
+L0044: def sha(path):
+L0045:     digest = hashlib.sha256()
+L0046:     with Path(path).open("rb") as handle:
+L0047:         for block in iter(lambda: handle.read(1024 * 1024), b""):
+L0048:             digest.update(block)
+L0049:     return digest.hexdigest()
+L0050: 
+L0051: 
+L0052: def read(path):
+L0053:     return json.loads(Path(path).read_text())
+L0054: 
+L0055: 
+L0056: def write(path, value):
+L0057:     path.parent.mkdir(parents=True, exist_ok=True)
+L0058:     with tempfile.NamedTemporaryFile(mode="w", dir=path.parent, delete=False) as handle:
+L0059:         json.dump(value, handle, indent=2, allow_nan=False)
+L0060:         handle.write("\n")
+L0061:         handle.flush()
+L0062:         os.fsync(handle.fileno())
+L0063:         temporary = handle.name
+L0064:     os.replace(temporary, path)
+L0065: 
+L0066: 
+L0067: def require(record, expected, label):
+L0068:     if any(record.get(key) != value for key, value in expected.items()):
+L0069:         raise ValueError(f"{label} identity differs")
+L0070: 
+L0071: 
+L0072: def records(args, dataset):
+L0073:     root = args.repo_root
+L0074:     fixed = root / "outputs/spin-sync-unified-fixed120-20260916-v1"
+L0075:     paths = {
+L0076:         "spin_sync_direct": Path(args.full_checkpoint.format(dataset=dataset)) if args.full_checkpoint else fixed / dataset / "spin_sync_direct/seed41001/best.pt",
+L0077:         "spin_direct_no_memory": Path(args.no_memory_checkpoint.format(dataset=dataset)) if args.no_memory_checkpoint else fixed / dataset / "spin_direct_no_memory/seed41001/best.pt",
+L0078:         "spin_adapted": root / "outputs/spin-comparison-20260914-v1" / dataset / "spin_adapted/seed41001/best.pt",
+L0079:         "direct_sync": root / "outputs/llm-candidates-20260914-v1" / dataset / "direct_sync/seed41001/best.pt"}
+L0080:     result = {}
+L0081:     for method, path in paths.items():
+L0082:         check_stop(args)
+L0083:         path = (root / path).resolve()
+L0084:         record = read(path.with_name("result.json"))
+L0085:         identity = {"dataset": dataset, "variant": method, "seed": 41001}
+L0086:         require(record, identity, method + " result")
+L0087:         require(record["primary_eval"], {"role": "development_only", "mask_seed": 71001}, method + " evaluation")
+L0088:         if record.get("epochs_completed", 0) < 1 or sha(path) != record["best_checkpoint_sha256"]:
+L0089:             raise ValueError(f"{method} selected checkpoint is missing or changed")
+L0090:         if method in METHODS[:2]:
+L0091:             require(record, {"state": "complete"}, method + " completion")
+L0092:             config_path = path.with_name("config.json")
+L0093:             config = read(config_path)
+L0094:             identity.update(protocol=config["protocol"], config_sha256=sha(config_path))
+L0095:             require(record, identity, method + " config binding")
+L0096:             require(config, {"dataset": dataset, "variant": method, "seed": 41001}, method + " config")
+L0097:             data = config["data"]
+L0098:         else:
+L0099:             config_path = path.parents[3] / "registry.json"
+L0100:             config = read(config_path)
+L0101:             identity["registry_sha256"] = sha(config_path)
+L0102:             require(record, identity, method + " registry binding")
+L0103:             require(read(path.with_name("status.json")), {**identity, "state": "complete"}, method + " completion")
+L0104:             data = config["data"][dataset]
+L0105:         for relative, checksum in config["source_files"].items():
+L0106:             if relative.endswith(".py") and sha(root / relative) != checksum:
+L0107:                 raise ValueError(f"Frozen source differs: {relative}")
+L0108:         result[method] = {"path": path, "result": record, "identity": identity, "data": data,
+L0109:             "files": {str(path): sha(path), str(path.with_name("result.json")): sha(path.with_name("result.json")),
+L0110:                       str(config_path): sha(config_path)}}
+L0111:     if any(item["data"] != result[METHODS[0]]["data"] for item in result.values()):
+L0112:         raise ValueError("Models do not use the same frozen data protocol")
+L0113:     return result
+L0114: 
+L0115: 
+L0116: def load_model(method, record, flows, fit):
+L0117:     import torch
+L0118:     from experiments.sync_delta_v1.run import state_sha
+L0119:     if method in METHODS[:2]:
+L0120:         from experiments.spin_sync_unified_v1.models import build_model
+L0121:         model = build_model(flows, init_seed=41001, variant=method)
+L0122:     elif method == "spin_adapted":
+L0123:         from experiments.spin_comparison_runtime_v1.run import build_model
+L0124:         model = build_model(flows, init_seed=41001)
+L0125:     else:
+L0126:         from experiments.llm_candidates_v1.models import build_model
+L0127:         model = build_model(flows, "direct_sync", init_seed=41001)
+L0128:     scaler = {}
+L0129:     if method != "direct_sync":
+L0130:         model.configure_fit_statistics(fit)
+L0131:         model.set_execution(node_chunk=32, gradient_checkpointing=False)
+L0132:         scaler = {name: getattr(model, name).clone() for name in ("fit_mean", "fit_scale", "fit_configured")}
+L0133:     saved = torch.load(record["path"], map_location="cpu", weights_only=False)
+L0134:     require(saved, record["identity"], method + " checkpoint")
+L0135:     expected = record["result"]
+L0136:     if saved["epoch"] != expected["best_epoch"] or saved["score"] != expected["primary_eval"]["selection_score"]:
+L0137:         raise ValueError(f"{method} checkpoint is not its completed selected epoch")
+L0138:     model.load_state_dict(saved["model"], strict=True)
+L0139:     if (state_sha(model.state_dict()) != expected["best_state_sha256"]
+L0140:             or sum(p.numel() for p in model.parameters()) != expected["parameter_count"]
+L0141:             or any(not torch.equal(getattr(model, key), value) for key, value in scaler.items())):
+L0142:         raise ValueError(f"{method} model state/parameter count/fit scaler differs")
+L0143:     return model.float().eval().requires_grad_(False)
+L0144: 
+L0145: 
+L0146: def benchmark(args, output):
+L0147:     import numpy as np
+L0148:     import torch
+L0149:     from experiments.sync_delta_v1 import engine
+L0150:     from experiments.sync_delta_v1.data import CONDITIONS, _arrays_sha256, array_sha256, load_fit_windows, make_mask_family, window_starts
+L0151:     check_stop(args)
+L0152:     device = torch.device(args.device)
+L0153:     if device.type != "cuda" or not torch.cuda.is_available():
+L0154:         raise ValueError("Use one authorized idle CUDA device")
+L0155:     engine.seed_runtime(41001)  # FP32 deterministic execution, TF32 disabled.
+L0156:     output.update(device=str(device), device_name=torch.cuda.get_device_name(device),
+L0157:         runtime={"python": platform.python_version(), "torch": torch.__version__, "numpy": np.__version__, "cuda": torch.version.cuda},
+L0158:         source_files={str(Path(__file__).resolve()): sha(__file__), **{str(Path(module.__file__).resolve()): sha(module.__file__)
+L0159:             for module in (engine, sys.modules["experiments.sync_delta_v1.data"])}})
+L0160:     for dataset in args.datasets:
+L0161:         artifacts = records(args, dataset)
+L0162:         values, starts, fit, neighbors_cpu = load_fit_windows(dataset, indices=tuple(range(8)))
+L0163:         fit_arrays = {key: fit[key] for key in ("mu", "sigma", "scale")}
+L0164:         fit_arrays.update(C=np.asarray(fit["C"], dtype="<f8"), global_scale=np.asarray(fit["global_scale"], dtype="<f8"))
+L0165:         fit_identity = {"stats_sha256": _arrays_sha256(fit_arrays), "neighbors_sha256": array_sha256(neighbors_cpu),
+L0166:                         "train_starts_sha256": array_sha256(window_starts(dataset, "fit"))}
+L0167:         if any(artifacts[METHODS[0]]["data"][key] != value for key, value in fit_identity.items()):
+L0168:             raise ValueError("Fit statistics, graph, or window starts differ")
+L0169:         flows = values.shape[-1]
+L0170:         families = [make_mask_family(flows, int(start), 71001, dataset=dataset) for start in starts]
+L0171:         masks = {condition: np.stack([family.masks[condition] for family in families]) for condition in CONDITIONS}
+L0172:         if any(int(mask.sum()) != 8 * 10 * flows for mask in masks.values()):
+L0173:             raise ValueError("Mask does not have the original 20% observation budget")
+L0174:         stats = {key: torch.as_tensor(fit[key], dtype=torch.float32, device=device) for key in ("mu", "scale")}
+L0175:         neighbors = torch.as_tensor(neighbors_cpu, dtype=torch.long, device=device)
+L0176:         dataset_result = {"fit_identity": fit_identity, "window_indices": list(range(8)), "window_starts": starts.tolist(),
+L0177:             "values_sha256": array_sha256(values), "shape": list(values.shape), "mask_seed": 71001,
+L0178:             "mask_sha256": {key: array_sha256(value) for key, value in masks.items()}, "models": {}, "measurements": []}
+L0179:         output["datasets"][dataset] = dataset_result
+L0180:         for method in METHODS:
+L0181:             check_stop(args)
+L0182:             record = artifacts[method]
+L0183:             model = load_model(method, record, flows, fit).to(device)
+L0184:             dataset_result["models"][method] = {"checkpoint_path": str(record["path"]), "checkpoint_sha256": sha(record["path"]),
+L0185:                 "bound_files": record["files"], "best_epoch": record["result"]["best_epoch"], "seed": 41001,
+L0186:                 "parameters": sum(p.numel() for p in model.parameters()), "internal_node_chunk": 32 if method != "direct_sync" else None}
+L0187:             for batch in (1, 8):
+L0188:                 for condition in CONDITIONS:
+L0189:                     def once():
+L0190:                         return engine.predict_windows(model, values[:batch], masks[condition][:batch], starts[:batch], stats, neighbors,
+L0191:                             dataset=dataset, physical_batch=batch, target_block=flows)
+L0192:                     for _ in range(WARMUPS):
+L0193:                         check_stop(args)
+L0194:                         once()
+L0195:                     torch.cuda.synchronize(device)
+L0196:                     torch.cuda.reset_peak_memory_stats(device)
+L0197:                     resident = torch.cuda.memory_allocated(device)
+L0198:                     elapsed = []
+L0199:                     for _ in range(REPEATS):
+L0200:                         check_stop(args)
+L0201:                         torch.cuda.synchronize(device)
+L0202:                         begin = time.perf_counter()
+L0203:                         final, raw = once()
+L0204:                         torch.cuda.synchronize(device)
+L0205:                         elapsed.append(1000 * (time.perf_counter() - begin))
+L0206:                     peak = torch.cuda.max_memory_allocated(device)
+L0207:                     if (not np.isfinite(final).all() or np.any(final < 0)
+L0208:                             or not np.array_equal(final[masks[condition][:batch]], values[:batch][masks[condition][:batch]])):
+L0209:                         raise ValueError("Inference output finiteness/clamp/observed copy differs")
+L0210:                     row = {"method": method, "batch": batch, "condition": condition, "warmups": WARMUPS, "repeats": REPEATS,
+L0211:                         "median_ms_per_batch": float(np.median(elapsed)), "p95_ms_per_batch": float(np.percentile(elapsed, 95)),
+L0212:                         "median_ms_per_window": float(np.median(elapsed)) / batch, "p95_ms_per_window": float(np.percentile(elapsed, 95)) / batch,
+L0213:                         "samples_ms_per_batch": elapsed, "resident_allocated_bytes": resident,
+L0214:                         "max_memory_allocated_bytes_including_resident_model": peak, "peak_above_resident_bytes": peak - resident}
+L0215:                     dataset_result["measurements"].append(row)
+L0216:                     write(args.output, output)
+L0217:                     print(json.dumps({"dataset": dataset, **{k: v for k, v in row.items() if k != "samples_ms_per_batch"}}), flush=True)
+L0218:                     del final, raw
+L0219:             del model
+L0220:             gc.collect()
+L0221:             torch.cuda.empty_cache()
+L0222:         for record in artifacts.values():
+L0223:             if any(sha(path) != checksum for path, checksum in record["files"].items()):
+L0224:                 raise ValueError("Checkpoint/config/result changed during benchmarking")
+L0225:         del stats, neighbors
+L0226:         gc.collect()
+L0227:         torch.cuda.empty_cache()
+L0228:     check_stop(args)
+L0229: 
+L0230: 
+L0231: def main():
+L0232:     parser = argparse.ArgumentParser(description=__doc__)
+L0233:     parser.add_argument("--repo-root", type=Path, default=Path.cwd())
+L0234:     parser.add_argument("--datasets", nargs="+", choices=("abilene", "geant"), default=["abilene", "geant"])
+L0235:     parser.add_argument("--full-checkpoint", help="Optional best.pt path; {dataset} is expanded for each WAN")
+L0236:     parser.add_argument("--no-memory-checkpoint", help="Optional best.pt path; {dataset} is expanded for each WAN")
+L0237:     parser.add_argument("--device", default="cuda:0")
+L0238:     parser.add_argument("--deadline-unix", type=float, required=True)
+L0239:     parser.add_argument("--output", type=Path, required=True)
+L0240:     args = parser.parse_args()
+L0241:     if not math.isfinite(args.deadline_unix) or args.deadline_unix <= time.time() + 60:
+L0242:         parser.error("A future authorized-allocation deadline with more than 60 seconds remaining is required")
+L0243:     args.repo_root, args.output = args.repo_root.resolve(), args.output.resolve()
+L0244:     if args.output.exists():
+L0245:         parser.error("Use a new output JSON; existing files are never overwritten")
+L0246:     sys.path.insert(0, str(args.repo_root))
+L0247:     signal.signal(signal.SIGTERM, request_stop)
+L0248:     signal.signal(signal.SIGINT, request_stop)
+L0249:     output = {"state": "running", "role": "fit_only_inference_benchmark", "datasets": {}, "started_unix": time.time(),
+L0250:         "deadline_unix": args.deadline_unix, "hostname": socket.gethostname(), "cuda_visible_devices": os.environ.get("CUDA_VISIBLE_DEVICES"),
+L0251:         "protocol": {"precision": "FP32; TF32 disabled", "batches": [1, 8], "full_target_graph": True,
+L0252:             "mask_observation_fraction": .2, "fit_input": "first 8 fit windows; B1 is the first of those windows",
+L0253:             "warmups_per_condition_batch": WARMUPS, "repeats_per_condition_batch": REPEATS,
+L0254:             "timing": "engine.predict_windows end-to-end; perf_counter with CUDA synchronize before/after",
+L0255:             "memory": "allocated bytes including current resident model, fit statistics and neighbor table; other models unloaded",
+L0256:             "per_window_latency": "batch latency divided by batch size, not an independently timed single window",
+L0257:             "excluded": ["checkpoint loading", "fit statistics/graph setup", "mask generation"], "accuracy_scores_computed": False}}
+L0258:     try:
+L0259:         benchmark(args, output)
+L0260:         output["state"] = "complete"
+L0261:     except Stopped as error:
+L0262:         output.update(state="stopped", reason=str(error))
+L0263:     except BaseException as error:
+L0264:         output.update(state="failed", error=f"{type(error).__name__}: {error}")
+L0265:         raise
+L0266:     finally:
+L0267:         output["finished_unix"] = time.time()
+L0268:         write(args.output, output)
+L0269: 
+L0270: 
+L0271: if __name__ == "__main__":
+L0272:     main()

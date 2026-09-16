@@ -1,0 +1,1446 @@
+Third-party attribution: see repository THIRD_PARTY_NOTICES.md and the included SPIN/TSL MIT license files; original source paths and line numbers follow.
+
+当前联合模型及七个依赖／历史对照源码
+
+只读源码快照，非可独立运行的完整仓库。Lxxxx 是原文件行号。历史依赖中包含其它变体，不代表当前 Full 全部使用它们；当前入口是第一个模型文件。
+
+
+========================================================================
+FILE: experiments/spin_sync_unified_v1/models.py
+SHA256: a9a27086cfec26999cc5749acbab79264504103617c457d61db1a39566b90fcb
+========================================================================
+L0001: """A jointly trained SPIN encoder feeding the original Direct+Sync reader.
+L0002: 
+L0003: This is a new model, not a checkpoint-compatible SPIN replica or output adapter.
+L0004: One real masked SPIN spatiotemporal block creates context for memory K/V/Q.
+L0005: Only observed positions write memory; Direct reads original observed values.
+L0006: The context sees the whole observed window: scan direction is NOT causality.
+L0007: """
+L0008: from __future__ import annotations
+L0009: 
+L0010: import math
+L0011: from collections.abc import Mapping
+L0012: 
+L0013: import torch
+L0014: from torch import Tensor, nn
+L0015: from torch.nn import functional as F
+L0016: 
+L0017: from experiments.spin_comparison_v1.attention import TemporalGraphAdditiveAttention
+L0018: from experiments.spin_comparison_v1.models import SPINAdapter
+L0019: from experiments.spin_comparison_v1.positional import PositionalEncoder
+L0020: from experiments.spin_comparison_v1.primitives import MLP
+L0021: from experiments.sync_delta_v1.models import (
+L0022:     HEADS, HEAD_DIM, WIDTH, SyncDeltaModel, safe_masked_softmax,
+L0023: )
+L0024: 
+L0025: VARIANTS = ("spin_sync_direct", "spin_direct_no_memory")
+L0026: MODEL_CONFIG = {
+L0027:     "context_layers": 1, "context_hidden": 32,
+L0028:     "context_temporal_attention": True, "context_spatial_masked": True,
+L0029:     "memory_heads": HEADS, "memory_head_dim": HEAD_DIM,
+L0030:     "direct_dim": 16, "direct_nearest_per_direction": 2,
+L0031:     "normalization": "global_fit_population_mean_std",
+L0032:     "initialization": "from scratch; zero final decoder; shared weights identical across variants",
+L0033:     "task": "offline whole-window imputation; directional scans of bidirectional context",
+L0034: }
+L0035: 
+L0036: 
+L0037: class SpinSyncDirectModel(nn.Module):
+L0038:     def __init__(self, num_flows: int, variant: str = "spin_sync_direct"):
+L0039:         super().__init__()
+L0040:         if num_flows < 1 or variant not in VARIANTS:
+L0041:             raise ValueError("Positive flow count and a supported variant are required")
+L0042:         self.num_flows, self.variant = int(num_flows), variant
+L0043:         self.memory_enabled = variant == "spin_sync_direct"
+L0044:         self.u_enc = PositionalEncoder(1, 32, n_layers=2, n_nodes=num_flows)
+L0045:         self.h_enc = MLP(1, 32, n_layers=2)
+L0046:         self.h_norm = nn.LayerNorm(32)
+L0047:         self.x_skip = nn.Linear(1, 32)
+L0048:         self.context_encoder = TemporalGraphAdditiveAttention(
+L0049:             input_size=32, output_size=32, msg_size=32, msg_layers=1,
+L0050:             root_weight=True, reweight="softmax", temporal_self_attention=True,
+L0051:             mask_temporal=True, mask_spatial=True, norm=True, dropout=0.,
+L0052:         )
+L0053:         self.key = nn.Linear(32, WIDTH)
+L0054:         self.value = nn.Sequential(nn.Linear(32, WIDTH), nn.GELU(), nn.Linear(WIDTH, WIDTH))
+L0055:         self.query = nn.Linear(32, WIDTH)
+L0056:         self.direct_query = nn.Linear(32, 16)
+L0057:         self.direct_key = nn.Linear(32, 16)
+L0058:         self.direct_fusion = nn.Linear(3, WIDTH, bias=False)
+L0059:         self.decoder = nn.Sequential(nn.Linear(3 * WIDTH, WIDTH), nn.GELU(), nn.Linear(WIDTH, 1))
+L0060:         nn.init.zeros_(self.decoder[-1].weight)
+L0061:         nn.init.zeros_(self.decoder[-1].bias)
+L0062:         self.register_buffer("fit_mean", torch.zeros(()))
+L0063:         self.register_buffer("fit_scale", torch.ones(()))
+L0064:         self.register_buffer("fit_configured", torch.tensor(False))
+L0065:         # Instantiate before removing these modules so shared layers consume the
+L0066:         # same RNG stream in both controls. They are absent from no-memory params.
+L0067:         if not self.memory_enabled:
+L0068:             del self.key, self.value
+L0069:         self.float()
+L0070:         self.set_execution()
+L0071: 
+L0072:     def configure_fit_statistics(self, statistics: Mapping):
+L0073:         return SPINAdapter.configure_fit_statistics(self, statistics)
+L0074: 
+L0075:     def configure_from_bundle(self, bundle):
+L0076:         return self.configure_fit_statistics(dict(
+L0077:             mu=bundle.mu, C=bundle.C, global_scale=bundle.metadata["global_scale"]))
+L0078: 
+L0079:     def set_execution(self, *, node_chunk=32, gradient_checkpointing=True):
+L0080:         if type(node_chunk) is not int or node_chunk < 1:
+L0081:             raise ValueError("node_chunk must be a positive integer")
+L0082:         self.context_encoder.node_chunk = node_chunk
+L0083:         self.context_encoder.gradient_checkpointing = bool(gradient_checkpointing)
+L0084: 
+L0085:     def _context(self, observed: Tensor, mask: Tensor, neighbors: Tensor):
+L0086:         if not bool(self.fit_configured):
+L0087:             raise RuntimeError("Configure fit-only statistics before prediction")
+L0088:         if observed.ndim != 3 or observed.shape != mask.shape:
+L0089:             raise ValueError("Values and mask must have shape [B,50,F]")
+L0090:         batch, length, flows = observed.shape
+L0091:         if length != 50 or flows != self.num_flows:
+L0092:             raise ValueError("This candidate uses a full flow graph and a 50-slot window")
+L0093:         if neighbors.ndim != 2 or neighbors.shape[0] != flows or not 1 <= neighbors.shape[1] <= 9:
+L0094:             raise ValueError("Expected original self-plus-neighbor table [F,J], 1<=J<=9")
+L0095:         clean = torch.where(mask, observed.float(), torch.zeros_like(observed, dtype=torch.float32))
+L0096:         z = torch.where(mask, (clean - self.fit_mean) / self.fit_scale,
+L0097:                         torch.zeros_like(clean))
+L0098:         u = torch.arange(length, device=observed.device, dtype=torch.float32)[None, :, None] / 49.
+L0099:         position = self.u_enc(u.expand(batch, -1, -1))
+L0100:         h = self.h_enc(z.unsqueeze(-1)) + position
+L0101:         h = self.h_norm(torch.where(mask.unsqueeze(-1), h, position))
+L0102:         h = h + self.x_skip(z.unsqueeze(-1)) * mask.unsqueeze(-1)
+L0103:         # SPIN spatial attention excludes self, its temporal attention covers self.
+L0104:         ids = torch.arange(flows, device=observed.device)
+L0105:         incoming = neighbors.masked_fill(neighbors == ids[:, None], -1)
+L0106:         h = self.context_encoder(h, incoming, mask=mask.unsqueeze(-1))
+L0107:         return h, position, z
+L0108: 
+L0109:     def _memory_tokens(self, h: Tensor, mask: Tensor, neighbors: Tensor, ids: Tensor):
+L0110:         batch, length = h.shape[:2]
+L0111:         selected = neighbors.index_select(0, ids)
+L0112:         valid = selected >= 0
+L0113:         safe = selected.clamp_min(0)
+L0114:         event_mask = (mask[:, :, safe] & valid[None, None]).permute(0, 2, 1, 3)
+L0115:         event_h = h[:, :, safe].permute(0, 2, 1, 3, 4)
+L0116:         shape = (batch, ids.numel(), length, selected.shape[1], HEADS, HEAD_DIM)
+L0117:         k = F.normalize(self.key(event_h).reshape(shape), dim=-1, eps=1e-6)
+L0118:         v = self.value(event_h).reshape(shape)
+L0119:         k = torch.where(event_mask[..., None, None], k, torch.zeros_like(k)).transpose(3, 4)
+L0120:         v = torch.where(event_mask[..., None, None], v, torch.zeros_like(v)).transpose(3, 4)
+L0121:         return k, v, event_mask
+L0122: 
+L0123:     # Preserve the original simultaneous update and after-bucket read semantics.
+L0124:     _memory_scan = SyncDeltaModel._memory_scan
+L0125: 
+L0126:     def _direct_reads(self, z: Tensor, mask: Tensor, position: Tensor, ids: Tensor, *, trace=False):
+L0127:         batch, length = z.shape[:2]
+L0128:         visible = mask.index_select(2, ids).permute(0, 2, 1)
+L0129:         values = z.index_select(2, ids).permute(0, 2, 1)
+L0130:         p = position.index_select(2, ids).permute(0, 2, 1, 3)
+L0131:         query, key = self.direct_query(p), self.direct_key(p)
+L0132:         slots = torch.arange(length, device=z.device)
+L0133:         delta = slots[:, None] - slots[None, :]
+L0134:         distance = delta.abs().float()
+L0135:         logits = query @ key.transpose(-1, -2) / math.sqrt(16)
+L0136:         logits = logits - torch.log1p(distance)[None, None]
+L0137:         reads, aux = [], {}
+L0138:         for reverse, label in ((False, "forward"), (True, "backward")):
+L0139:             direction = delta <= 0 if reverse else delta >= 0
+L0140:             allowed = visible[:, :, None, :] & direction
+L0141:             ranked = distance[None, None].expand(batch, ids.numel(), -1, -1)
+L0142:             cutoff = ranked.masked_fill(~allowed, float(length + 1)).topk(
+L0143:                 2, dim=-1, largest=False).values[..., -1:]
+L0144:             selected = allowed & (distance[None, None] <= cutoff)
+L0145:             weights = safe_masked_softmax(logits, selected)
+L0146:             value_read = (weights @ values[..., None]).squeeze(-1)
+L0147:             distance_read = (weights * (distance / 49.)[None, None]).sum(-1)
+L0148:             available = selected.any(-1).to(dtype=z.dtype)
+L0149:             features = torch.stack((value_read, distance_read, available), -1)
+L0150:             read = self.direct_fusion(features).permute(0, 2, 1, 3)
+L0151:             reads.append(read)
+L0152:             if trace:
+L0153:                 aux[f"direct_weights_{label}"] = weights
+L0154:                 aux[f"direct_features_{label}"] = features.permute(0, 2, 1, 3)
+L0155:                 aux[f"direct_read_{label}"] = read
+L0156:         return reads[0], reads[1], aux
+L0157: 
+L0158:     def predict_block(self, x_observed, mask, stats, neighbors, target_ids,
+L0159:                       serial_order_context=None, *, return_aux=False, trace=False,
+L0160:                       intervention=None):
+L0161:         if intervention is not None or serial_order_context is not None:
+L0162:             raise ValueError("Use separately trained variants; no inference intervention is defined")
+L0163:         device = x_observed.device
+L0164:         mask = mask.to(device=device, dtype=torch.bool)
+L0165:         neighbors = torch.as_tensor(neighbors, device=device, dtype=torch.long)
+L0166:         ids = torch.as_tensor(target_ids, device=device, dtype=torch.long)
+L0167:         if ids.ndim != 1 or not ids.numel():
+L0168:             raise ValueError("target_ids must be a nonempty vector")
+L0169:         collect = return_aux or trace
+L0170:         with torch.autocast(device_type=device.type, enabled=False):
+L0171:             # Always encode the whole graph, even when reading only target blocks.
+L0172:             h, position, z = self._context(x_observed, mask, neighbors)
+L0173:             batch, length = h.shape[:2]
+L0174:             query = F.normalize(self.query(h.index_select(2, ids)).reshape(
+L0175:                 batch, length, ids.numel(), HEADS, HEAD_DIM), dim=-1, eps=1e-6)
+L0176:             q = query.permute(0, 2, 1, 3, 4)
+L0177:             query_flat = query.flatten(-2)
+L0178:             extra = {}
+L0179:             if self.memory_enabled:
+L0180:                 k, v, event_mask = self._memory_tokens(h, mask, neighbors, ids)
+L0181:                 memory_reads = []
+L0182:                 for reverse, label in ((False, "forward"), (True, "backward")):
+L0183:                     read, aux = self._memory_scan(k, v, q, reverse=reverse, order=None,
+L0184:                                                    return_aux=collect, trace=trace)
+L0185:                     memory_reads.append(read.reshape(batch, ids.numel(), length, WIDTH).permute(0, 2, 1, 3))
+L0186:                     if collect:
+L0187:                         extra.update({f"{name}_{label}": value for name, value in aux.items()})
+L0188:                 mf, mb = memory_reads
+L0189:                 if collect:
+L0190:                     extra.update(k=k, v=v, event_mask=event_mask)
+L0191:             else:
+L0192:                 mf, mb = torch.zeros_like(query_flat), torch.zeros_like(query_flat)
+L0193:             df, db, aux = self._direct_reads(z, mask, position, ids, trace=collect)
+L0194:             hf, hb = mf + df, mb + db
+L0195:             standardized = self.decoder(torch.cat((hf, hb, query_flat), -1)).squeeze(-1)
+L0196:             raw = self.fit_mean + self.fit_scale * standardized
+L0197:             if collect:
+L0198:                 extra.update(aux)
+L0199:                 extra.update(context=h, position=position, q=q, memory_hf=mf, memory_hb=mb,
+L0200:                              hf=hf, hb=hb, standardized_final=standardized)
+L0201:                 return raw, extra
+L0202:             return raw
+L0203: 
+L0204:     def forward(self, x_observed, mask, stats, neighbors):
+L0205:         ids = torch.arange(self.num_flows, device=x_observed.device)
+L0206:         raw = self.predict_block(x_observed, mask, stats, neighbors, ids)
+L0207:         return torch.where(mask.bool(), x_observed, raw.clamp_min(0))
+L0208: 
+L0209: 
+L0210: def build_model(num_flows, init_seed=41001, variant="spin_sync_direct"):
+L0211:     with torch.random.fork_rng(devices=[]):
+L0212:         torch.manual_seed(init_seed)
+L0213:         return SpinSyncDirectModel(num_flows, variant=variant).float()
+
+
+========================================================================
+FILE: experiments/spin_comparison_v1/attention.py
+SHA256: 756c757fbfb29baecf43c4f8dc6db7b21e2c24a67d4d10c82ee0abc1256e3fe5
+========================================================================
+L0001: """Exact dense/chunked algebra for the pinned SPIN additive attention.
+L0002: 
+L0003: Each spatial edge has its own temporal softmax; messages are then summed over
+L0004: incoming spatial edges. This is not dot-product attention or a replacement GAT.
+L0005: Chunking/checkpointing changes only execution and floating-point summation order.
+L0006: """
+L0007: 
+L0008: import torch
+L0009: from torch import nn
+L0010: from torch.utils.checkpoint import checkpoint
+L0011: 
+L0012: from .primitives import MLP, PyGLinear, TSLNorm
+L0013: 
+L0014: 
+L0015: def masked_softmax(logits, allowed):
+L0016:     if allowed is None:
+L0017:         allowed = torch.ones_like(logits, dtype=torch.bool)
+L0018:     allowed = allowed.expand_as(logits)
+L0019:     active = allowed.any(-2, keepdim=True)
+L0020:     masked = logits.masked_fill(~allowed, -torch.inf)
+L0021:     maximum = torch.where(active, masked.amax(-2, keepdim=True), torch.zeros_like(masked[..., :1, :]))
+L0022:     exp = torch.exp(masked - maximum)
+L0023:     # Exact pinned TSL epsilon, with zero fallback for an empty source set.
+L0024:     return exp / (exp.sum(-2, keepdim=True) + 5e-8)
+L0025: 
+L0026: 
+L0027: class TemporalAdditiveAttention(nn.Module):
+L0028:     def __init__(self, input_size, output_size, msg_size=None, msg_layers=1,
+L0029:                  root_weight=False, reweight="softmax", norm=False, dropout=0., **kwargs):
+L0030:         super().__init__()
+L0031:         if reweight != "softmax" or dropout != 0:
+L0032:             raise ValueError("This bounded adapter implements official spin.yaml only")
+L0033:         source, target = (input_size, input_size) if isinstance(input_size, int) else input_size
+L0034:         self.lin_src = PyGLinear(source, output_size, weight_initializer="glorot", bias_initializer="zeros")
+L0035:         self.lin_tgt = PyGLinear(target, output_size, weight_initializer="glorot", bias=False)
+L0036:         if root_weight:
+L0037:             self.lin_skip = PyGLinear(target, output_size, bias=False)
+L0038:         else:
+L0039:             self.register_parameter("lin_skip", None)
+L0040:         self.msg_nn = nn.Sequential(nn.PReLU(init=.2),
+L0041:             MLP(output_size, msg_size or output_size, output_size,
+L0042:                 n_layers=msg_layers, activation="prelu", dropout=dropout))
+L0043:         self.msg_gate = nn.Linear(output_size, 1, bias=False)
+L0044:         self.norm = nn.LayerNorm(output_size) if norm else None
+L0045:         self.reset_parameters()
+L0046: 
+L0047:     def reset_parameters(self):
+L0048:         self.lin_src.reset_parameters()
+L0049:         self.lin_tgt.reset_parameters()
+L0050:         if self.lin_skip is not None:
+L0051:             self.lin_skip.reset_parameters()
+L0052: 
+L0053:     def pair_read(self, source, target, source_mask=None, temporal_mask=None):
+L0054:         """Projected source/target [..., time, channels] -> target read."""
+L0055:         message = self.msg_nn(source.unsqueeze(-3) + target.unsqueeze(-2))
+L0056:         allowed = None if source_mask is None else source_mask.unsqueeze(-3)
+L0057:         if temporal_mask is not None:
+L0058:             shape = [1] * (message.ndim - 3) + [*temporal_mask.shape, 1]
+L0059:             temporal_mask = temporal_mask.reshape(shape)
+L0060:             allowed = temporal_mask if allowed is None else allowed & temporal_mask
+L0061:         weights = masked_softmax(self.msg_gate(message), allowed)
+L0062:         return (message * weights).sum(-2)
+L0063: 
+L0064:     def forward(self, x, mask=None, temporal_mask=None):
+L0065:         source, target = (x, x) if isinstance(x, torch.Tensor) else x
+L0066:         # Official public shape [B,T,N,D]; independent temporal groups become N.
+L0067:         src = self.lin_src(source).transpose(1, 2)
+L0068:         tgt = self.lin_tgt(target).transpose(1, 2)
+L0069:         allowed = None if mask is None else mask.bool().transpose(1, 2)
+L0070:         out = self.pair_read(src, tgt, allowed, temporal_mask).transpose(1, 2)
+L0071:         if self.lin_skip is not None:
+L0072:             out = out + self.lin_skip(target)
+L0073:         return self.norm(out) if self.norm is not None else out
+L0074: 
+L0075: 
+L0076: class TemporalGraphAdditiveAttention(nn.Module):
+L0077:     def __init__(self, input_size, output_size, msg_size=None, msg_layers=1,
+L0078:                  root_weight=True, reweight=None, temporal_self_attention=True,
+L0079:                  mask_temporal=True, mask_spatial=True, norm=True, dropout=0., **kwargs):
+L0080:         super().__init__()
+L0081:         args = dict(input_size=input_size, output_size=output_size, msg_size=msg_size,
+L0082:                     msg_layers=msg_layers, reweight=reweight, dropout=dropout,
+L0083:                     root_weight=False, norm=False)
+L0084:         self.mask_temporal, self.mask_spatial = mask_temporal, mask_spatial
+L0085:         self.self_attention = TemporalAdditiveAttention(**args) if temporal_self_attention else None
+L0086:         self.cross_attention = TemporalAdditiveAttention(**args)
+L0087:         target = input_size if isinstance(input_size, int) else input_size[1]
+L0088:         self.lin_skip = PyGLinear(target, output_size, bias_initializer="zeros") if root_weight else None
+L0089:         self.norm = TSLNorm(output_size) if norm else None
+L0090:         self.node_chunk = 8
+L0091:         self.gradient_checkpointing = True
+L0092:         self.reset_parameters()
+L0093: 
+L0094:     def reset_parameters(self):
+L0095:         self.cross_attention.reset_parameters()
+L0096:         if self.self_attention is not None:
+L0097:             self.self_attention.reset_parameters()
+L0098:         if self.lin_skip is not None:
+L0099:             self.lin_skip.reset_parameters()
+L0100:         if self.norm is not None:
+L0101:             self.norm.reset_parameters()
+L0102: 
+L0103:     def _cross_chunk(self, source, target, source_mask, valid_edges):
+L0104:         out = self.cross_attention.pair_read(source, target.unsqueeze(2), source_mask)
+L0105:         return (out * valid_edges[None, :, :, None, None]).sum(2)
+L0106: 
+L0107:     def _self_chunk(self, source, target, source_mask, temporal_mask):
+L0108:         return self.self_attention.pair_read(source, target, source_mask, temporal_mask)
+L0109: 
+L0110:     def forward(self, x, edge_index, edge_weight=None, mask=None):
+L0111:         if not isinstance(x, torch.Tensor) or edge_weight is not None:
+L0112:             raise ValueError("Bounded SPIN adapter uses one full unweighted graph")
+L0113:         # Adapter passes a padded incoming-neighbor table, excluding self.
+L0114:         incoming = edge_index
+L0115:         if incoming.ndim != 2 or incoming.shape[0] != x.shape[2]:
+L0116:             raise ValueError("Expected incoming-neighbor table [N,K]")
+L0117:         source = self.cross_attention.lin_src(x).transpose(1, 2)
+L0118:         target = self.cross_attention.lin_tgt(x).transpose(1, 2)
+L0119:         chunks = []
+L0120:         do_checkpoint = self.training and self.gradient_checkpointing and torch.is_grad_enabled()
+L0121:         for first in range(0, x.shape[2], self.node_chunk):
+L0122:             ids = incoming[first:first+self.node_chunk]
+L0123:             valid = ids >= 0
+L0124:             safe = ids.clamp_min(0)
+L0125:             src = source[:, safe]
+L0126:             tgt = target[:, first:first+len(ids)]
+L0127:             allowed = valid[None, :, :, None, None].expand(x.shape[0], -1, -1, x.shape[1], 1)
+L0128:             if self.mask_spatial and mask is not None:
+L0129:                 allowed = allowed & mask.transpose(1, 2)[:, safe].bool()
+L0130:             if do_checkpoint:
+L0131:                 out = checkpoint(self._cross_chunk, src, tgt, allowed, valid, use_reentrant=False)
+L0132:             else:
+L0133:                 out = self._cross_chunk(src, tgt, allowed, valid)
+L0134:             chunks.append(out)
+L0135:         out = torch.cat(chunks, dim=1).transpose(1, 2)
+L0136:         if self.self_attention is not None:
+L0137:             source = self.self_attention.lin_src(x).transpose(1, 2)
+L0138:             target = self.self_attention.lin_tgt(x).transpose(1, 2)
+L0139:             temporal = ~torch.eye(x.shape[1], dtype=torch.bool, device=x.device)
+L0140:             chunks = []
+L0141:             for first in range(0, x.shape[2], self.node_chunk):
+L0142:                 src, tgt = source[:, first:first+self.node_chunk], target[:, first:first+self.node_chunk]
+L0143:                 allowed = None
+L0144:                 if self.mask_temporal and mask is not None:
+L0145:                     allowed = mask.transpose(1, 2)[:, first:first+self.node_chunk].bool()
+L0146:                 if do_checkpoint:
+L0147:                     result = checkpoint(self._self_chunk, src, tgt, allowed, temporal, use_reentrant=False)
+L0148:                 else:
+L0149:                     result = self._self_chunk(src, tgt, allowed, temporal)
+L0150:                 chunks.append(result)
+L0151:             out = out + torch.cat(chunks, dim=1).transpose(1, 2)
+L0152:         if self.lin_skip is not None:
+L0153:             out = out + self.lin_skip(x)
+L0154:         return self.norm(out) if self.norm is not None else out
+
+
+========================================================================
+FILE: experiments/spin_comparison_v1/positional.py
+SHA256: c52d03228ad2998677c93894f835e77f266f2d382606d9de3f3e76195037d79f
+========================================================================
+L0001: from typing import Optional
+L0002: 
+L0003: from torch import nn
+L0004: from .primitives import StaticGraphEmbedding
+L0005: from .primitives import MLP
+L0006: from .primitives import PositionalEncoding
+L0007: 
+L0008: 
+L0009: class PositionalEncoder(nn.Module):
+L0010: 
+L0011:     def __init__(self, in_channels, out_channels,
+L0012:                  n_layers: int = 1,
+L0013:                  n_nodes: Optional[int] = None):
+L0014:         super(PositionalEncoder, self).__init__()
+L0015:         self.lin = nn.Linear(in_channels, out_channels)
+L0016:         self.activation = nn.LeakyReLU()
+L0017:         self.mlp = MLP(out_channels, out_channels, out_channels,
+L0018:                        n_layers=n_layers, activation='relu')
+L0019:         self.positional = PositionalEncoding(out_channels)
+L0020:         if n_nodes is not None:
+L0021:             self.node_emb = StaticGraphEmbedding(n_nodes, out_channels)
+L0022:         else:
+L0023:             self.register_parameter('node_emb', None)
+L0024: 
+L0025:     def forward(self, x, node_emb=None, node_index=None):
+L0026:         if node_emb is None:
+L0027:             node_emb = self.node_emb(token_index=node_index)
+L0028:         # x: [b s c], node_emb: [n c] -> [b s n c]
+L0029:         x = self.lin(x)
+L0030:         x = self.activation(x.unsqueeze(-2) + node_emb)
+L0031:         out = self.mlp(x)
+L0032:         out = self.positional(out)
+L0033:         return out
+
+
+========================================================================
+FILE: experiments/spin_comparison_v1/primitives.py
+SHA256: 6b5d8d6b0ac53b986456dea47fb5ff8df0b53dd47786a28a15febf5d2c344ccb
+========================================================================
+L0001: """Small Torch-only equivalents of SPIN's pinned TSL/PyG primitives.
+L0002: 
+L0003: Parameter names and mathematical definitions follow torch_spatiotemporal 0.1.1.
+L0004: The unusual std+eps normalization is deliberately NOT replaced by torch LayerNorm.
+L0005: """
+L0006: 
+L0007: import math
+L0008: 
+L0009: import torch
+L0010: from torch import nn
+L0011: 
+L0012: 
+L0013: class Dense(nn.Module):
+L0014:     def __init__(self, input_size, output_size, activation="linear", dropout=0., bias=True):
+L0015:         super().__init__()
+L0016:         activation_cls = {"relu": nn.ReLU, "prelu": nn.PReLU,
+L0017:                           "linear": nn.Identity}[activation]
+L0018:         self.layer = nn.Sequential(nn.Linear(input_size, output_size, bias=bias),
+L0019:                                    activation_cls(),
+L0020:                                    nn.Dropout(dropout) if dropout > 0 else nn.Identity())
+L0021: 
+L0022:     def forward(self, x):
+L0023:         return self.layer(x)
+L0024: 
+L0025: 
+L0026: class MLP(nn.Module):
+L0027:     def __init__(self, input_size, hidden_size, output_size=None, exog_size=None,
+L0028:                  n_layers=1, activation="relu", dropout=0.):
+L0029:         super().__init__()
+L0030:         if exog_size is not None:
+L0031:             input_size += exog_size
+L0032:         self.mlp = nn.Sequential(*[
+L0033:             Dense(input_size if i == 0 else hidden_size, hidden_size,
+L0034:                   activation, dropout) for i in range(n_layers)])
+L0035:         if output_size is not None:
+L0036:             self.readout = nn.Linear(hidden_size, output_size)
+L0037:         else:
+L0038:             self.register_parameter("readout", None)
+L0039: 
+L0040:     def forward(self, x, u=None):
+L0041:         if u is not None:
+L0042:             if u.ndim == 3 and x.ndim == 4:
+L0043:                 u = u.unsqueeze(-2).expand(*x.shape[:-1], u.shape[-1])
+L0044:             x = torch.cat((x, u), dim=-1)
+L0045:         out = self.mlp(x)
+L0046:         return self.readout(out) if self.readout is not None else out
+L0047: 
+L0048: 
+L0049: class StaticGraphEmbedding(nn.Module):
+L0050:     def __init__(self, n_tokens, emb_size):
+L0051:         super().__init__()
+L0052:         self.emb = nn.Parameter(torch.empty(n_tokens, emb_size))
+L0053:         nn.init.uniform_(self.emb, -1 / math.sqrt(emb_size), 1 / math.sqrt(emb_size))
+L0054: 
+L0055:     def forward(self, token_index=None):
+L0056:         return self.emb if token_index is None else self.emb[token_index]
+L0057: 
+L0058: 
+L0059: class PositionalEncoding(nn.Module):
+L0060:     def __init__(self, d_model, dropout=0., max_len=5000):
+L0061:         super().__init__()
+L0062:         self.dropout = nn.Dropout(dropout)
+L0063:         pe = torch.zeros(max_len, d_model)
+L0064:         position = torch.arange(max_len, dtype=torch.float32).unsqueeze(1)
+L0065:         divisor = torch.exp(torch.arange(0, d_model, 2).float()
+L0066:                             * (-math.log(10000.0) / d_model))
+L0067:         pe[:, 0::2], pe[:, 1::2] = torch.sin(position * divisor), torch.cos(position * divisor)
+L0068:         self.register_buffer("pe", pe.unsqueeze(1))
+L0069: 
+L0070:     def forward(self, x):
+L0071:         return self.dropout(x + self.pe[:x.size(1)])
+L0072: 
+L0073: 
+L0074: class TSLNorm(nn.Module):
+L0075:     def __init__(self, in_channels, eps=1e-5):
+L0076:         super().__init__()
+L0077:         self.eps = eps
+L0078:         self.weight = nn.Parameter(torch.ones(in_channels))
+L0079:         self.bias = nn.Parameter(torch.zeros(in_channels))
+L0080: 
+L0081:     def reset_parameters(self):
+L0082:         nn.init.ones_(self.weight)
+L0083:         nn.init.zeros_(self.bias)
+L0084: 
+L0085:     def forward(self, x):
+L0086:         mean = x.mean(-1, keepdim=True)
+L0087:         std = x.std(-1, unbiased=False, keepdim=True)
+L0088:         return (x - mean) / (std + self.eps) * self.weight + self.bias
+L0089: 
+L0090: 
+L0091: class PyGLinear(nn.Linear):
+L0092:     """PyG Linear's default Kaiming/Glorot choices for the used nonlazy case."""
+L0093:     def __init__(self, in_features, out_features, bias=True,
+L0094:                  weight_initializer=None, bias_initializer=None):
+L0095:         self.weight_initializer = weight_initializer
+L0096:         self.bias_initializer = bias_initializer
+L0097:         super().__init__(in_features, out_features, bias=bias)
+L0098: 
+L0099:     def reset_parameters(self):
+L0100:         if self.weight_initializer == "glorot":
+L0101:             nn.init.xavier_uniform_(self.weight)
+L0102:         else:
+L0103:             nn.init.kaiming_uniform_(self.weight, a=math.sqrt(5))
+L0104:         if self.bias is not None:
+L0105:             if self.bias_initializer == "zeros":
+L0106:                 nn.init.zeros_(self.bias)
+L0107:             else:
+L0108:                 nn.init.uniform_(self.bias, -1 / math.sqrt(self.in_features),
+L0109:                                  1 / math.sqrt(self.in_features))
+L0110: 
+
+
+========================================================================
+FILE: experiments/spin_comparison_v1/models.py
+SHA256: 001e1cb8a48f988ecee0324dfcf39c33f7a78ebde7ecc84b669d459f4b60899b
+========================================================================
+L0001: """Observation-only CalibTM API around the unmodified SPIN model architecture."""
+L0002: 
+L0003: from collections.abc import Mapping
+L0004: 
+L0005: import numpy as np
+L0006: import torch
+L0007: from torch import nn
+L0008: 
+L0009: from .source_model import SPINModel
+L0010: 
+L0011: 
+L0012: MODEL_CONFIG = dict(input_size=1, hidden_size=32, u_size=1, output_size=1,
+L0013:                     temporal_self_attention=True, reweight="softmax", n_layers=4,
+L0014:                     eta=3, message_layers=1)
+L0015: TRAINING = dict(optimizer="Adam", lr=0.0008, weight_decay=0.0,
+L0016:                 betas=[0.9, 0.999], eps=1e-8, max_epochs=300,
+L0017:                 patience=40, effective_batch=8, physical_batch=1,
+L0018:                 gradient_clip=5.0, prediction_loss_weight=1.0,
+L0019:                 scheduler="CosineSchedulerWithRestarts", num_warmup_steps=12,
+L0020:                 min_factor=0.1, linear_decay=0.67, num_cycles=3,
+L0021:                 scheduler_interval="epoch", selection="mean_condition_nmae",
+L0022:                 precision="float32", loss="sum_of_four_scaled_missing_L1")
+L0023: 
+L0024: 
+L0025: class SPINAdapter(nn.Module):
+L0026:     variant = "spin_adapted"
+L0027: 
+L0028:     def __init__(self, num_flows):
+L0029:         super().__init__()
+L0030:         self.num_flows = int(num_flows)
+L0031:         self.core = SPINModel(n_nodes=self.num_flows, **MODEL_CONFIG)
+L0032:         self.register_buffer("fit_mean", torch.zeros(()))
+L0033:         self.register_buffer("fit_scale", torch.ones(()))
+L0034:         self.register_buffer("fit_configured", torch.tensor(False))
+L0035: 
+L0036:     def configure_fit_statistics(self, statistics: Mapping):
+L0037:         """Global fit StandardScaler from registered per-flow sufficient stats.
+L0038: 
+L0039:         Original SPIN StandardScaler(axis=(0,1)) on [time,nodes,channels] uses
+L0040:         one population mean/std. Here C supplies the exact global mean; the
+L0041:         global second moment combines fit RMS std and dispersion of fit means.
+L0042:         Only the latter summand inherits the parent mu array's FP32 precision.
+L0043:         """
+L0044:         mu = np.asarray(statistics["mu"], dtype=np.float64)
+L0045:         mean = float(statistics.get("C", mu.mean()))
+L0046:         within = float(statistics["global_scale"]) ** 2
+L0047:         variance = within + float(np.mean((mu - mean) ** 2))
+L0048:         scale = max(variance ** .5, 1e-8)
+L0049:         if mu.shape != (self.num_flows,) or not np.isfinite([mean, scale]).all():
+L0050:             raise ValueError("Invalid fit-only global statistics")
+L0051:         self.fit_mean.fill_(mean)
+L0052:         self.fit_scale.fill_(scale)
+L0053:         self.fit_configured.fill_(True)
+L0054:         return {"mean": mean, "scale": scale, "fit_only": True,
+L0055:                 "normalization": "global_population_std_axes_time_nodes",
+L0056:                 "mu_input_precision": "parent_fp32"}
+L0057: 
+L0058:     def configure_from_bundle(self, bundle):
+L0059:         return self.configure_fit_statistics(dict(mu=bundle.mu, C=bundle.C,
+L0060:             global_scale=bundle.metadata["global_scale"]))
+L0061: 
+L0062:     def set_execution(self, *, node_chunk=8, gradient_checkpointing=True):
+L0063:         if node_chunk < 1:
+L0064:             raise ValueError("node_chunk must be positive")
+L0065:         for layer in self.core.encoder:
+L0066:             layer.node_chunk = int(node_chunk)
+L0067:             layer.gradient_checkpointing = bool(gradient_checkpointing)
+L0068: 
+L0069:     def _standardized(self, x_observed, mask, neighbors, target_ids):
+L0070:         if not bool(self.fit_configured):
+L0071:             raise RuntimeError("Configure fit-only global statistics before prediction")
+L0072:         if x_observed.ndim != 3 or x_observed.shape != mask.shape:
+L0073:             raise ValueError("x_observed and mask must have shape [B,T,F]")
+L0074:         if x_observed.shape[2] != self.num_flows or x_observed.shape[1] != 50:
+L0075:             raise ValueError("Frozen task requires full flow graph and native T50")
+L0076:         if neighbors.shape[0] != self.num_flows:
+L0077:             raise ValueError("Graph must include all flows")
+L0078:         nodes = torch.arange(self.num_flows, device=neighbors.device)
+L0079:         incoming = neighbors.masked_fill(neighbors == nodes[:, None], -1)
+L0080:         # Keep original source->target edge orientation; same parent fit graph.
+L0081:         clean = torch.where(mask.bool(), x_observed.float(), torch.zeros_like(x_observed).float())
+L0082:         z = torch.where(mask.bool(), (clean - self.fit_mean) / self.fit_scale,
+L0083:                         torch.zeros_like(clean)).unsqueeze(-1)
+L0084:         u = torch.arange(50, device=z.device, dtype=z.dtype)[None, :, None] / 49.
+L0085:         u = u.expand(z.shape[0], -1, -1)
+L0086:         final, intermediate = self.core(z, u, mask.bool().unsqueeze(-1), incoming,
+L0087:                                        target_nodes=target_ids)
+L0088:         return final.squeeze(-1), [value.squeeze(-1) for value in intermediate]
+L0089: 
+L0090:     def predict_block(self, x_observed, mask, stats, neighbors, target_ids,
+L0091:                       serial_order_context=None, *, return_aux=False, trace=False,
+L0092:                       intervention=None):
+L0093:         if intervention is not None:
+L0094:             raise ValueError("SPIN baseline has no intervention variants")
+L0095:         final, intermediate = self._standardized(x_observed, mask, neighbors, target_ids)
+L0096:         raw = final * self.fit_scale + self.fit_mean
+L0097:         if return_aux or trace:
+L0098:             return raw, {"standardized_final": final,
+L0099:                          "standardized_intermediate": intermediate}
+L0100:         return raw
+L0101: 
+L0102:     def forward(self, x_observed, mask, stats, neighbors):
+L0103:         ids = torch.arange(self.num_flows, device=x_observed.device)
+L0104:         raw = self.predict_block(x_observed, mask, stats, neighbors, ids)
+L0105:         return torch.where(mask.bool(), x_observed, raw.clamp_min(0))
+L0106: 
+L0107: 
+L0108: def build_model(num_flows, init_seed=41001):
+L0109:     with torch.random.fork_rng(devices=[]):
+L0110:         torch.manual_seed(int(init_seed))
+L0111:         return SPINAdapter(num_flows).float()
+L0112: 
+L0113: 
+L0114: def make_optimizer_scheduler(model):
+L0115:     from .scheduler import CosineSchedulerWithRestarts
+L0116:     optimizer = torch.optim.Adam(model.parameters(), lr=TRAINING["lr"],
+L0117:                                  weight_decay=TRAINING["weight_decay"])
+L0118:     scheduler = CosineSchedulerWithRestarts(optimizer, num_warmup_steps=12,
+L0119:         num_training_steps=300, min_factor=.1, linear_decay=.67, num_cycles=3)
+L0120:     return optimizer, scheduler
+L0121: 
+L0122: 
+L0123: def train_step(model, batch_values, batch_masks, window_starts, stats, neighbors,
+L0124:                C, optimizer, *, dataset, epoch, physical_batch=1,
+L0125:                target_block=None, order_seed=81001):
+L0126:     """Official four-layer L1 supervision, accumulated over full effective batch.
+L0127: 
+L0128:     Run scheduler.step() ONCE after each completed epoch, as Lightning's default
+L0129:     epoch interval in the upstream. Root runner owns stopping and checkpointing.
+L0130:     """
+L0131:     batch, length, flows = batch_values.shape
+L0132:     if target_block is not None and target_block < flows:
+L0133:         raise ValueError("SPIN must train the full graph once per microbatch")
+L0134:     count = int((~batch_masks).sum())
+L0135:     if length != 50 or count != batch * 40 * flows:
+L0136:         raise ValueError("SPIN training must use unchanged 20% masks")
+L0137:     device = next(model.parameters()).device
+L0138:     optimizer.zero_grad(set_to_none=True)
+L0139:     model.train()
+L0140:     total = torch.zeros((), device=device)
+L0141:     ids = torch.arange(flows, device=device)
+L0142:     for first in range(0, batch, physical_batch):
+L0143:         truth = torch.as_tensor(batch_values[first:first+physical_batch], device=device)
+L0144:         mask = torch.as_tensor(batch_masks[first:first+physical_batch], dtype=torch.bool, device=device)
+L0145:         visible = torch.where(mask, truth, torch.zeros_like(truth))
+L0146:         final, intermediate = model._standardized(visible, mask, neighbors, ids)
+L0147:         target = (truth - model.fit_mean) / model.fit_scale
+L0148:         loss = sum((pred - target).abs().masked_select(~mask).sum()
+L0149:                    for pred in [final, *intermediate]) / count
+L0150:         if not torch.isfinite(loss):
+L0151:             raise FloatingPointError("Nonfinite SPIN deep-supervised loss")
+L0152:         loss.backward()
+L0153:         total += loss.detach()
+L0154:     norm = nn.utils.clip_grad_norm_(model.parameters(), 5., error_if_nonfinite=True)
+L0155:     optimizer.step()
+L0156:     return {"loss": float(total), "gradient_norm": float(norm),
+L0157:             "missing_targets": count, "supervised_readouts": 4}
+
+
+========================================================================
+FILE: experiments/spin_comparison_v1/source_model.py
+SHA256: 54dd71a4b4afd6fdba49b64dae9f9b776dd0f992a193d53ec68cb6a592f919d6
+========================================================================
+L0001: from typing import Optional
+L0002: 
+L0003: import torch
+L0004: from torch import nn, Tensor
+L0005: from torch.nn import LayerNorm
+L0006: OptTensor = Optional[Tensor]
+L0007: from .primitives import StaticGraphEmbedding
+L0008: from .primitives import MLP
+L0009: 
+L0010: from .positional import PositionalEncoder
+L0011: from .attention import TemporalGraphAdditiveAttention
+L0012: 
+L0013: 
+L0014: class SPINModel(nn.Module):
+L0015: 
+L0016:     def __init__(self, input_size: int,
+L0017:                  hidden_size: int,
+L0018:                  n_nodes: int,
+L0019:                  u_size: Optional[int] = None,
+L0020:                  output_size: Optional[int] = None,
+L0021:                  temporal_self_attention: bool = True,
+L0022:                  reweight: Optional[str] = 'softmax',
+L0023:                  n_layers: int = 4,
+L0024:                  eta: int = 3,
+L0025:                  message_layers: int = 1):
+L0026:         super(SPINModel, self).__init__()
+L0027: 
+L0028:         u_size = u_size or input_size
+L0029:         output_size = output_size or input_size
+L0030:         self.n_nodes = n_nodes
+L0031:         self.n_layers = n_layers
+L0032:         self.eta = eta
+L0033:         self.temporal_self_attention = temporal_self_attention
+L0034: 
+L0035:         self.u_enc = PositionalEncoder(in_channels=u_size,
+L0036:                                        out_channels=hidden_size,
+L0037:                                        n_layers=2,
+L0038:                                        n_nodes=n_nodes)
+L0039: 
+L0040:         self.h_enc = MLP(input_size, hidden_size, n_layers=2)
+L0041:         self.h_norm = LayerNorm(hidden_size)
+L0042: 
+L0043:         self.valid_emb = StaticGraphEmbedding(n_nodes, hidden_size)
+L0044:         self.mask_emb = StaticGraphEmbedding(n_nodes, hidden_size)
+L0045: 
+L0046:         self.x_skip = nn.ModuleList()
+L0047:         self.encoder, self.readout = nn.ModuleList(), nn.ModuleList()
+L0048:         for l in range(n_layers):
+L0049:             x_skip = nn.Linear(input_size, hidden_size)
+L0050:             encoder = TemporalGraphAdditiveAttention(
+L0051:                 input_size=hidden_size,
+L0052:                 output_size=hidden_size,
+L0053:                 msg_size=hidden_size,
+L0054:                 msg_layers=message_layers,
+L0055:                 temporal_self_attention=temporal_self_attention,
+L0056:                 reweight=reweight,
+L0057:                 mask_temporal=True,
+L0058:                 mask_spatial=l < eta,
+L0059:                 norm=True,
+L0060:                 root_weight=True,
+L0061:                 dropout=0.0
+L0062:             )
+L0063:             readout = MLP(hidden_size, hidden_size, output_size,
+L0064:                           n_layers=2)
+L0065:             self.x_skip.append(x_skip)
+L0066:             self.encoder.append(encoder)
+L0067:             self.readout.append(readout)
+L0068: 
+L0069:     def forward(self, x: Tensor, u: Tensor, mask: Tensor,
+L0070:                 edge_index: Tensor, edge_weight: OptTensor = None,
+L0071:                 node_index: OptTensor = None, target_nodes: OptTensor = None):
+L0072:         if target_nodes is None:
+L0073:             target_nodes = slice(None)
+L0074: 
+L0075:         # Whiten missing values
+L0076:         x = x * mask
+L0077: 
+L0078:         # POSITIONAL ENCODING #################################################
+L0079:         # Obtain spatio-temporal positional encoding for every node-step pair #
+L0080:         # in both observed and target sets. Encoding are obtained by jointly  #
+L0081:         # processing node and time positional encoding.                       #
+L0082: 
+L0083:         # Build (node, timestamp) encoding
+L0084:         q = self.u_enc(u, node_index=node_index)
+L0085:         # Condition value on key
+L0086:         h = self.h_enc(x) + q
+L0087: 
+L0088:         # ENCODER #############################################################
+L0089:         # Obtain representations h^i_t for every (i, t) node-step pair by     #
+L0090:         # only taking into account valid data in representation set.          #
+L0091: 
+L0092:         # Replace H in missing entries with queries Q
+L0093:         h = torch.where(mask.bool(), h, q)
+L0094:         # Normalize features
+L0095:         h = self.h_norm(h)
+L0096: 
+L0097:         imputations = []
+L0098: 
+L0099:         for l in range(self.n_layers):
+L0100:             if l == self.eta:
+L0101:                 # Condition H on two different embeddings to distinguish
+L0102:                 # valid values from masked ones
+L0103:                 valid = self.valid_emb(token_index=node_index)
+L0104:                 masked = self.mask_emb(token_index=node_index)
+L0105:                 h = torch.where(mask.bool(), h + valid, h + masked)
+L0106:             # Masked Temporal GAT for encoding representation
+L0107:             h = h + self.x_skip[l](x) * mask  # skip connection for valid x
+L0108:             h = self.encoder[l](h, edge_index, mask=mask)
+L0109:             # Read from H to get imputations
+L0110:             target_readout = self.readout[l](h[..., target_nodes, :])
+L0111:             imputations.append(target_readout)
+L0112: 
+L0113:         # Get final layer imputations
+L0114:         x_hat = imputations.pop(-1)
+L0115: 
+L0116:         return x_hat, imputations
+L0117: 
+L0118:     @staticmethod
+L0119:     def add_model_specific_args(parser):
+L0120:         parser.opt_list('--hidden-size', type=int, tunable=True, default=32,
+L0121:                         options=[32, 64, 128, 256])
+L0122:         parser.add_argument('--u-size', type=int, default=None)
+L0123:         parser.add_argument('--output-size', type=int, default=None)
+L0124:         parser.add_argument('--temporal-self-attention', type=bool,
+L0125:                             default=True)
+L0126:         parser.add_argument('--reweight', type=str, default='softmax')
+L0127:         parser.add_argument('--n-layers', type=int, default=4)
+L0128:         parser.add_argument('--eta', type=int, default=3)
+L0129:         parser.add_argument('--message-layers', type=int, default=1)
+L0130:         return parser
+
+
+========================================================================
+FILE: experiments/sync_delta_v1/models.py
+SHA256: 575329e6f4bf7b5e5eb01ec153bf69bef6a577b41890147aa457d6eeb6aa0508
+========================================================================
+L0001: """Five observation-only readers for the frozen Sync-Delta experiment.
+L0002: 
+L0003: ``predict_block`` returns *unclipped raw-unit* predictions for training.  ``forward``
+L0004: adds the evaluation clamp and observed-value copy.  Neither method owns optimizer,
+L0005: mask-generation, fit-statistic, or random serial-order state.
+L0006: """
+L0007: 
+L0008: from __future__ import annotations
+L0009: 
+L0010: import math
+L0011: from collections.abc import Mapping
+L0012: from typing import Any
+L0013: 
+L0014: import torch
+L0015: from torch import Tensor, nn
+L0016: from torch.nn import functional as F
+L0017: 
+L0018: 
+L0019: VARIANTS = ("sync_delta", "attention", "serial_delta", "batch_ridge", "additive")
+L0020: HEADS = 4
+L0021: HEAD_DIM = 32
+L0022: WIDTH = HEADS * HEAD_DIM
+L0023: TIME_STEPS = 50
+L0024: 
+L0025: 
+L0026: def time_encoding(length: int = TIME_STEPS, *, device: Any = None) -> Tensor:
+L0027:     """Original native-grid coordinates, including during a backward scan."""
+L0028:     if not 1 <= length <= TIME_STEPS:
+L0029:         raise ValueError(f"length must be in [1, {TIME_STEPS}], got {length}")
+L0030:     u = torch.arange(length, dtype=torch.float32, device=device) / 49.0
+L0031:     return torch.stack(
+L0032:         (u, u.square(), (math.pi * u).sin(), (math.pi * u).cos(),
+L0033:          (2 * math.pi * u).sin(), (2 * math.pi * u).cos(),
+L0034:          (4 * math.pi * u).sin(), (4 * math.pi * u).cos()), dim=-1,
+L0035:     )
+L0036: 
+L0037: 
+L0038: def gram_denominator(keys: Tensor) -> Tensor:
+L0039:     """c=max(1, max absolute Gram row sum); keys have shape [..., n, d].
+L0040: 
+L0041:     Invalid slots must already be zero.  ``amax`` distributes gradients over
+L0042:     tied maxima, unlike the index-selecting reduction ``max(dim=...)``.
+L0043:     """
+L0044:     if keys.shape[-2] == 0:
+L0045:         return keys.new_ones(keys.shape[:-2])
+L0046:     gram = keys @ keys.transpose(-1, -2)
+L0047:     return gram.abs().sum(dim=-1).amax(dim=-1).clamp_min(1.0)
+L0048: 
+L0049: 
+L0050: stable_gram_denominator = gram_denominator
+L0051: 
+L0052: 
+L0053: def sync_delta_update(
+L0054:     state: Tensor,
+L0055:     keys: Tensor,
+L0056:     values: Tensor,
+L0057:     *,
+L0058:     additive: bool = False,
+L0059:     return_aux: bool = False,
+L0060: ) -> Tensor | tuple[Tensor, Tensor, Tensor]:
+L0061:     """One simultaneous update; S[...,dv,dk], K[...,n,dk], V[...,n,dv]."""
+L0062:     denominator = gram_denominator(keys)
+L0063:     value_columns = values.transpose(-1, -2)
+L0064:     residual = value_columns if additive else value_columns - state @ keys.transpose(-1, -2)
+L0065:     update = (residual @ keys) / denominator[..., None, None]
+L0066:     result = state + update
+L0067:     return (result, denominator, update) if return_aux else result
+L0068: 
+L0069: 
+L0070: sync_update = sync_delta_update
+L0071: 
+L0072: 
+L0073: def safe_masked_softmax(logits: Tensor, allowed: Tensor, dim: int = -1) -> Tensor:
+L0074:     """Exactly zero weights and finite backward for an entirely empty row."""
+L0075:     allowed = allowed.to(dtype=torch.bool)
+L0076:     any_allowed = allowed.any(dim=dim, keepdim=True)
+L0077:     masked = logits.masked_fill(~allowed, -torch.inf)
+L0078:     safe = torch.where(any_allowed, masked, torch.zeros_like(masked))
+L0079:     weights = torch.softmax(safe, dim=dim)
+L0080:     return torch.where(allowed, weights, torch.zeros_like(weights))
+L0081: 
+L0082: 
+L0083: class SyncDeltaModel(nn.Module):
+L0084:     """Shared encoders/decoder with one of the five frozen reader variants."""
+L0085: 
+L0086:     def __init__(self, num_flows: int, variant: str = "sync_delta") -> None:
+L0087:         super().__init__()
+L0088:         if variant not in VARIANTS:
+L0089:             raise ValueError(f"unknown variant {variant!r}; expected one of {VARIANTS}")
+L0090:         if num_flows < 1:
+L0091:             raise ValueError("num_flows must be positive")
+L0092:         self.num_flows = int(num_flows)
+L0093:         self.variant = variant
+L0094:         self.flow_embedding = nn.Embedding(num_flows, 16)
+L0095:         self.key = nn.Linear(25 if variant == "attention" else 24, WIDTH)
+L0096:         self.query = nn.Linear(24, WIDTH)
+L0097:         self.value = nn.Sequential(nn.Linear(25, WIDTH), nn.GELU(), nn.Linear(WIDTH, WIDTH))
+L0098:         self.decoder = nn.Sequential(nn.Linear(3 * WIDTH, WIDTH), nn.GELU(), nn.Linear(WIDTH, 1))
+L0099:         nn.init.zeros_(self.decoder[-1].weight)
+L0100:         nn.init.zeros_(self.decoder[-1].bias)
+L0101:         self.register_buffer("_time_features", time_encoding(), persistent=False)
+L0102:         self.float()
+L0103: 
+L0104:     @torch.no_grad()
+L0105:     def copy_shared_initialization_(self, reference: "SyncDeltaModel") -> "SyncDeltaModel":
+L0106:         """Copy all shared parameters, preserving Attention's extra value column.
+L0107: 
+L0108:         The coordinate columns and key bias are shared too.  The extra column is
+L0109:         initialized independently by ``build_model`` using a local CPU RNG.
+L0110:         """
+L0111:         if self.num_flows != reference.num_flows:
+L0112:             raise ValueError("initialization reference must use the same flow count")
+L0113:         reference_parameters = dict(reference.named_parameters())
+L0114:         for name, parameter in self.named_parameters():
+L0115:             source = reference_parameters[name]
+L0116:             if name == "key.weight" and parameter.shape != source.shape:
+L0117:                 parameter[:, :24].copy_(source[:, :24])
+L0118:             else:
+L0119:                 if parameter.shape != source.shape:
+L0120:                     raise ValueError(f"unexpected initialization mismatch for {name}")
+L0121:                 parameter.copy_(source)
+L0122:         return self
+L0123: 
+L0124:     def _encode(
+L0125:         self,
+L0126:         x_observed: Tensor,
+L0127:         mask: Tensor,
+L0128:         stats: Mapping[str, Tensor],
+L0129:         neighbors: Tensor,
+L0130:         target_ids: Tensor,
+L0131:         intervention: str | None,
+L0132:     ) -> tuple[Tensor, Tensor, Tensor, Tensor, Tensor, Tensor, Tensor, Tensor]:
+L0133:         batch, length, flows = x_observed.shape
+L0134:         device = x_observed.device
+L0135:         if flows != self.num_flows or mask.shape != x_observed.shape:
+L0136:             raise ValueError("x_observed/mask must have shape [B,T,num_flows]")
+L0137:         if not 1 <= length <= TIME_STEPS:
+L0138:             raise ValueError("this specification accepts 1..50 native time steps")
+L0139:         target_ids = torch.as_tensor(target_ids, dtype=torch.long, device=device)
+L0140:         neighbors = torch.as_tensor(neighbors, dtype=torch.long, device=device)
+L0141:         if target_ids.ndim != 1 or target_ids.numel() == 0:
+L0142:             raise ValueError("target_ids must be a nonempty vector")
+L0143:         if neighbors.ndim != 2 or neighbors.shape[0] != flows or not 1 <= neighbors.shape[1] <= 9:
+L0144:             raise ValueError("neighbors must be [num_flows,J], 1<=J<=9, with -1 padding")
+L0145:         mask = mask.to(dtype=torch.bool)
+L0146:         mu = torch.as_tensor(stats["mu"], dtype=torch.float32, device=device)
+L0147:         scale_input = stats["scale"] if "scale" in stats else stats["s"]
+L0148:         scale = torch.as_tensor(scale_input, dtype=torch.float32, device=device)
+L0149:         if mu.shape != (flows,) or scale.shape != (flows,):
+L0150:             raise ValueError("fit mu and scale must both be vectors of num_flows entries")
+L0151: 
+L0152:         # Sanitize before normalization/encoding, including hidden NaNs/Infs.
+L0153:         clean = torch.where(mask, x_observed.float(), torch.zeros((), device=device))
+L0154:         z = torch.where(mask, (clean - mu) / scale, torch.zeros((), device=device))
+L0155:         selected = neighbors.index_select(0, target_ids)
+L0156:         valid_neighbor = selected >= 0
+L0157:         source_ids = selected.clamp_min(0)
+L0158:         group_count, group_size = source_ids.shape
+L0159:         # [B,T,G,J] -> [B,G,T,J]. Missing and padding keys are excluded below.
+L0160:         event_mask = (mask[:, :, source_ids] & valid_neighbor[None, None]).permute(0, 2, 1, 3)
+L0161:         event_z = z[:, :, source_ids].permute(0, 2, 1, 3)
+L0162:         event_z = torch.where(event_mask, event_z, torch.zeros_like(event_z))
+L0163:         time = self._time_features[:length]
+L0164:         source_embedding = self.flow_embedding(source_ids)
+L0165:         coordinates = torch.cat(
+L0166:             (time[None, :, None, :].expand(group_count, -1, group_size, -1),
+L0167:              source_embedding[:, None].expand(-1, length, -1, -1)), dim=-1,
+L0168:         )
+L0169:         coordinates = coordinates[None].expand(batch, -1, -1, -1, -1)
+L0170:         observed_features = torch.cat((coordinates, event_z[..., None]), dim=-1)
+L0171:         value_z = torch.zeros_like(event_z) if intervention == "zero_value" else event_z
+L0172:         value_features = torch.cat((coordinates, value_z[..., None]), dim=-1)
+L0173:         key_features = observed_features if self.variant == "attention" else coordinates
+L0174:         keys = F.normalize(self.key(key_features).reshape(batch, group_count, length, group_size, HEADS, HEAD_DIM),
+L0175:                            p=2, dim=-1, eps=1e-6)
+L0176:         values = self.value(value_features).reshape(batch, group_count, length, group_size, HEADS, HEAD_DIM)
+L0177:         valid = event_mask[..., None, None]
+L0178:         keys = torch.where(valid, keys, torch.zeros_like(keys)).transpose(3, 4)
+L0179:         values = torch.where(valid, values, torch.zeros_like(values)).transpose(3, 4)
+L0180:         query_coordinates = torch.cat(
+L0181:             (time[None].expand(group_count, -1, -1),
+L0182:              self.flow_embedding(target_ids)[:, None].expand(-1, length, -1)), dim=-1,
+L0183:         )
+L0184:         queries = F.normalize(self.query(query_coordinates).reshape(group_count, length, HEADS, HEAD_DIM),
+L0185:                               p=2, dim=-1, eps=1e-6)
+L0186:         queries = queries[None].expand(batch, -1, -1, -1, -1)
+L0187:         events = torch.where(event_mask[..., None], observed_features, torch.zeros_like(observed_features))
+L0188:         return keys, values, queries, event_mask, events, target_ids, mu, scale
+L0189: 
+L0190:     def _serial_order(
+L0191:         self, context: Mapping[str, Tensor] | Tensor | None, shape: tuple[int, int, int, int],
+L0192:         device: torch.device, target_ids: Tensor,
+L0193:     ) -> Tensor:
+L0194:         if context is None:
+L0195:             raise ValueError("serial_delta requires externally generated deterministic slot order")
+L0196:         order = context["order"] if isinstance(context, Mapping) else context
+L0197:         order = torch.as_tensor(order, dtype=torch.long, device=device)
+L0198:         batch, groups, length, group_size = shape
+L0199:         # Public order layout is [B,T,G,J], or [B,T,F,J] before selecting targets.
+L0200:         if order.ndim == 4 and order.shape[2] == self.num_flows and groups != self.num_flows:
+L0201:             order = order.index_select(2, target_ids)
+L0202:         if order.shape != (batch, length, groups, group_size):
+L0203:             raise ValueError(f"serial order must be {(batch, length, groups, group_size)}, got {tuple(order.shape)}")
+L0204:         return order.permute(0, 2, 1, 3)
+L0205: 
+L0206:     def _memory_scan(
+L0207:         self, keys: Tensor, values: Tensor, queries: Tensor, *, reverse: bool,
+L0208:         order: Tensor | None, return_aux: bool, trace: bool,
+L0209:     ) -> tuple[Tensor, dict[str, Tensor]]:
+L0210:         batch, groups, length, heads, group_size, dimension = keys.shape
+L0211:         state = keys.new_zeros(batch, groups, heads, dimension, dimension)
+L0212:         readouts: list[Tensor | None] = [None] * length
+L0213:         states: list[Tensor | None] = [None] * length
+L0214:         state_norms: list[Tensor | None] = [None] * length
+L0215:         update_norms: list[Tensor | None] = [None] * length
+L0216:         denominators = gram_denominator(keys) if self.variant != "serial_delta" else None
+L0217:         times = range(length - 1, -1, -1) if reverse else range(length)
+L0218:         for t in times:
+L0219:             k, v = keys[:, :, t], values[:, :, t]
+L0220:             previous = state
+L0221:             if self.variant == "serial_delta":
+L0222:                 assert order is not None
+L0223:                 slot_order = order[:, :, t].flip(-1) if reverse else order[:, :, t]
+L0224:                 gather_index = slot_order[:, :, None, :, None].expand(-1, -1, heads, -1, dimension)
+L0225:                 ordered_keys = k.gather(-2, gather_index)
+L0226:                 ordered_values = v.gather(-2, gather_index)
+L0227:                 for slot in range(group_size):
+L0228:                     key = ordered_keys[..., slot, :]
+L0229:                     value = ordered_values[..., slot, :]
+L0230:                     residual = value - (state @ key[..., None]).squeeze(-1)
+L0231:                     state = state + residual[..., :, None] * key[..., None, :]
+L0232:             else:
+L0233:                 value_columns = v.transpose(-1, -2)
+L0234:                 residual = value_columns if self.variant == "additive" else value_columns - state @ k.transpose(-1, -2)
+L0235:                 assert denominators is not None
+L0236:                 state = state + (residual @ k) / denominators[:, :, t, :, None, None]
+L0237:             # Current-t query always reads after the entire current-t bucket.
+L0238:             readouts[t] = (state @ queries[:, :, t, :, :, None]).squeeze(-1)
+L0239:             if return_aux:
+L0240:                 state_norms[t] = state.detach().norm(dim=(-2, -1))
+L0241:                 update_norms[t] = (state - previous).detach().norm(dim=(-2, -1))
+L0242:             if trace:
+L0243:                 states[t] = state
+L0244:         result = torch.stack(readouts, dim=2)
+L0245:         aux: dict[str, Tensor] = {}
+L0246:         if return_aux:
+L0247:             aux["state_norm"] = torch.stack(state_norms, dim=2)
+L0248:             aux["update_norm"] = torch.stack(update_norms, dim=2)
+L0249:             if denominators is not None:
+L0250:                 aux["c"] = denominators
+L0251:         if trace:
+L0252:             aux["states"] = torch.stack(states, dim=2)
+L0253:         return result, aux
+L0254: 
+L0255:     def _attention(
+L0256:         self, keys: Tensor, values: Tensor, queries: Tensor, event_mask: Tensor, *, trace: bool,
+L0257:     ) -> tuple[Tensor, Tensor, dict[str, Tensor]]:
+L0258:         batch, groups, length, heads, group_size, dimension = keys.shape
+L0259:         k = keys.permute(0, 1, 3, 2, 4, 5).reshape(batch, groups, heads, length * group_size, dimension)
+L0260:         v = values.permute(0, 1, 3, 2, 4, 5).reshape(batch, groups, heads, length * group_size, dimension)
+L0261:         q = queries.permute(0, 1, 3, 2, 4)
+L0262:         logits = (q @ k.transpose(-1, -2)) * math.sqrt(HEAD_DIM)
+L0263:         event_times = torch.arange(length, device=keys.device).repeat_interleave(group_size)
+L0264:         query_times = torch.arange(length, device=keys.device)
+L0265:         visible = event_mask.reshape(batch, groups, 1, 1, length * group_size)
+L0266:         past = event_times[None, :] <= query_times[:, None]
+L0267:         future = event_times[None, :] >= query_times[:, None]
+L0268:         forward_weights = safe_masked_softmax(logits, visible & past)
+L0269:         backward_weights = safe_masked_softmax(logits, visible & future)
+L0270:         forward = (forward_weights @ v).permute(0, 1, 3, 2, 4)
+L0271:         backward = (backward_weights @ v).permute(0, 1, 3, 2, 4)
+L0272:         aux = {"weights_forward": forward_weights, "weights_backward": backward_weights} if trace else {}
+L0273:         return forward, backward, aux
+L0274: 
+L0275:     def _ridge_scan(
+L0276:         self, keys: Tensor, values: Tensor, queries: Tensor, *, reverse: bool,
+L0277:         trace: bool, return_aux: bool,
+L0278:     ) -> tuple[Tensor, dict[str, Tensor]]:
+L0279:         # SUM statistics, never mean: lambda=1 is exactly the identity below.
+L0280:         bucket_gram = keys.transpose(-1, -2) @ keys
+L0281:         bucket_cross = values.transpose(-1, -2) @ keys
+L0282:         # CUDA cumsum has no deterministic implementation in the pinned Torch
+L0283:         # 2.2.2 runtime. Fixed chronological additions preserve SUM/lambda=1 and
+L0284:         # the complete autograd graph, without relaxing global determinism.
+L0285:         length = keys.shape[2]
+L0286:         gram_steps: list[Tensor | None] = [None] * length
+L0287:         cross_steps: list[Tensor | None] = [None] * length
+L0288:         running_gram = torch.zeros_like(bucket_gram[:, :, 0])
+L0289:         running_cross = torch.zeros_like(bucket_cross[:, :, 0])
+L0290:         times = range(length - 1, -1, -1) if reverse else range(length)
+L0291:         for t in times:
+L0292:             running_gram = running_gram + bucket_gram[:, :, t]
+L0293:             running_cross = running_cross + bucket_cross[:, :, t]
+L0294:             gram_steps[t] = running_gram
+L0295:             cross_steps[t] = running_cross
+L0296:         gram = torch.stack(gram_steps, dim=2)
+L0297:         cross = torch.stack(cross_steps, dim=2)
+L0298:         identity = torch.eye(HEAD_DIM, dtype=torch.float32, device=keys.device)
+L0299:         regularized_gram = gram + identity
+L0300:         factor, info = torch.linalg.cholesky_ex(regularized_gram, check_errors=False)
+L0301:         if bool((info != 0).any().item()):
+L0302:             failures = (info != 0).nonzero().detach().cpu().tolist()
+L0303:             raise RuntimeError(f"Batch-Ridge Cholesky failed at {failures[:8]}; no jitter fallback is permitted")
+L0304:         solved_query = torch.cholesky_solve(queries[..., None], factor)
+L0305:         readout = (cross @ solved_query).squeeze(-1)
+L0306:         aux: dict[str, Tensor] = {}
+L0307:         if trace:
+L0308:             aux.update(gram=regularized_gram, cross=cross)
+L0309:         if return_aux:
+L0310:             aux["cross_norm"] = cross.detach().norm(dim=(-2, -1))
+L0311:         return readout, aux
+L0312: 
+L0313:     def predict_block(
+L0314:         self,
+L0315:         x_observed: Tensor,
+L0316:         mask: Tensor,
+L0317:         stats: Mapping[str, Tensor],
+L0318:         neighbors: Tensor,
+L0319:         target_ids: Tensor,
+L0320:         serial_order_context: Mapping[str, Tensor] | Tensor | None = None,
+L0321:         *,
+L0322:         return_aux: bool = False,
+L0323:         trace: bool = False,
+L0324:         intervention: str | None = None,
+L0325:     ) -> Tensor | tuple[Tensor, dict[str, Tensor]]:
+L0326:         """Predict unclipped raw values [B,T,G] for independent target groups.
+L0327: 
+L0328:         ``neighbors`` is [F,J], padded with -1. ``stats`` contains fit-only ``mu``
+L0329:         and ``scale`` [F]. Serial orders contain permutations of *neighbor slot*
+L0330:         indices, [B,T,G,J], generated externally from stable data identities.
+L0331: 
+L0332:         Auxiliary ``hf/hb/q`` use [B,T,G,128]; ``k/v`` use [B,G,T,4,J,32].
+L0333:         ``trace=True`` additionally retains states/statistics/attention weights.
+L0334:         It is intended for small correctness probes, not routine training logs.
+L0335:         """
+L0336:         if x_observed.ndim != 3:
+L0337:             raise ValueError("x_observed must have shape [B,T,F]")
+L0338:         if intervention not in (None, "zero_readout", "zero_value"):
+L0339:             raise ValueError(f"unknown intervention {intervention!r}")
+L0340:         collect = return_aux or trace
+L0341:         # The frozen implementation keeps all projected features and state algebra FP32.
+L0342:         with torch.autocast(device_type=x_observed.device.type, enabled=False):
+L0343:             keys, values, queries, event_mask, events, target_ids, mu, scale = self._encode(
+L0344:                 x_observed, mask, stats, neighbors, target_ids, intervention,
+L0345:             )
+L0346:             batch, groups, length, _, group_size, _ = keys.shape
+L0347:             extra: dict[str, Tensor] = {}
+L0348:             if self.variant == "attention":
+L0349:                 hf, hb, extra = self._attention(keys, values, queries, event_mask, trace=trace)
+L0350:             else:
+L0351:                 order = self._serial_order(serial_order_context, (batch, groups, length, group_size),
+L0352:                                            keys.device, target_ids) if self.variant == "serial_delta" else None
+L0353:                 direction_aux: dict[str, dict[str, Tensor]] = {}
+L0354:                 reads: list[Tensor] = []
+L0355:                 for reverse, label in ((False, "forward"), (True, "backward")):
+L0356:                     if self.variant == "batch_ridge":
+L0357:                         read, aux = self._ridge_scan(keys, values, queries, reverse=reverse,
+L0358:                                                     trace=trace, return_aux=collect)
+L0359:                     else:
+L0360:                         read, aux = self._memory_scan(keys, values, queries, reverse=reverse,
+L0361:                                                      order=order, return_aux=collect, trace=trace)
+L0362:                     reads.append(read)
+L0363:                     direction_aux[label] = aux
+L0364:                 hf, hb = reads
+L0365:                 for label, aux in direction_aux.items():
+L0366:                     extra.update({f"{key}_{label}": value for key, value in aux.items()})
+L0367:             if intervention == "zero_readout":
+L0368:                 hf, hb = torch.zeros_like(hf), torch.zeros_like(hb)
+L0369:             hf = hf.reshape(batch, groups, length, WIDTH).permute(0, 2, 1, 3)
+L0370:             hb = hb.reshape(batch, groups, length, WIDTH).permute(0, 2, 1, 3)
+L0371:             q = queries.reshape(batch, groups, length, WIDTH).permute(0, 2, 1, 3)
+L0372:             normalized_prediction = self.decoder(torch.cat((hf, hb, q), dim=-1)).squeeze(-1)
+L0373:             raw = mu[target_ids][None, None] + scale[target_ids][None, None] * normalized_prediction
+L0374:             if collect:
+L0375:                 extra.update(hf=hf, hb=hb, q=q, h_forward=hf, h_backward=hb,
+L0376:                              k=keys, v=values, events=events, event_mask=event_mask)
+L0377:                 return raw, extra
+L0378:             return raw
+L0379: 
+L0380:     def forward(
+L0381:         self,
+L0382:         x_observed: Tensor,
+L0383:         mask: Tensor,
+L0384:         stats: Mapping[str, Tensor],
+L0385:         neighbors: Tensor,
+L0386:         target_ids: Tensor,
+L0387:         serial_order_context: Mapping[str, Tensor] | Tensor | None = None,
+L0388:         *,
+L0389:         return_aux: bool = False,
+L0390:         trace: bool = False,
+L0391:         intervention: str | None = None,
+L0392:     ) -> Tensor | tuple[Tensor, dict[str, Tensor]]:
+L0393:         """Evaluation output: nonnegative missing predictions and observed copy."""
+L0394:         result = self.predict_block(x_observed, mask, stats, neighbors, target_ids,
+L0395:                                     serial_order_context, return_aux=return_aux,
+L0396:                                     trace=trace, intervention=intervention)
+L0397:         raw, aux = result if isinstance(result, tuple) else (result, None)
+L0398:         ids = torch.as_tensor(target_ids, dtype=torch.long, device=x_observed.device)
+L0399:         prediction = torch.where(mask[:, :, ids].bool(), x_observed[:, :, ids], raw.clamp_min(0))
+L0400:         if aux is not None:
+L0401:             aux["raw"] = raw
+L0402:             return prediction, aux
+L0403:         return prediction
+L0404: 
+L0405: 
+L0406: def build_model(num_flows: int, variant: str = "sync_delta", init_seed: int = 41001) -> SyncDeltaModel:
+L0407:     """Reproduce common initialization without consuming the caller's RNG state.
+L0408: 
+L0409:     Every variant copies the same sync template. Attention's additional value
+L0410:     column retains an independent, explicitly seeded default Linear initializer.
+L0411:     The seed here never controls masks, data order, or serial event permutations.
+L0412:     """
+L0413:     with torch.random.fork_rng(devices=[]):
+L0414:         generator = torch.Generator(device="cpu").manual_seed(int(init_seed))
+L0415:         torch.random.set_rng_state(generator.get_state())
+L0416:         reference = SyncDeltaModel(num_flows, "sync_delta")
+L0417:         if variant == "sync_delta":
+L0418:             return reference
+L0419:         extra_generator = torch.Generator(device="cpu").manual_seed(int(init_seed) + 42017)
+L0420:         torch.random.set_rng_state(extra_generator.get_state())
+L0421:         model = SyncDeltaModel(num_flows, variant)
+L0422:         return model.copy_shared_initialization_(reference)
+L0423: 
+L0424: 
+L0425: __all__ = ["SyncDeltaModel", "build_model", "VARIANTS", "time_encoding", "gram_denominator",
+L0426:            "stable_gram_denominator", "sync_delta_update", "sync_update", "safe_masked_softmax"]
+
+
+========================================================================
+FILE: experiments/llm_candidates_v1/direct.py
+SHA256: c89dfc0e0718c95fb8beb81095ce7027c75fec91728c39fdfbea739b6bea4211
+========================================================================
+L0001: """One bounded Based-inspired direct-read candidate for Sync-Delta.
+L0002: 
+L0003: Each direction reads at most two nearest observed values of the target flow.
+L0004: One 16-dimensional attention head uses learned coordinate Q/K scores plus the
+L0005: fixed native-slot distance bias -log(1 + distance). The weighted standardized
+L0006: value, weighted distance / 49, and availability are projected into the original
+L0007: 128-dimensional memory readout. All frozen Sync modules retain names/shapes.
+L0008: 
+L0009: This is a direct bypass around the existing self-plus-neighbor memory, not a
+L0010: replication of the Based LM or of the full-neighborhood Attention baseline.
+L0011: It is not fixed Linear interpolation: weights and the final decoder are learned.
+L0012: No additional gate, auxiliary loss, attention grid, or dependency is introduced.
+L0013: """
+L0014: 
+L0015: from __future__ import annotations
+L0016: 
+L0017: import math
+L0018: from collections.abc import Mapping
+L0019: 
+L0020: import torch
+L0021: from torch import Tensor, nn
+L0022: 
+L0023: from experiments.sync_delta_v1.models import (
+L0024:     WIDTH,
+L0025:     SyncDeltaModel,
+L0026:     safe_masked_softmax,
+L0027: )
+L0028: 
+L0029: 
+L0030: DIRECT_DIM = 16
+L0031: DIRECT_NEAREST_PER_DIRECTION = 2
+L0032: 
+L0033: 
+L0034: class DirectSyncModel(SyncDeltaModel):
+L0035:     """Sync memory plus a small, observation-only direct temporal readout."""
+L0036: 
+L0037:     def __init__(self, num_flows: int) -> None:
+L0038:         super().__init__(num_flows, variant="sync_delta")
+L0039:         self.direct_query = nn.Linear(24, DIRECT_DIM)
+L0040:         self.direct_key = nn.Linear(24, DIRECT_DIM)
+L0041:         # Default nonzero initialization avoids another zero-initialized layer
+L0042:         # before the frozen zero decoder. The base decoder still guarantees the
+L0043:         # common fit-mean prediction at initialization.
+L0044:         self.direct_fusion = nn.Linear(3, WIDTH, bias=False)
+L0045:         self.float()
+L0046: 
+L0047:     def _direct_reads(
+L0048:         self,
+L0049:         x_observed: Tensor,
+L0050:         mask: Tensor,
+L0051:         mu: Tensor,
+L0052:         scale: Tensor,
+L0053:         target_ids: Tensor,
+L0054:         *,
+L0055:         intervention: str | None,
+L0056:         trace: bool,
+L0057:     ) -> tuple[Tensor, Tensor, dict[str, Tensor]]:
+L0058:         """Return [B,T,G,128] reads using only each target's own observations.
+L0059: 
+L0060:         Nearest refers to native time-slot distance, not the number of observed
+L0061:         events and not continuous wall-clock time. Scores are computed over a
+L0062:         small dense T-by-T matrix; support is at most two events per direction.
+L0063:         """
+L0064:         batch, length, _ = x_observed.shape
+L0065:         groups = target_ids.numel()
+L0066:         visible = mask.bool().index_select(2, target_ids).permute(0, 2, 1)
+L0067:         source = x_observed.float().index_select(2, target_ids).permute(0, 2, 1)
+L0068:         clean = torch.where(visible, source, torch.zeros_like(source))
+L0069:         z = torch.where(
+L0070:             visible,
+L0071:             (clean - mu[target_ids][None, :, None]) / scale[target_ids][None, :, None],
+L0072:             torch.zeros_like(clean),
+L0073:         )
+L0074:         if intervention == "zero_value":
+L0075:             z = torch.zeros_like(z)
+L0076:         coordinates = torch.cat(
+L0077:             (self._time_features[:length][None].expand(groups, -1, -1),
+L0078:              self.flow_embedding(target_ids)[:, None].expand(-1, length, -1)),
+L0079:             dim=-1,
+L0080:         )
+L0081:         query = self.direct_query(coordinates)
+L0082:         key = self.direct_key(coordinates)
+L0083:         times = torch.arange(length, device=x_observed.device)
+L0084:         delta = times[:, None] - times[None, :]
+L0085:         distance = delta.abs().float()
+L0086:         logits = (query @ key.transpose(-1, -2)) / math.sqrt(DIRECT_DIM)
+L0087:         logits = logits - torch.log1p(distance)[None]
+L0088:         reads = []
+L0089:         extra: dict[str, Tensor] = {}
+L0090:         for reverse, label in ((False, "forward"), (True, "backward")):
+L0091:             direction = delta <= 0 if reverse else delta >= 0
+L0092:             allowed = visible[:, :, None, :] & direction
+L0093:             # Only distance selects the local support. Invalid sentinel ties
+L0094:             # cannot make hidden events visible because allowed is reapplied.
+L0095:             ranked_distance = distance[None, None].expand(batch, groups, -1, -1)
+L0096:             ranked_distance = ranked_distance.masked_fill(~allowed, float(length + 1))
+L0097:             cutoff = ranked_distance.topk(
+L0098:                 min(DIRECT_NEAREST_PER_DIRECTION, length), dim=-1, largest=False
+L0099:             ).values[..., -1:]
+L0100:             selected = allowed & (distance[None, None] <= cutoff)
+L0101:             weights = safe_masked_softmax(logits[None], selected)
+L0102:             value_read = (weights @ z[..., None]).squeeze(-1)
+L0103:             distance_read = (weights * (distance / 49.0)[None, None]).sum(-1)
+L0104:             available = selected.any(-1).to(dtype=z.dtype)
+L0105:             features = torch.stack((value_read, distance_read, available), dim=-1)
+L0106:             projected = self.direct_fusion(features).permute(0, 2, 1, 3)
+L0107:             reads.append(projected)
+L0108:             if trace:
+L0109:                 extra[f"direct_weights_{label}"] = weights
+L0110:                 extra[f"direct_features_{label}"] = features.permute(0, 2, 1, 3)
+L0111:                 extra[f"direct_read_{label}"] = projected
+L0112:         return reads[0], reads[1], extra
+L0113: 
+L0114:     def predict_block(
+L0115:         self,
+L0116:         x_observed: Tensor,
+L0117:         mask: Tensor,
+L0118:         stats: Mapping[str, Tensor],
+L0119:         neighbors: Tensor,
+L0120:         target_ids: Tensor,
+L0121:         serial_order_context: Mapping[str, Tensor] | Tensor | None = None,
+L0122:         *,
+L0123:         return_aux: bool = False,
+L0124:         trace: bool = False,
+L0125:         intervention: str | None = None,
+L0126:     ) -> Tensor | tuple[Tensor, dict[str, Tensor]]:
+L0127:         if x_observed.ndim != 3:
+L0128:             raise ValueError("x_observed must have shape [B,T,F]")
+L0129:         if intervention not in (None, "zero_readout", "zero_value"):
+L0130:             raise ValueError(f"unknown intervention {intervention!r}")
+L0131:         collect = return_aux or trace
+L0132:         with torch.autocast(device_type=x_observed.device.type, enabled=False):
+L0133:             keys, values, queries, event_mask, events, ids, mu, scale = self._encode(
+L0134:                 x_observed, mask, stats, neighbors, target_ids, intervention
+L0135:             )
+L0136:             batch, groups, length = keys.shape[:3]
+L0137:             extra: dict[str, Tensor] = {}
+L0138:             memory_reads = []
+L0139:             for reverse, label in ((False, "forward"), (True, "backward")):
+L0140:                 read, aux = self._memory_scan(
+L0141:                     keys, values, queries, reverse=reverse, order=None,
+L0142:                     return_aux=collect, trace=trace,
+L0143:                 )
+L0144:                 memory_reads.append(
+L0145:                     read.reshape(batch, groups, length, WIDTH).permute(0, 2, 1, 3)
+L0146:                 )
+L0147:                 extra.update({f"{name}_{label}": value for name, value in aux.items()})
+L0148:             direct_forward, direct_backward, direct_aux = self._direct_reads(
+L0149:                 x_observed, mask, mu, scale, ids,
+L0150:                 intervention=intervention, trace=collect,
+L0151:             )
+L0152:             extra.update(direct_aux)
+L0153:             hf = memory_reads[0] + direct_forward
+L0154:             hb = memory_reads[1] + direct_backward
+L0155:             if intervention == "zero_readout":
+L0156:                 hf, hb = torch.zeros_like(hf), torch.zeros_like(hb)
+L0157:             query = queries.reshape(batch, groups, length, WIDTH).permute(0, 2, 1, 3)
+L0158:             decoded = self.decoder(torch.cat((hf, hb, query), dim=-1)).squeeze(-1)
+L0159:             raw = mu[ids][None, None] + scale[ids][None, None] * decoded
+L0160:             if collect:
+L0161:                 extra.update(
+L0162:                     hf=hf, hb=hb, q=query, h_forward=hf, h_backward=hb,
+L0163:                     memory_hf=memory_reads[0], memory_hb=memory_reads[1],
+L0164:                     k=keys, v=values, events=events, event_mask=event_mask,
+L0165:                 )
+L0166:                 return raw, extra
+L0167:             return raw
+L0168: 
+L0169: 
+L0170: __all__ = ["DirectSyncModel", "DIRECT_DIM", "DIRECT_NEAREST_PER_DIRECTION"]

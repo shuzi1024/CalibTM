@@ -1,0 +1,17 @@
+{
+  "created_utc": "2026-09-16T09:07:39.763966+00:00",
+  "compiler": "/Users/agiuser/Documents/work/CalibTM/analysis/overnight_20260915/runtime_deps/tex/tectonic",
+  "command": [
+    "/Users/agiuser/Documents/work/CalibTM/analysis/overnight_20260915/runtime_deps/tex/tectonic",
+    "--untrusted",
+    "--keep-logs",
+    "--keep-intermediates",
+    "--only-cached",
+    "--outdir",
+    "/Users/agiuser/Documents/work/CalibTM/paper/spin_context_direct_cn_20260916/build",
+    "/Users/agiuser/Documents/work/CalibTM/paper/spin_context_direct_cn_20260916/manuscript.tex"
+  ],
+  "pdf": "/Users/agiuser/Documents/work/CalibTM/paper/spin_context_direct_cn_20260916/build/manuscript.pdf",
+  "pdf_sha256": "069cb0c9324b0e270a8ddbc4416145dea567baa62271aee5f2acdcc769e20990",
+  "purpose": "Chinese working draft in IEEEtran conference layout"
+}

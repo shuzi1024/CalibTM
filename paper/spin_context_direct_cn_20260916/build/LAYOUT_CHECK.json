@@ -1,0 +1,26 @@
+{
+  "checked_utc": "2026-09-16T09:14:39.459660+00:00",
+  "pdf_sha256": "069cb0c9324b0e270a8ddbc4416145dea567baa62271aee5f2acdcc769e20990",
+  "page_count": 4,
+  "page_size": "US Letter, 612 x 792 points",
+  "all_fonts_embedded": true,
+  "final_build_offline": true,
+  "log_checks": {
+    "missing_glyphs": false,
+    "overfull_boxes": false,
+    "unresolved_references_or_citations": false
+  },
+  "visually_checked_pages": [
+    1,
+    2,
+    3,
+    4
+  ],
+  "visual_result": "All four final rendered pages inspected: Chinese text, equations, vector architecture, tables and references are legible; no visible clipping or overlap.",
+  "nonblocking_log_messages": [
+    "fontspec: Songti SC lacks requested Default script metadata; no missing glyphs and rendered CJK text checked.",
+    "Two underfull hboxes (badness 3861 and 10000); visible text and line wrapping checked."
+  ],
+  "scientific_review": "analysis/spin_sync_unified_20260916/PAPER_SCIENTIFIC_REVIEW_CN.md",
+  "submission_status": "Chinese internal working draft; not submission-ready."
+}

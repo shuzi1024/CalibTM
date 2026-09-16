@@ -1,0 +1,56 @@
+\section{方法}
+\label{sec:method}
+
+\subsection{任务与上下文编码}
+本文考察已有组件在统一补全网络中的组合：采用SPIN的观测掩蔽时空编码\cite{marisca2022spin}，结合本流直接读出及基于delta-rule残差纠错思想的矩阵记忆\cite{yang2024deltanet}。完整模型记为\full{}。
+
+设窗口为$X\in\mathbb R_{\geq0}^{T\times F}$，$M_{ti}=1$表示可见，$T=50$。任务是\emph{离线整窗补全}：允许使用窗口内前后两侧观测。全局均值$\mu$、总体标准差$\sigma$及邻域均由拟合段确定；每流邻域包含自身，以及按拟合段Pearson相关降序选择的至多八个正相关邻流。隐藏真值不进入编码，标准化输入为
+\begin{equation}
+ z_{ti}=\begin{cases}(X_{ti}-\mu)/\sigma,&M_{ti}=1,\\0,&M_{ti}=0.\end{cases}
+ \label{eq:observed-input}
+\end{equation}
+
+槽位$t/49$、可学习流嵌入与正弦位置编码产生32维位置表示$p_{ti}$。可见位置叠加数值编码，经归一化和数值跳连后进入\emph{一层}32维SPIN时空块，得到$h_{ti}$。该块同时聚合本流跨时间观测和邻流时空观测，并非只处理空间关系；空间分支逐邻流在源时间维归一化后求和。所有流共同编码，缺失位置也可作为查询，但仅可见位置作为注意力源。时间分支屏蔽自身时间对角项，空间分支排除自身流；无有效观测源时注意力读出为零，根节点跳连保留查询位置表示。上下文可依赖整窗，因此后续扫描方向不构成因果保证。
+
+这一结构不同于原四层SPIN网络：仅使用一次上下文编码和最终输出监督，不沿用原模型的多层读出深监督。因此，与原SPIN的结构差异不能单独归因于Sync。
+
+\subsection{Direct双向局部读出}
+对目标$(t,i)$，分别在$s\leq t$与$s\geq t$的本流可见位置中，按槽位距离选择最近的至多两个，记为$\mathcal S^{\rightarrow}_{ti}$与$\mathcal S^{\leftarrow}_{ti}$。可见查询自身允许进入两侧集合。两方向共享两个带偏置的16维仿射投影$\phi_Q^D,\phi_K^D$，以位置表示打分：
+\begin{equation}
+ \ell_{tis}=\frac{\phi_Q^D(p_{ti})^\top\phi_K^D(p_{si})}{\sqrt{16}}
+ -\log(1+|t-s|).
+ \label{eq:direct-score}
+\end{equation}
+各集合内的softmax权重用于汇总可见标准化数值及归一化距离$|t-s|/49$，再与支持是否存在的指示量组成三维特征，经无偏置投影得到128维读出$d^{\rightarrow}_{ti},d^{\leftarrow}_{ti}$。空集合读出为零。Direct的权重来自$p$，读出的数值来自真实观测，并不读取SPIN的补全预测。
+
+\subsection{Sync同步矩阵记忆}
+上下文$h$另行生成键、值与查询，分为四个32维头，键和查询在头内作$\ell_2$归一化。每个目标、方向及头维护独立的$32\times32$状态。对同一槽位的自身与邻流，仅可见源保留键值；隐藏源和无效邻域槽的键值均置零。省略目标和头下标，堆叠$K_t,V_t\in\mathbb R^{J\times32}$，同步更新为
+\begin{equation}
+ \begin{aligned}
+ c_t&=\max\{1,\|K_tK_t^\top\|_\infty\},\\
+ S_{\rm new}&=S_{\rm old}
+ +\frac{(V_t^\top-S_{\rm old}K_t^\top)K_t}{c_t}.
+ \end{aligned}
+ \label{eq:sync-update}
+\end{equation}
+其中矩阵无穷范数为最大绝对行和。所有同刻源均相对同一旧状态计算残差后一次写入，不依赖桶内逐源写入顺序；空桶不改变状态。两方向共享投影，独立从零状态正反扫描，每个新窗口重置。当前桶全部写入后，以$S_{\rm new}q_{ti}$读取，拼接四头得到128维记忆读出$m^{\rightarrow}_{ti},m^{\leftarrow}_{ti}$。写入值是可见源的上下文特征，不是将补全值当作新观测。
+
+\subsection{统一解码与去记忆对照}
+每个方向将Direct与记忆以系数$1{:}1$相加，再拼接128维上下文查询$q_{ti}$，由共享$384\to128\to1$的GELU解码器$D$输出：
+\begin{equation}
+ R_{ti}=\mu+\sigma D\!\left(
+ [m^{\rightarrow}_{ti}+d^{\rightarrow}_{ti};
+ m^{\leftarrow}_{ti}+d^{\leftarrow}_{ti};q_{ti}]
+ \right).
+ \label{eq:unified-decoder}
+\end{equation}
+相加系数不代表两路径贡献各占一半。最终仅对缺失位置作非负截断，可见位置回填原值。所有模块从头联合训练，末层零初始化；对批次缺失集合$\Omega$优化未截断、原量纲的L1损失：
+\begin{equation}
+ \mathcal L=\frac{1}{C|\Omega|}\sum_{(b,t,i)\in\Omega}|R_{bti}-X_{bti}|,
+ \quad C=\operatorname{mean}|X_{\rm fit}|.
+ \label{eq:missing-loss}
+\end{equation}
+
+非负截断与观测回填不参与损失计算；优化设置见实验部分。
+
+去Sync模型\lite{}删除键值模块及矩阵扫描，令两向$m=0$，保留同一SPIN块、Direct、上下文查询和解码器。故去除记忆后仍有SPIN上下文经查询进入预测。两模型同种子的共有参数初值一致，分别训练；其参数量不同，该对照用于考察加入当前Sync路径的作用，不是等参数量比较。

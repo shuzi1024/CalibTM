@@ -1,0 +1,103 @@
+% Chinese working draft in IEEE conference layout; not a submission file.
+% Compile with Tectonic/XeLaTeX. Verified experiment results; internal draft.
+\RequirePackage[T1]{fontenc}
+\documentclass[conference,10pt,letterpaper]{IEEEtran}
+\usepackage{fontspec}
+\usepackage{xeCJK}
+\setmainfont{texgyretermes-regular.otf}[
+  BoldFont=texgyretermes-bold.otf,
+  ItalicFont=texgyretermes-italic.otf,
+  BoldItalicFont=texgyretermes-bolditalic.otf]
+\setsansfont{Arial}
+\setmonofont{Courier New}
+\setCJKmainfont{Songti SC}[
+  Script=Default,ItalicFont={Songti SC},
+  BoldItalicFont={Songti SC Bold},SmallCapsFont={Songti SC}]
+\setCJKsansfont{Heiti SC}[Script=Default]
+\setCJKmonofont{Songti SC}[Script=Default]
+\usepackage{amsmath,amssymb,booktabs,graphicx}
+\usepackage[hidelinks,unicode]{hyperref}
+\renewcommand{\abstractname}{摘要}
+\renewcommand{\IEEEkeywordsname}{关键词}
+\renewcommand{\figurename}{图}
+\renewcommand{\tablename}{表}
+\renewcommand{\refname}{参考文献}
+\newcommand{\R}{\mathbb{R}}
+\newcommand{\full}{SPIN--Direct--Sync}
+\newcommand{\lite}{SPIN--Direct}
+\title{融合时空上下文与观测直读的网络流量矩阵补全}
+\author{\IEEEauthorblockN{作者信息待填写}
+\IEEEauthorblockA{中文内部研究初稿\quad 2026 年 9 月 16 日}}
+\begin{document}
+\maketitle
+\begin{abstract}
+稀疏网络流量矩阵补全需要同时利用相关流的时空信息与本流的邻近真实观测。
+本文构建一个从头联合训练的融合模型：采用一层SPIN时空编码，
+并行读取本流前后最近观测，在此基础上加入仅由可见源写入的双向同步矩阵记忆。
+通过与去记忆变体的配对比较，研究额外记忆是否值得保留。
+在Abilene与处理后的GEANT快照上，固定20\%观测率、三种缺失条件和两个初始化，
+共完成八条120轮训练轨迹。开发集结果表明，加入记忆后，归一化平均绝对误差
+在Abilene基本持平，在GEANT增加1.41\%；归一化均方根误差分别降低0.86\%和1.24\%。
+同一H20上的完整推理测量显示，记忆使批量为8时的每窗摊销耗时增加约62\%--64\%。
+去记忆模型相对既有四层SPIN参考的归一化平均绝对误差分别降低1.22\%和0.74\%，
+对应批量推理耗时约为参考的27.2\%和26.7\%。
+这些结果支持优先研究较简化的时空上下文与观测直读组合，
+并将同步记忆的价值限定为平方误差与计算成本的取舍。
+本文结果属于开发性比较，尚需在预先固定的最终评估中确认。
+\end{abstract}
+\begin{IEEEkeywords}
+网络流量矩阵，稀疏观测，时空补全，观测直读，同步矩阵记忆
+\end{IEEEkeywords}
+\input{intro_related}
+\begin{figure*}[t]
+\centering
+\input{architecture}
+\caption{联合模型的可见信息路径。SPIN与Direct使用同一窗口的可见输入；
+Direct读取原始观测值，不读取SPIN的隐表示。
+完整变体在两个方向内分别将Direct读出与Sync记忆读出相加，再与上下文查询拼接解码。
+去记忆变体删除K/V与扫描，保留其余路径。整窗上下文使本模型属于离线补全。}
+\label{fig:architecture}
+\end{figure*}
+\input{method_section}
+\input{results_tables}
+\input{experiment_setup}
+\input{results_section}
+\section{局限与下一步}
+当前结果回答的是固定实现和训练预算下的结构取舍。
+两种初始化中的一致方向具有描述价值，但不能替代更多独立训练或构成统计显著性证据。
+八条轨迹中七条的最佳轮位于113--120轮，说明部分模型仍可能受训练预算影响；
+达到120轮不能被解释为已充分优化，也不能据此认定同步记忆机制普遍无效。
+本轮保持结构、融合方式和损失固定，以既定预算作为比较边界。
+
+更直接的限制来自评价用途。开发集既用于检查点选择，也参与了既有研究的模型选择；
+项目中的后续数据范围同样曾被历史实验访问。
+因此，本轮缺少与开发选型隔离的独立最终测试。
+两个WAN、单一观测预算与固定窗口长度也不能支持对其他网络、时间跨度或缺失机制的普遍结论。
+GEANT处理快照尚缺少到原生时间戳和物理单位的核实映射，
+所以本文仅以行或槽位表述距离，不据此解释具体分钟尺度上的网络行为。
+
+关于方法归因，去Sync同时删除了24,960个参数及相应变换，
+现有实验识别的是整个新增记忆分支的作用。
+它没有分离同步规则、参数容量和有效邻域范围的贡献，
+也没有单独证明Direct相对相同一层SPIN模型的独立增量。
+旧四层SPIN参考的结构与训练日程均不同，不能代替这一组件归因。
+本文据此将后续方向收窄到\lite 的精度与推理成本取舍，
+保留\full 的完整结果，不把组合已有模块本身视为首次提出的概念。
+
+后续若继续推进投稿，优先补足支持所选主张的最小证据：
+在相同一层上下文与训练设置下确认Direct读出的增量，
+并在事先固定、可与选型区分的最终评估来源上确认排序。
+这两项针对现有主张的不足，不意味着需要增加观测率、门控和新模块的实验矩阵。
+当前版本先作为组织方法、结果和局限的内部初稿。
+
+\section{结论}
+本文联合训练一层SPIN时空上下文、局部真实观测直读和可选的双向同步矩阵记忆，
+以两套WAN数据上的八条配对轨迹及统一推理测量检验额外记忆的价值。
+在固定120轮的开发评估中，Sync没有带来稳定的主指标NMAE改善，
+但四个配对的条件平均NRMSE均有改善，并付出额外推理成本。
+较简化的\lite 在两个WAN上取得有竞争力的开发NMAE及相对旧SPIN参考的速度优势，
+适合作为下一阶段的优先候选。
+这些结论保留了误差指标之间的取舍，也保留了参考配方不同、开发选型和组件归因的限制。
+\bibliographystyle{IEEEtran}
+\bibliography{references}
+\end{document}

@@ -1,0 +1,53 @@
+% Figure body only: \input this file inside figure*.
+% Uses core LaTeX plus amsmath; the main document defines \lite.
+% H and Q denote the collections of h_{ti} and q_{ti} in the method text.
+% Every framed paragraph is bounded by a fraction of the figure linewidth.
+\begingroup
+\centering
+\small
+\setlength{\fboxsep}{3pt}
+\setlength{\fboxrule}{0.4pt}
+\renewcommand{\arraystretch}{1.0}
+\newcommand{\scdarchbox}[2]{%
+  \fbox{\parbox[c]{#1}{\centering #2}}}
+\begin{tabular}{@{}c@{\hspace{0.06\linewidth}}c@{}}
+  \multicolumn{2}{c}{%
+    \scdarchbox{0.94\linewidth}{%
+      可见输入 $X_{\rm obs},M$ $\longrightarrow$ 拟合标准化 $z$
+      \qquad 共享位置表示 $p$}}\\[1pt]
+  $\swarrow$ & $\searrow$ \\[1pt]
+  \scdarchbox{0.41\linewidth}{%
+    \textbf{一层 SPIN 时空上下文}\\
+    $H=\{h_{ti}\}$}
+  &
+  \scdarchbox{0.41\linewidth}{%
+    \textbf{Direct 双向读取}\\
+    本流前/后各至多 2 个真实观测}\\[1pt]
+  $\downarrow$ & $\downarrow$ \\[1pt]
+  \scdarchbox{0.41\linewidth}{%
+    $H\to K,V$：仅观测源写入\\
+    $H\to Q$：供扫描读出与解码\\
+    双向 Sync：$(K,V;Q)\to m^{\rightarrow},m^{\leftarrow}$}
+  &
+  \scdarchbox{0.41\linewidth}{%
+    共享 $p$ 评分，读取真实观测 $z$\\
+    数值、距离与可用性组成特征\\
+    线性投影 $\to d^{\rightarrow},d^{\leftarrow}$}\\[1pt]
+  $\searrow$ & $\swarrow$ \\[1pt]
+  \multicolumn{2}{c}{%
+    \scdarchbox{0.94\linewidth}{%
+      \textbf{按方向相加、拼接查询 $Q$，送入共享解码器}\\
+      $[m^{\rightarrow}+d^{\rightarrow};\,
+        m^{\leftarrow}+d^{\leftarrow};\,Q]
+        \ \longrightarrow\ \mathrm{MLP}
+        \ \longrightarrow\ \mu+\sigma(\cdot)
+        \ \longrightarrow\ R$\\
+      非负截断与可见值回填 $\longrightarrow$ 补全输出}}\\[4pt]
+  \multicolumn{2}{c}{%
+    \parbox{0.94\linewidth}{\centering
+      \lite{}：删除 $K,V$ 与双向扫描，令
+      $m^{\rightarrow}=m^{\leftarrow}=0$；\\
+      保留 SPIN 上下文、查询 $Q$、Direct 和解码器。}}
+\end{tabular}
+\par
+\endgroup

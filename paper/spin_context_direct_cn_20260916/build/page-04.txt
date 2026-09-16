@@ -1,0 +1,110 @@
+责重叠。但这只是解释候选。Sync 读取邻流上下文还可能
+带来间接邻域信息，且具有不同的矩阵压缩与查询机制。
+本轮实验不能区分信息重叠、优化难度和任务中剩余可利
+用信号不足等原因，不将当前消融结果解释为已定位某个
+失败机制。
+B. 与已有参考的系统比较
+SPIN–Direct 相对旧 SPIN 的平均 NMAE 在 Abilene 降低
+1.2235%，在 GEANT 降低 0.7406%。其 NRMSE 在 Abilene
+降低 0.3688%，在 GEANT 却增加 0.7397%。相对 Linear，
+SPIN–Direct 的平均 NMAE 分别降低 5.0593% 和 0.3983%，
+但 GEANT 上的 NRMSE 增加 1.0591%。这说明更简化的
+组合具备开发 NMAE 竞争力，同时仍存在平方误差代价。
+SPIN–Direct–Sync 在 Abilene 的平均 NMAE 与 NRMSE
+都 低 于 旧 SPIN； 在 GEANT， 其 NMAE 高 于 旧
+SPIN0.6553%，NRMSE 则低 0.5096%。旧 Direct+Sync 在
+GEANT 上保留了更低的平均 NRMSE， Linear 也仍是接近
+主要神经模型的简单参考。不同参考在绝对误差、平方误
+差和成本上形成不同取舍。由于参考模型的深度、优化和
+检查点选择轨迹不同，这些比较尚不能把差异全部归因于
+Direct 或某个特定更新规则。
+C. 推理成本与后续模型选择
+表II显示， SPIN–Direct–Sync 相对 SPIN–Direct 的单窗耗
+时比为 4.54 和 2.36，批量 8 时的摊销耗时分别增加 64.44%
+和 62.22%。同步记忆的参数增加量固定为 24,960，但参数
+数量不足以描述两方向扫描及中间张量带来的执行成本。
+GEANT 的批量 8 峰值已分配显存增加约 27.56%； Abilene
+的对应峰值几乎不变，与共享上下文临时张量占主导的解
+释一致，但当前测量没有逐算子定位峰值来源。
+SPIN–Direct 的批量 8 摊销耗时约为旧 SPIN 的 27.20%
+和 26.65%，由同批量耗时折算，批量推理速度分别约为
+旧 SPIN 的 3.68 和 3.75 倍。该优势伴随着一层与四层上
+下文的结构差异，不能单独归因于 Direct。它也不意味着
+所有资源都降低：Abilene 的参数量比旧 SPIN 更多，两个
+WAN 上的峰值显存均仅有极小变化。既有 Direct+Sync 在
+批量 8 的两个 WAN 上仍比 SPIN–Direct 更快；Linear 没
+有参加本轮成本测量，不能据此声称在全部参考中成本最
+优。
+综合预定 NMAE、推理耗时和结构复杂度， SPIN–Direct
+是本轮之后更合理的优先简化候选。若应用更看重平方
+误差，SPIN–Direct–Sync 的结果提供了一个额外成本换取
+NRMSE 改善的实现选择，但当前证据没有建立这种取舍
+在独立最终评价上的稳定性。模型选择应保留任务指标和
+部署批量，不能只依据参数量或某个获胜数字。
+V. 局限与下一步
+当前结果回答的是固定实现和训练预算下的结构取舍。
+两种初始化中的一致方向具有描述价值，但不能替代更多
+独立训练或构成统计显著性证据。八条轨迹中七条的最佳
+轮位于 113–120 轮，说明部分模型仍可能受训练预算影响；
+达到 120 轮不能被解释为已充分优化，也不能据此认定同
+步记忆机制普遍无效。本轮保持结构、融合方式和损失固
+定，以既定预算作为比较边界。
+更直接的限制来自评价用途。开发集既用于检查点选择，
+也参与了既有研究的模型选择；项目中的后续数据范围同
+样曾被历史实验访问。因此，本轮缺少与开发选型隔离的
+独立最终测试。两个 WAN、单一观测预算与固定窗口长
+度也不能支持对其他网络、时间跨度或缺失机制的普遍结
+论。GEANT 处理快照尚缺少到原生时间戳和物理单位的
+核实映射，所以本文仅以行或槽位表述距离，不据此解释
+具体分钟尺度上的网络行为。
+关于方法归因，去 Sync 同时删除了 24,960 个参数及相
+应变换，现有实验识别的是整个新增记忆分支的作用。它
+没有分离同步规则、参数容量和有效邻域范围的贡献，也
+没有单独证明 Direct 相对相同一层 SPIN 模型的独立增量。
+旧四层 SPIN 参考的结构与训练日程均不同，不能代替这
+一组件归因。本文据此将后续方向收窄到 SPIN–Direct 的
+精度与推理成本取舍，保留 SPIN–Direct–Sync 的完整结
+果，不把组合已有模块本身视为首次提出的概念。
+后续若继续推进投稿，优先补足支持所选主张的最小证
+据：在相同一层上下文与训练设置下确认 Direct 读出的增
+量，并在事先固定、可与选型区分的最终评估来源上确认
+排序。这两项针对现有主张的不足，不意味着需要增加观
+测率、门控和新模块的实验矩阵。当前版本先作为组织方
+法、结果和局限的内部初稿。
+VI. 结论
+本文联合训练一层 SPIN 时空上下文、局部真实观测直
+读和可选的双向同步矩阵记忆，以两套 WAN 数据上的八
+条配对轨迹及统一推理测量检验额外记忆的价值。在固定
+120 轮的开发评估中， Sync 没有带来稳定的主指标 NMAE
+改善，但四个配对的条件平均 NRMSE 均有改善，并付出
+额外推理成本。较简化的 SPIN–Direct 在两个 WAN 上取
+得有竞争力的开发 NMAE 及相对旧 SPIN 参考的速度优
+势，适合作为下一阶段的优先候选。这些结论保留了误差
+指标之间的取舍，也保留了参考配方不同、开发选型和组
+件归因的限制。
+参考文献
+[1] I. Marisca, A. Cini, and C. Alippi, “Learning to reconstruct
+missing data from spatiotemporal graphs with sparse observations,”
+in Advances in Neural Information Processing Systems,
+vol. 35. Curran Associates, Inc., 2022, pp. 32 069–32 082.
+[Online]. Available: https://proceedings.neurips.cc/paper_files/paper/
+2022/file/cf70320e93c08b39b1b29a348097a376-Paper-Conference.pdf
+[2] Y. Zhang, M. Roughan, W. Willinger, and L. Qiu, “Spatio-temporal
+compressive sensing and internet traﬀic matrices,” in Proceedings of
+the ACM SIGCOMM 2009 Conference on Data Communication, 2009,
+pp. 267–278. [Online]. Available: https://www.cs.utexas.edu/~yzhang/
+papers/sensing-sigc09.pdf
+[3] S. Yang, B. Wang, Y. Zhang, Y. Shen, and Y. Kim,
+“Parallelizing linear transformers with the delta rule over
+sequence length,” in Advances in Neural Information Pro-
+cessing Systems, vol. 37, 2024, pp. 115 491–115 522. [On-
+line]. Available: https://proceedings.neurips.cc/paper_files/paper/2024/
+hash/d13a3eae72366e61dfdc7eea82eeb685-Abstract-Conference.html
+[4] “Abilene traﬀic matrix data: Format documentation,” traﬀic weeks
+X01–X24 from 2004; accessed September 16, 2026. [Online]. Available:
+https://www.cs.utexas.edu/~yzhang/research/AbileneTM/readme.txt
+[5] “ARI-LLM: Source code and released datasets,” GitHub
+repository, pinned commit 6a4f63656dbf; accessed September 16,
+2026. [Online]. Available: https://github.com/shuzi1024/ARI-LLM/
+blob/6a4f63656dbf0964219c516ffd3e1e8fcf99ebed/datasets/net_traffic/
+GEANT/geant.csv

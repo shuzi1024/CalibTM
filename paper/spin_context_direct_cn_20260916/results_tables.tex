@@ -1,0 +1,42 @@
+\begin{table*}[t]
+\centering
+\caption{开发集三条件平均误差；越低越好。新变体为两个初始化的均值$\pm$样本标准差。旧可训练参考各一个检查点；训练配方不同。}
+\label{tab:accuracy}
+\small
+\setlength{\tabcolsep}{6pt}
+\begin{tabular}{lcccc}
+\toprule
+& \multicolumn{2}{c}{Abilene} & \multicolumn{2}{c}{GEANT} \\
+\cmidrule(lr){2-3}\cmidrule(lr){4-5}
+方法 & NMAE & NRMSE & NMAE & NRMSE \\
+\midrule
+\full & $0.162431\,\pm\,0.000771$ & $0.218068\,\pm\,0.000153$ & $0.169420\,\pm\,0.001018$ & $0.228322\,\pm\,0.000202$ \\
+\lite & $0.162369\,\pm\,0.001505$ & $0.219958\,\pm\,0.000469$ & $0.167071\,\pm\,0.000856$ & $0.231189\,\pm\,0.001893$ \\
+旧SPIN参考 & $0.164380$ & $0.220773$ & $0.168317$ & $0.229492$ \\
+旧Direct+Sync参考 & $0.165639$ & $0.223398$ & $0.173336$ & $0.228001$ \\
+Linear & $0.171021$ & $0.241480$ & $0.167739$ & $0.228767$ \\
+\bottomrule
+\end{tabular}
+\end{table*}
+
+\begin{table*}[t]
+\centering
+\caption{同一H20上的完整推理成本。B1为单窗整批耗时；B8为批量8的摊销每窗耗时。峰值为B8的PyTorch已分配显存，非整卡占用。}
+\label{tab:cost}
+\small
+\begin{tabular}{llrrrr}
+\toprule
+WAN & 模型 & 参数量 & B1 (ms) & B8 (ms/窗) & B8峰值 (MiB) \\
+\midrule
+Abilene & \full & 98,693 & 42.879 & 10.060 & 2896.948 \\
+Abilene & \lite & 73,733 & 9.448 & 6.117 & 2896.853 \\
+Abilene & 旧SPIN & 65,364 & 27.388 & 22.494 & 2897.615 \\
+Abilene & 旧Direct+Sync & 79,137 & 37.015 & 4.767 & 1219.579 \\
+\midrule
+GEANT & \full & 108,869 & 53.023 & 30.849 & 3797.136 \\
+GEANT & \lite & 83,909 & 22.422 & 19.017 & 2976.750 \\
+GEANT & 旧SPIN & 95,892 & 79.850 & 71.355 & 2979.620 \\
+GEANT & 旧Direct+Sync & 84,225 & 37.186 & 12.253 & 3830.259 \\
+\bottomrule
+\end{tabular}
+\end{table*}

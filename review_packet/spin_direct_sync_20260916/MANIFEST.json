@@ -1,0 +1,63 @@
+{
+  "edition": "GitHub publication, 2026-09-16",
+  "web_entry": "START_HERE.md",
+  "source_note": "Original implementation sources are unchanged. Public edition updates navigation, status and attribution; SPIN original paper is linked through its official publisher.",
+  "packet_files": {
+    "00_PROMPT_CN.txt": {
+      "sha256": "acbaf9076b7738b179420543e91c2ef30897b33a76c5109d271d9af723637b1e",
+      "bytes": 4422
+    },
+    "01_METHOD_AND_CONTEXT_CN.md": {
+      "sha256": "798fe8556a68f49214a20c15c8af0f5e36443f96d1ebdc568f2066318a852291",
+      "bytes": 8348
+    },
+    "02_COMPLETE_RESULTS_CN.md": {
+      "sha256": "d6d9a1004c37a3231436f61d6a7941be55ddb5816344030cb351d3bf9d45f5e1",
+      "bytes": 36745
+    },
+    "03_MODEL_SOURCE.txt": {
+      "sha256": "20f525c100006d71edb1054201ae5147024755b4c1a8964d8f0ebf814c768a0b",
+      "bytes": 80529
+    },
+    "04_SPIN_SOURCE.md": {
+      "sha256": "77ff19db8da526f81b29b1b432fff8e48c6d69f533befb957f54b7c78361fc7d",
+      "bytes": 868
+    },
+    "README_CN.md": {
+      "sha256": "df943e8937a906674737741d7bc3ef556594e3ef6df4169c08f86931deaf34de",
+      "bytes": 2748
+    },
+    "REVIEW_WEB_CN.md": {
+      "sha256": "ff1698f22d40fd43c0e3b0bbfd191705c288b90a09c94a7a53363744eb3ac746",
+      "bytes": 49996
+    },
+    "START_HERE.md": {
+      "sha256": "7d03e8b8512798e7773d5cff254e7b75ebee6b60595cc9ff8fa47eeb37f2003b",
+      "bytes": 1876
+    },
+    "optional/05_CHINESE_DRAFT.pdf": {
+      "sha256": "069cb0c9324b0e270a8ddbc4416145dea567baa62271aee5f2acdcc769e20990",
+      "bytes": 266392
+    },
+    "optional/06_PRIOR_ICC_REVIEW_CN.md": {
+      "sha256": "46bf66817af9f31c15a7b8dccd18fb9f1493eef30d6724a81f56344c2d2caec7",
+      "bytes": 10821
+    },
+    "optional/07_PROTOCOL_SOURCE.txt": {
+      "sha256": "d9987227f98e053f0189bebe2819b381f3a88298ba095744f9103d9a58dcddef",
+      "bytes": 126524
+    },
+    "optional/08_DEVELOPMENT_CURVES.pdf": {
+      "sha256": "0fee0db623a417d46b748d3cd495ee8a2b37d9a4ea6243cb6b09a0f0e938c985",
+      "bytes": 30132
+    },
+    "optional/09_HISTORICAL_EVALUATION_AUDIT_CN.md": {
+      "sha256": "ea4b41d522f85307122115c445e0de55100915cf8fe17bf4a842933abfcad11d",
+      "bytes": 8750
+    },
+    "optional/10_PAPER_FOLLOWUP_PROMPT_CN.txt": {
+      "sha256": "e04afb01be12274d6de9fbded6e520e7a3253074834829c78e61559688337882",
+      "bytes": 729
+    }
+  }
+}
