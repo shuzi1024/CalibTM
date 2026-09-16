@@ -1,0 +1,11 @@
+{
+  "config_sha256": "8645277f8415a5c9be65fbdad5f512942a4e1d389e80c234f2809499818cf4d0",
+  "dataset": "geant",
+  "deadline_unix": 1789558409.0,
+  "eligible_as_completed_result": false,
+  "protocol": "spin-sync-unified-development-20260916-v1",
+  "seed": 41001,
+  "state": "smoke_passed",
+  "updated": "2026-09-16T04:35:10.716232+00:00",
+  "variant": "spin_sync_direct"
+}

@@ -1,0 +1,11 @@
+{
+  "config_sha256": "69df6094753001993351221c1fd6777c0afd45f4a4fb8f11aafadf72d37addbc",
+  "dataset": "abilene",
+  "deadline_unix": 1789558409.0,
+  "eligible_as_completed_result": false,
+  "protocol": "spin-sync-unified-development-20260916-v1",
+  "seed": 41002,
+  "state": "smoke_passed",
+  "updated": "2026-09-16T06:16:45.311466+00:00",
+  "variant": "spin_sync_direct"
+}
