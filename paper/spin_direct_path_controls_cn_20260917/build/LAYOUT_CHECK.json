@@ -1,0 +1,27 @@
+{
+  "checked_utc": "2026-09-16T21:20:08.541731+00:00",
+  "pdf_sha256": "0428b1b38dfc342748ad7607ee91b56d15cf73f80ee24faedd905844a2db8cf9",
+  "page_count": 5,
+  "page_size": "US Letter, 612 x 792 points",
+  "all_fonts_embedded": true,
+  "final_build_offline": true,
+  "log_checks": {
+    "missing_glyphs": false,
+    "overfull_boxes": false,
+    "unresolved_references_or_citations": false
+  },
+  "visually_checked_pages": [
+    1,
+    2,
+    3,
+    4,
+    5
+  ],
+  "visual_result": "All five final rendered pages inspected: Chinese text, equations, architecture, two tables and references legible; no visible clipping or overlap. Final page contains remaining references.",
+  "nonblocking_log_messages": [
+    "Songti SC Default-script metadata warning; no missing glyphs; rendered text inspected.",
+    "One underfull bibliography paragraph; visible line wrapping inspected."
+  ],
+  "scientific_review": "analysis/spin_path_controls_20260917/PAPER_REVIEW_CN.md",
+  "submission_status": "Chinese internal working draft; not submission-ready."
+}

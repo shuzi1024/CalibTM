@@ -1,0 +1,91 @@
+\section{方法与匹配路径对照}
+\label{sec:method}
+
+\subsection{任务与一层时空上下文}
+设窗口$X\in\mathbb R_{\geq0}^{T\times F}$，$T=50$，
+掩码$M_{ti}=1$表示可见。任务是\emph{离线整窗补全}，允许读取前后两侧观测。
+完整拟合段确定全局均值$\mu$和总体标准差$\sigma$（下限$10^{-8}$），
+以及每流自身和相关系数最高的至多八个正Pearson相关邻流的集合。
+全局方差由流内方差与流均值间方差合成，不采用逐流标准化。
+当前窗口的隐藏值不进入编码，标准化输入为
+\begin{equation}
+ z_{ti}=\begin{cases}(X_{ti}-\mu)/\sigma,&M_{ti}=1,\\0,&M_{ti}=0.\end{cases}
+ \label{eq:observed-input}
+\end{equation}
+实现先按掩码清除隐藏输入，不依赖该位置的真值。
+
+槽位$t/49$经可学习映射，与流身份嵌入及正弦位置编码构成32维$p_{ti}$。
+可见位置加入数值编码，经归一化和数值跳连后，
+由一层32维SPIN时空块得到$h_{ti}$\cite{marisca2022spin}。
+本流时间注意力屏蔽同刻对角项；空间注意力排除自身流，
+逐邻流在源时间维归一化后聚合。所有查询位置均保留，只有真实可见位置作为注意力源；
+空支持读出为零，并保留根节点跳连。
+由$h_{ti}$经带偏置仿射投影获得128维查询，分为四个32维块；
+每块$v$按$v/\max(\|v\|_2,10^{-6})$归一化，拼接记为$q(h_{ti})$。
+整窗上下文和双向读取均不提供在线因果保证。
+
+\subsection{双向本流观测直读}
+对目标$(t,i)$，从$s\leq t$与$s\geq t$的本流可见位置中，
+分别选距离最近的至多两个，记为$\mathcal S^{\rightarrow}_{ti}$和$\mathcal S^{\leftarrow}_{ti}$。
+可见目标自身可进入两侧集合；待补全位置不会读取自身隐藏值。
+两方向共享带偏置的$32\to16$仿射投影$\phi_Q^D,\phi_K^D$，评分为
+\begin{equation}
+ \ell_{tis}=\frac{\phi_Q^D(p_{ti})^\top\phi_K^D(p_{si})}{\sqrt{16}}
+             -\log(1+|t-s|).
+ \label{eq:direct-score}
+\end{equation}
+在每个非空方向集合内作softmax，得到$\alpha^{r}_{tis}$，其中$r\in\{\rightarrow,\leftarrow\}$。
+每方向仅提取三个统计量：
+\begin{equation}
+ \begin{aligned}
+ v^r_{ti}&=\sum_{s\in\mathcal S^r_{ti}}\alpha^r_{tis}z_{si},\\
+ \delta^r_{ti}&=\sum_{s\in\mathcal S^r_{ti}}\alpha^r_{tis}|t-s|/49,\\
+ a^r_{ti}&=\mathbb I[\mathcal S^r_{ti}\ne\varnothing],\qquad
+ d^r_{ti}=A[v^r_{ti};\delta^r_{ti};a^r_{ti}],
+ \end{aligned}
+ \label{eq:direct-statistics}
+\end{equation}
+其中两方向共享的$A\in\mathbb R^{128\times3}$无偏置，空支持时三个统计量及读出均为零。
+因此$\operatorname{rank}(A)\leq3$：128维是统计量的嵌入宽度，
+不意味着提取128个独立的局部特征。
+给定参数后，权重由位置、距离和可见支持决定，不由当前流量数值决定；
+数值经加权、投影和解码后输出，不能称为保证保幅的原值复制。
+
+\subsection{解码与训练目标}
+组合模型将两向Direct读出和上下文查询拼接，
+由$384\to128\to1$的GELU解码器$D$输出原量纲预测：
+\begin{equation}
+ R_{ti}=\mu+\sigma D([d^{\rightarrow}_{ti};d^{\leftarrow}_{ti};q(h_{ti})]).
+ \label{eq:decoder}
+\end{equation}
+推理时对缺失位置作非负截断，并回填可见真值。
+所有保留模块联合训练，解码末层零初始化。
+对批次缺失位置集合$\Omega$，使用未截断的原量纲L1损失
+\begin{equation}
+ \mathcal L=\frac{\sum_{(b,t,i)\in\Omega}|R_{bti}-X_{bti}|}{C|\Omega|},
+ \quad C=\operatorname{mean}|X_{\rm fit}|.
+ \label{eq:missing-loss}
+\end{equation}
+观测回填和非负截断均不参与该损失。
+
+\subsection{两个单路径对照及实现边界}
+\textbf{Context-only}删除Direct的评分与投影参数，
+保留SPIN、$q(h)$和原解码器，输入变为$[0;0;q(h)]$。
+\textbf{Direct-only}删除数值上下文编码器与SPIN聚合，
+保留位置编码、Direct与解码器，并将查询改为$q(p)$，即输入$[d^{\rightarrow};d^{\leftarrow};q(p)]$。
+后者的目标流预测不接收其他流当前窗口的数值、掩码或图信息，
+但仍沿用共同的拟合期全局标准化。
+两者均独立训练，不是推理时临时关闭分支。
+
+同一种子先按组合模型的完整顺序初始化，再删除停用模块，
+使共有参数初值逐位一致。
+这些对照检验整条信息路径的使用价值，\emph{不是等参数量或等有效容量比较}。
+Context-only首层有$256\times128=32{,}768$个权重对应恒零输入，
+数据损失对其梯度为零，虽仍受AdamW权重衰减，不能表达额外信息。
+Context-only也不是官方SPIN的复现替代品。
+
+实现方面，Direct先计算同流完整$T\times T$评分再掩蔽筛选，
+因此逻辑上读取至多两个观测不构成时间线性复杂度保证。
+SPIN也沿用密集时间配对及内部节点分块；本文只报告当前实现的实测成本。
+历史Full另将两个方向的同步记忆读出分别与$d^r$相加，
+其120轮结果仅用于展示额外记忆的取舍，不与本轮160轮路径对照混作同预算结论。

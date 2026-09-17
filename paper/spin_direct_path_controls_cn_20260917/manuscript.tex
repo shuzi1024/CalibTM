@@ -1,0 +1,52 @@
+% Chinese internal working draft; IEEE conference layout, not a submission.
+\RequirePackage[T1]{fontenc}
+\documentclass[conference,10pt,letterpaper]{IEEEtran}
+\usepackage{fontspec}
+\usepackage{xeCJK}
+\setmainfont{texgyretermes-regular.otf}[
+  BoldFont=texgyretermes-bold.otf,
+  ItalicFont=texgyretermes-italic.otf,
+  BoldItalicFont=texgyretermes-bolditalic.otf]
+\setsansfont{Arial}
+\setmonofont{Courier New}
+\setCJKmainfont{Songti SC}[
+  Script=Default,ItalicFont={Songti SC},
+  BoldItalicFont={Songti SC Bold},SmallCapsFont={Songti SC}]
+\setCJKsansfont{Heiti SC}[Script=Default]
+\setCJKmonofont{Songti SC}[Script=Default]
+\usepackage{amsmath,amssymb,booktabs,graphicx}
+\usepackage[hidelinks,unicode]{hyperref}
+\renewcommand{\abstractname}{摘要}
+\renewcommand{\IEEEkeywordsname}{关键词}
+\renewcommand{\figurename}{图}
+\renewcommand{\tablename}{表}
+\renewcommand{\refname}{参考文献}
+\newcommand{\R}{\mathbb{R}}
+\newcommand{\full}{SPIN--Direct--Sync}
+\newcommand{\lite}{SPIN--Direct}
+\title{浅层时空流量补全中的显式本流观测读出}
+\author{\IEEEauthorblockN{作者信息待填写}
+\IEEEauthorblockA{中文内部研究初稿\quad 2026 年 9 月 17 日}}
+\begin{document}
+\maketitle
+\begin{abstract}
+\input{abstract}
+\end{abstract}
+\begin{IEEEkeywords}
+网络流量矩阵，离线补全，时空上下文，局部观测读出，路径对照
+\end{IEEEkeywords}
+\input{intro_related}
+\begin{figure*}[t]
+\centering
+\input{architecture}
+\caption{SPIN与本流观测读出使用同一窗口的可见输入，两路通过查询和解码接口联合训练。Direct从真实观测提取统计量，不读取SPIN的预测。本轮匹配对照分别独立训练删除一条信息路径的模型；同步记忆仅作为历史扩展参考。}
+\label{fig:architecture}
+\end{figure*}
+\input{method_section}
+\input{experiment_setup}
+\input{results_tables}
+\input{results_section}
+\input{discussion}
+\bibliographystyle{IEEEtran}
+\bibliography{references}
+\end{document}

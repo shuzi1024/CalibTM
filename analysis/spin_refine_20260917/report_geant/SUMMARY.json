@@ -1,0 +1,474 @@
+{
+  "automatic_expansion_or_main_model_replacement": false,
+  "component_screen_passed": false,
+  "component_screen_rule": "two_step beats one_step in BOTH seeds on best1..160 and last20 median NMAE",
+  "cost_references": [
+    {
+      "dataset": "geant",
+      "device_name": "NVIDIA H20",
+      "hostname": "d-20260907060201-gt68m",
+      "path": "/mnt/suzikun/CalibTM/analysis/spin_refine_20260917/INFERENCE_BENCHMARK_GEANT.json",
+      "role": "provided_cost_reference_not_measured_by_this_report",
+      "rows": [
+        {
+          "batch": 1,
+          "execution_device": "cpu",
+          "max_allocated_mib_including_model": null,
+          "mean_condition_median_ms_per_window": 3.350387637813886,
+          "method": "linear_cpu",
+          "parameters": 0
+        },
+        {
+          "batch": 8,
+          "execution_device": "cpu",
+          "max_allocated_mib_including_model": null,
+          "mean_condition_median_ms_per_window": 3.3969079377129674,
+          "method": "linear_cpu",
+          "parameters": 0
+        },
+        {
+          "batch": 1,
+          "execution_device": "cuda:0",
+          "max_allocated_mib_including_model": 425.6181640625,
+          "mean_condition_median_ms_per_window": 23.27924904723962,
+          "method": "one_step",
+          "parameters": 83941
+        },
+        {
+          "batch": 8,
+          "execution_device": "cuda:0",
+          "max_allocated_mib_including_model": 3159.1796875,
+          "mean_condition_median_ms_per_window": 19.0348563871036,
+          "method": "one_step",
+          "parameters": 83941
+        },
+        {
+          "batch": 1,
+          "execution_device": "cuda:0",
+          "max_allocated_mib_including_model": 401.98876953125,
+          "mean_condition_median_ms_per_window": 22.352976414064567,
+          "method": "spin_direct",
+          "parameters": 83909
+        },
+        {
+          "batch": 8,
+          "execution_device": "cuda:0",
+          "max_allocated_mib_including_model": 2976.75,
+          "mean_condition_median_ms_per_window": 18.982130180423457,
+          "method": "spin_direct",
+          "parameters": 83909
+        },
+        {
+          "batch": 1,
+          "execution_device": "cuda:0",
+          "max_allocated_mib_including_model": 439.1142578125,
+          "mean_condition_median_ms_per_window": 43.147373323639236,
+          "method": "two_step",
+          "parameters": 83941
+        },
+        {
+          "batch": 8,
+          "execution_device": "cuda:0",
+          "max_allocated_mib_including_model": 3274.26416015625,
+          "mean_condition_median_ms_per_window": 37.042236188426614,
+          "method": "two_step",
+          "parameters": 83941
+        }
+      ],
+      "sha256": "cde453f7ece3067ec826e8000352c2ade70e5cb8313b6ad21ca3c5010310984a"
+    }
+  ],
+  "curve_artifacts": [
+    "/mnt/suzikun/CalibTM/analysis/spin_refine_20260917/report_geant/geant_learning_curves.png",
+    "/mnt/suzikun/CalibTM/analysis/spin_refine_20260917/report_geant/geant_learning_curves.pdf"
+  ],
+  "dataset": "geant",
+  "eligible_to_consider_further_validation": false,
+  "historical_comparisons": [
+    {
+      "relative_best_nmae_gain": -0.028471893580185394,
+      "seed": 41001,
+      "two_step_better_best_nmae": false,
+      "two_step_better_last20_median": false
+    },
+    {
+      "relative_best_nmae_gain": -0.04093846532453291,
+      "seed": 41002,
+      "two_step_better_best_nmae": false,
+      "two_step_better_last20_median": false
+    }
+  ],
+  "historical_reference_missing": [],
+  "historical_references": [
+    {
+      "best_epoch": 153,
+      "cap": 160,
+      "comparison_role": "historical_reference_not_iteration_ablation",
+      "condition_nmae": {
+        "unequal": 0.17092585193927723,
+        "unequal_gap": 0.17223429276135122,
+        "uniform": 0.15246297319444332
+      },
+      "condition_nrmse": {
+        "unequal": 0.2392846487252855,
+        "unequal_gap": 0.23677611647133978,
+        "uniform": 0.20995461641992283
+      },
+      "context_passes_per_prediction": 1,
+      "dataset": "geant",
+      "last20_max_nmae": 0.16696524467702825,
+      "last20_mean_nmae": 0.16610116570945124,
+      "last20_median_nmae": 0.16604633352329354,
+      "last20_min_nmae": 0.16520770596502393,
+      "last_epoch_nmae": 0.16696524467702825,
+      "nmae": 0.16520770596502393,
+      "nrmse": 0.2286717938721827,
+      "parameter_count": 83909,
+      "seed": 41001,
+      "source_artifacts": {
+        "/mnt/suzikun/CalibTM/outputs/spin-path-controls-20260917-v1/geant/spin_direct/seed41001/config.json": "1e10edc73ccf0abe8b26f06092fde316e12012304154251ced0ef0a8f8c5a8d6",
+        "/mnt/suzikun/CalibTM/outputs/spin-path-controls-20260917-v1/geant/spin_direct/seed41001/history.json": "9385c479d9c3a3a0cced0a605057821d5074b8364e080257999077a350c46864",
+        "/mnt/suzikun/CalibTM/outputs/spin-path-controls-20260917-v1/geant/spin_direct/seed41001/result.json": "34a0c64cdd88e25bf95301c27a896922b6ca5634d5e65adb14648ab7c0beb69a"
+      },
+      "training_seconds": 5798.887175467797,
+      "variant": "spin_direct"
+    },
+    {
+      "best_epoch": 153,
+      "cap": 160,
+      "comparison_role": "historical_reference_not_iteration_ablation",
+      "condition_nmae": {
+        "unequal": 0.17000946289692323,
+        "unequal_gap": 0.1716562338036032,
+        "uniform": 0.15157144281067728
+      },
+      "condition_nrmse": {
+        "unequal": 0.2416389701519687,
+        "unequal_gap": 0.24072831526930957,
+        "uniform": 0.21001934382798854
+      },
+      "context_passes_per_prediction": 1,
+      "dataset": "geant",
+      "last20_max_nmae": 0.16579352997820965,
+      "last20_mean_nmae": 0.1650511414582196,
+      "last20_median_nmae": 0.1650312255016277,
+      "last20_min_nmae": 0.1644123798370679,
+      "last_epoch_nmae": 0.1649789192134855,
+      "nmae": 0.1644123798370679,
+      "nrmse": 0.23079554308308894,
+      "parameter_count": 83909,
+      "seed": 41002,
+      "source_artifacts": {
+        "/mnt/suzikun/CalibTM/outputs/spin-path-controls-20260917-v1/geant/spin_direct/seed41002/config.json": "e6ed01938da987e07e200ad43dfa6c38df261eb32092fc58363ca545220255e9",
+        "/mnt/suzikun/CalibTM/outputs/spin-path-controls-20260917-v1/geant/spin_direct/seed41002/history.json": "84a83fdb60682e54b053fed16f3bd2844400ed3092818e98b37e50a293189e86",
+        "/mnt/suzikun/CalibTM/outputs/spin-path-controls-20260917-v1/geant/spin_direct/seed41002/result.json": "10ee92954e11df9436bdbe27876522e7a2e4bec561d9d75f30b7210c51a4c682"
+      },
+      "training_seconds": 5802.608789640479,
+      "variant": "spin_direct"
+    }
+  ],
+  "independent_test": false,
+  "limitations": [
+    "Both arms match optimizer updates and data, not compute; two_step makes two context passes.",
+    "Context pass counts exclude gradient-checkpoint backward recomputation and do not measure FLOPs.",
+    "The last 20 checkpoints are correlated trajectory diagnostics, not independent repeats.",
+    "Original SPIN+Direct is a historical reference; iteration attribution uses the matched one_step arm.",
+    "Development-screen success does not establish independent-test generalization or publication readiness."
+  ],
+  "matched_compute": false,
+  "per_seed_comparisons": [
+    {
+      "per_condition_better_nmae": {
+        "unequal": false,
+        "unequal_gap": false,
+        "uniform": false
+      },
+      "relative_best_nmae_gain": -0.02656141162780385,
+      "seed": 41001,
+      "two_step_better_best_nmae": false,
+      "two_step_better_last20_median": false
+    },
+    {
+      "per_condition_better_nmae": {
+        "unequal": false,
+        "unequal_gap": false,
+        "uniform": false
+      },
+      "relative_best_nmae_gain": -0.04084435550181515,
+      "seed": 41002,
+      "two_step_better_best_nmae": false,
+      "two_step_better_last20_median": false
+    }
+  ],
+  "protocol": "spin-refine-development-20260917-v1",
+  "records": [
+    {
+      "best_epoch": 118,
+      "cap": 120,
+      "comparison_role": "matched_skeleton_iteration_ablation",
+      "condition_nmae": {
+        "unequal": 0.17339018554213556,
+        "unequal_gap": 0.17506011669435415,
+        "uniform": 0.15513922290201748
+      },
+      "condition_nrmse": {
+        "unequal": 0.23860635034104052,
+        "unequal_gap": 0.23689857505050113,
+        "uniform": 0.211772800694141
+      },
+      "context_passes_per_prediction": 1,
+      "dataset": "geant",
+      "last20_max_nmae": 0.19145422948305893,
+      "last20_mean_nmae": 0.17351478840498213,
+      "last20_median_nmae": 0.1712484545771752,
+      "last20_min_nmae": 0.16786317504616907,
+      "last_epoch_nmae": 0.1762865616416147,
+      "nmae": 0.16786317504616907,
+      "nrmse": 0.22909257536189423,
+      "parameter_count": 83941,
+      "seed": 41001,
+      "source_artifacts": {
+        "/mnt/suzikun/CalibTM/outputs/spin-refine-20260917-v1/geant/one_step/seed41001/config.json": "76f1d9728951620003afcd25c57906d42e36751f20c3a29637455e8a3559ba15",
+        "/mnt/suzikun/CalibTM/outputs/spin-refine-20260917-v1/geant/one_step/seed41001/history120.json": "7bebd517cc3d4d9b9ea33cd380c2a20faff2f6af7c7e53041ee1d01e96941041",
+        "/mnt/suzikun/CalibTM/outputs/spin-refine-20260917-v1/geant/one_step/seed41001/result120.json": "209da6044d382d9687bbdb2606cc2dcdc7f28a342cf6007c84a42cfb8638ec6b"
+      },
+      "training_seconds": 4372.614144524559,
+      "variant": "one_step"
+    },
+    {
+      "best_epoch": 137,
+      "cap": 160,
+      "comparison_role": "matched_skeleton_iteration_ablation",
+      "condition_nmae": {
+        "unequal": 0.17102182720481715,
+        "unequal_gap": 0.17241768090057524,
+        "uniform": 0.15310598911467285
+      },
+      "condition_nrmse": {
+        "unequal": 0.2382533564117277,
+        "unequal_gap": 0.23617746756891062,
+        "uniform": 0.210222210237392
+      },
+      "context_passes_per_prediction": 1,
+      "dataset": "geant",
+      "last20_max_nmae": 0.1670763933434498,
+      "last20_mean_nmae": 0.16629821651673746,
+      "last20_median_nmae": 0.1662710554928471,
+      "last20_min_nmae": 0.16568821183398907,
+      "last_epoch_nmae": 0.16670470433229453,
+      "nmae": 0.16551516574002176,
+      "nrmse": 0.22821767807267676,
+      "parameter_count": 83941,
+      "seed": 41001,
+      "source_artifacts": {
+        "/mnt/suzikun/CalibTM/outputs/spin-refine-20260917-v1/geant/one_step/seed41001/config.json": "76f1d9728951620003afcd25c57906d42e36751f20c3a29637455e8a3559ba15",
+        "/mnt/suzikun/CalibTM/outputs/spin-refine-20260917-v1/geant/one_step/seed41001/history.json": "be0188fbb60c9a6e8f8a44547b7e3ec5443c6947dd5dec16fe302cee0c9d4e15",
+        "/mnt/suzikun/CalibTM/outputs/spin-refine-20260917-v1/geant/one_step/seed41001/result.json": "d5c43db220131d385b42b600022151cae3b88eaec4255d152a3024faf204451e"
+      },
+      "training_seconds": 5828.948819166049,
+      "variant": "one_step"
+    },
+    {
+      "best_epoch": 118,
+      "cap": 120,
+      "comparison_role": "matched_skeleton_iteration_ablation",
+      "condition_nmae": {
+        "unequal": 0.1709908830151915,
+        "unequal_gap": 0.17241534331609326,
+        "uniform": 0.15414592129124
+      },
+      "condition_nrmse": {
+        "unequal": 0.23794613859059394,
+        "unequal_gap": 0.23643927355897368,
+        "uniform": 0.2127768149743365
+      },
+      "context_passes_per_prediction": 1,
+      "dataset": "geant",
+      "last20_max_nmae": 0.20874647489304662,
+      "last20_mean_nmae": 0.17359085521198753,
+      "last20_median_nmae": 0.17059871111281594,
+      "last20_min_nmae": 0.1658507158741749,
+      "last_epoch_nmae": 0.1736405374595568,
+      "nmae": 0.1658507158741749,
+      "nrmse": 0.22905407570796804,
+      "parameter_count": 83941,
+      "seed": 41002,
+      "source_artifacts": {
+        "/mnt/suzikun/CalibTM/outputs/spin-refine-20260917-v1/geant/one_step/seed41002/config.json": "ba4d7f27cbc0708b6176c30c0de00db900d38a2bc5e70cdd07d6358dee029cf5",
+        "/mnt/suzikun/CalibTM/outputs/spin-refine-20260917-v1/geant/one_step/seed41002/history120.json": "f5192a706deb87d0d4132f941247d6b2043d6d39d23f0f19345f9f86fc7cf123",
+        "/mnt/suzikun/CalibTM/outputs/spin-refine-20260917-v1/geant/one_step/seed41002/result120.json": "aa27d252abdff13e047a4f59891082c63d8ae2efd150e3d7792c3b0799bafc1d"
+      },
+      "training_seconds": 4370.848886691034,
+      "variant": "one_step"
+    },
+    {
+      "best_epoch": 153,
+      "cap": 160,
+      "comparison_role": "matched_skeleton_iteration_ablation",
+      "condition_nmae": {
+        "unequal": 0.16952977351136742,
+        "unequal_gap": 0.17081180770425086,
+        "uniform": 0.15294015522260132
+      },
+      "condition_nrmse": {
+        "unequal": 0.23597346000863506,
+        "unequal_gap": 0.23394420667366098,
+        "uniform": 0.21196924048950644
+      },
+      "context_passes_per_prediction": 1,
+      "dataset": "geant",
+      "last20_max_nmae": 0.16540724205381743,
+      "last20_mean_nmae": 0.1647985795373817,
+      "last20_median_nmae": 0.16466242942071654,
+      "last20_min_nmae": 0.16442724547940654,
+      "last_epoch_nmae": 0.16518574176897124,
+      "nmae": 0.16442724547940654,
+      "nrmse": 0.22729563572393416,
+      "parameter_count": 83941,
+      "seed": 41002,
+      "source_artifacts": {
+        "/mnt/suzikun/CalibTM/outputs/spin-refine-20260917-v1/geant/one_step/seed41002/config.json": "ba4d7f27cbc0708b6176c30c0de00db900d38a2bc5e70cdd07d6358dee029cf5",
+        "/mnt/suzikun/CalibTM/outputs/spin-refine-20260917-v1/geant/one_step/seed41002/history.json": "0f830f04e60cfb535366d54b91178937fa5b0119bcd8797e04619efb53ae1bb6",
+        "/mnt/suzikun/CalibTM/outputs/spin-refine-20260917-v1/geant/one_step/seed41002/result.json": "14e6b4d939926c39096b9d27911a2db2dc8bae2f734a3fda00c9a1875f90d953"
+      },
+      "training_seconds": 5826.839754421264,
+      "variant": "one_step"
+    },
+    {
+      "best_epoch": 116,
+      "cap": 120,
+      "comparison_role": "matched_skeleton_iteration_ablation",
+      "condition_nmae": {
+        "unequal": 0.17830660458568492,
+        "unequal_gap": 0.18005001817802538,
+        "uniform": 0.1617521423612238
+      },
+      "condition_nrmse": {
+        "unequal": 0.24079242755301009,
+        "unequal_gap": 0.24013200807393897,
+        "uniform": 0.21611230301700954
+      },
+      "context_passes_per_prediction": 2,
+      "dataset": "geant",
+      "last20_max_nmae": 0.1851407937699366,
+      "last20_mean_nmae": 0.17795214279604538,
+      "last20_median_nmae": 0.17756400796202057,
+      "last20_min_nmae": 0.17336958837497804,
+      "last_epoch_nmae": 0.1742607804931706,
+      "nmae": 0.17336958837497804,
+      "nrmse": 0.2323455795479862,
+      "parameter_count": 83941,
+      "seed": 41001,
+      "source_artifacts": {
+        "/mnt/suzikun/CalibTM/outputs/spin-refine-20260917-v1/geant/two_step/seed41001/config.json": "8993948c03f1d931d2196a3b98ed148a22983d6206b865c393d7405736b0f15f",
+        "/mnt/suzikun/CalibTM/outputs/spin-refine-20260917-v1/geant/two_step/seed41001/history120.json": "740db82892d608705e523aef88389aaa1f3db9a68d730c0c4c5ed575531330d4",
+        "/mnt/suzikun/CalibTM/outputs/spin-refine-20260917-v1/geant/two_step/seed41001/result120.json": "7c0d45704c69ff63f8cf55ad169f9f9c1c742796f8add5419932dca0c729b326"
+      },
+      "training_seconds": 8647.713506297208,
+      "variant": "two_step"
+    },
+    {
+      "best_epoch": 154,
+      "cap": 160,
+      "comparison_role": "matched_skeleton_iteration_ablation",
+      "condition_nmae": {
+        "unequal": 0.17490669831226277,
+        "unequal_gap": 0.17695871767784827,
+        "uniform": 0.15786903057354887
+      },
+      "condition_nrmse": {
+        "unequal": 0.23936242127979865,
+        "unequal_gap": 0.23871979857365758,
+        "uniform": 0.21673699684183215
+      },
+      "context_passes_per_prediction": 2,
+      "dataset": "geant",
+      "last20_max_nmae": 0.17179293089252448,
+      "last20_mean_nmae": 0.17065417111036787,
+      "last20_median_nmae": 0.1706335954872324,
+      "last20_min_nmae": 0.16991148218788665,
+      "last_epoch_nmae": 0.17091110063179604,
+      "nmae": 0.16991148218788665,
+      "nrmse": 0.23160640556509612,
+      "parameter_count": 83941,
+      "seed": 41001,
+      "source_artifacts": {
+        "/mnt/suzikun/CalibTM/outputs/spin-refine-20260917-v1/geant/two_step/seed41001/config.json": "8993948c03f1d931d2196a3b98ed148a22983d6206b865c393d7405736b0f15f",
+        "/mnt/suzikun/CalibTM/outputs/spin-refine-20260917-v1/geant/two_step/seed41001/history.json": "1d8b64e296ae8b11f7351cc5e190794b89356aff330b293db5ec00d09fbc688f",
+        "/mnt/suzikun/CalibTM/outputs/spin-refine-20260917-v1/geant/two_step/seed41001/result.json": "8ee0265aa340442d8f6ac86cfe6624b35c3d042f903e3317be146ae4936e18d4"
+      },
+      "training_seconds": 11530.316951093264,
+      "variant": "two_step"
+    },
+    {
+      "best_epoch": 107,
+      "cap": 120,
+      "comparison_role": "matched_skeleton_iteration_ablation",
+      "condition_nmae": {
+        "unequal": 0.17871065617136395,
+        "unequal_gap": 0.18066728355092074,
+        "uniform": 0.16181255358647595
+      },
+      "condition_nrmse": {
+        "unequal": 0.23867798451593786,
+        "unequal_gap": 0.23760104861318146,
+        "uniform": 0.21536496071483768
+      },
+      "context_passes_per_prediction": 2,
+      "dataset": "geant",
+      "last20_max_nmae": 0.18653822257552188,
+      "last20_mean_nmae": 0.17764866190129758,
+      "last20_median_nmae": 0.17704635058308194,
+      "last20_min_nmae": 0.17373016443625355,
+      "last_epoch_nmae": 0.17681419364078807,
+      "nmae": 0.17373016443625355,
+      "nrmse": 0.23054799794798567,
+      "parameter_count": 83941,
+      "seed": 41002,
+      "source_artifacts": {
+        "/mnt/suzikun/CalibTM/outputs/spin-refine-20260917-v1/geant/two_step/seed41002/config.json": "a8863e1199ccb6ca2a23a6f94a491e8344b0d82d6689d42351d655ac8ee9cfb0",
+        "/mnt/suzikun/CalibTM/outputs/spin-refine-20260917-v1/geant/two_step/seed41002/history120.json": "dd1a4bed66cf883c3d41d32ad5af47109da0c760bd2ada5ed43c55419aba7a6d",
+        "/mnt/suzikun/CalibTM/outputs/spin-refine-20260917-v1/geant/two_step/seed41002/result120.json": "eefe861bf99343224793378753d2cf86de23da171d395e159d5ae72ca40a8b36"
+      },
+      "training_seconds": 8636.991477200761,
+      "variant": "two_step"
+    },
+    {
+      "best_epoch": 158,
+      "cap": 160,
+      "comparison_role": "matched_skeleton_iteration_ablation",
+      "condition_nmae": {
+        "unequal": 0.17566643545740998,
+        "unequal_gap": 0.1775658078840418,
+        "uniform": 0.16019726770240317
+      },
+      "condition_nrmse": {
+        "unequal": 0.23409300383143036,
+        "unequal_gap": 0.23345496621029926,
+        "uniform": 0.2160648618689064
+      },
+      "context_passes_per_prediction": 2,
+      "dataset": "geant",
+      "last20_max_nmae": 0.1729042665668142,
+      "last20_mean_nmae": 0.1720154516449552,
+      "last20_median_nmae": 0.17208075695538444,
+      "last20_min_nmae": 0.17114317034795165,
+      "last_epoch_nmae": 0.172384244904891,
+      "nmae": 0.17114317034795165,
+      "nrmse": 0.22787094397021201,
+      "parameter_count": 83941,
+      "seed": 41002,
+      "source_artifacts": {
+        "/mnt/suzikun/CalibTM/outputs/spin-refine-20260917-v1/geant/two_step/seed41002/config.json": "a8863e1199ccb6ca2a23a6f94a491e8344b0d82d6689d42351d655ac8ee9cfb0",
+        "/mnt/suzikun/CalibTM/outputs/spin-refine-20260917-v1/geant/two_step/seed41002/history.json": "6227793218b30a3a175979c7234662a43fb00bde2429e3c26a45f392897f141f",
+        "/mnt/suzikun/CalibTM/outputs/spin-refine-20260917-v1/geant/two_step/seed41002/result.json": "95ce7e1837d09210cfadc69b8e100d6fd1276d69d014c15c616acd433dae35d3"
+      },
+      "training_seconds": 11516.04495677352,
+      "variant": "two_step"
+    }
+  ],
+  "report_generator_sha256": "8dab25b67bd14e5cd9169e0e13b1120d0dc10f9240b03bcabaa1c4214ac60647",
+  "role": "development_only",
+  "state": "complete",
+  "two_step_also_better_than_original_on_both_criteria_and_seeds": false
+}

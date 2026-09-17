@@ -1,0 +1,11 @@
+{
+  "role": "development_only",
+  "independent_test": false,
+  "source_sha256": {
+    "analysis/spin_path_controls_20260917/summary_abilene/SUMMARY.json": "05ea4878873458f865176860eb423d2daac2a3d40dde9f4d87111ecd1081bf29",
+    "analysis/spin_path_controls_20260917/INFERENCE_BENCHMARK_ABILENE.json": "6718c0c462fd42125561d3278d188ff24c226c12d1e53e7a2aa678d47c64a0b5",
+    "analysis/spin_path_controls_20260917/summary/SUMMARY.json": "a87d88c80cd2e48edac24fd32ae721c390ac7aba7bc274afc3bdf1ff0993ccc3",
+    "analysis/spin_path_controls_20260917/INFERENCE_BENCHMARK.json": "c2e47881a06d07c8d1545b411f444c1e05663d72faf9f9b63786f8392b1695d2"
+  },
+  "script_sha256": "07704ae370cb1e6e65c07ad0729ffd1b59aa906fcf25b70d857eb16ceaa6cf02"
+}

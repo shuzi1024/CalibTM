@@ -1,0 +1,36 @@
+% Figure body only; input inside a figure* environment.
+% Uses core LaTeX and amsmath. No external graphics or TikZ dependency.
+\begingroup
+\centering
+\small
+\setlength{\fboxsep}{3pt}
+\setlength{\fboxrule}{0.4pt}
+\newcommand{\patharchbox}[2]{\fbox{\parbox[c]{#1}{\centering #2}}}
+\begin{tabular}{@{}c@{\hspace{0.06\linewidth}}c@{}}
+\multicolumn{2}{c}{\patharchbox{0.94\linewidth}{%
+可见窗口 $X_{\rm obs},M$ $\longrightarrow$ 拟合期标准化 $z$
+\qquad 时间与流身份 $\longrightarrow p$}}\\[1pt]
+$\swarrow$ & $\searrow$\\[1pt]
+\patharchbox{0.41\linewidth}{%
+\textbf{一层 SPIN 时空上下文}\\
+可见源的本流时间／邻流时间聚合\\
+$H\longrightarrow q(H)$：128维，四块归一化}
+&
+\patharchbox{0.41\linewidth}{%
+\textbf{本流双向真实观测读出}\\
+前／后各至多2个可见位置\\
+数值、距离、可用性 $\longrightarrow d^{\rightarrow},d^{\leftarrow}$}\\[1pt]
+$\searrow$ & $\swarrow$\\[1pt]
+\multicolumn{2}{c}{\patharchbox{0.94\linewidth}{%
+\textbf{SPIN+Direct：拼接后共同解码}\\
+$[d^{\rightarrow};d^{\leftarrow};q(H)]\longrightarrow
+\mathrm{MLP}_{384\to128\to1}\longrightarrow\mu+\sigma(\cdot)$\\
+缺失项非负截断，可见项回填原值}}\\[3pt]
+\multicolumn{2}{c}{\parbox{0.94\linewidth}{\centering
+\textbf{独立训练的路径对照：}
+Context-only为$[0;0;q(H)]$；
+Direct-only为$[d^{\rightarrow};d^{\leftarrow};q(p)]$。\\
+两者删除停用模块，共有参数初值相同；非等参数量对照。}}
+\end{tabular}
+\par
+\endgroup

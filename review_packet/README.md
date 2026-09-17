@@ -1,6 +1,8 @@
 # 外部评审材料
 
-最新研究： [2026-09-16 SPIN／Direct／Sync 独立评审入口](spin_direct_sync_20260916/START_HERE.md)。
+最新更新：[2026-09-18 SPIN＋Direct 路径对照与两步细化](spin_direct_update_20260918/START_HERE.md)。
+
+2026-09-16 历史研究： [2026-09-16 SPIN／Direct／Sync 独立评审入口](spin_direct_sync_20260916/START_HERE.md)。
 
 下面保留 2026-09-11 的旧材料说明，不代表当前方法。
 

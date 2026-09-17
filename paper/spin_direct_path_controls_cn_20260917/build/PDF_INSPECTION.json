@@ -1,0 +1,205 @@
+{
+  "all_fonts_embedded" : true,
+  "fonts" : [
+    {
+      "embedded" : true,
+      "name" : "AKHCZK+CMMI10",
+      "resource" : "F10",
+      "subtype" : "Type1"
+    },
+    {
+      "embedded" : true,
+      "name" : "BZIVMZ+TeXGyreTermes-Regular-Identity-H",
+      "resource" : "F3",
+      "subtype" : "Type0"
+    },
+    {
+      "embedded" : true,
+      "name" : "CAFSZL+MSBM10",
+      "resource" : "F12",
+      "subtype" : "Type1"
+    },
+    {
+      "embedded" : true,
+      "name" : "DDIEWW+CMMI7",
+      "resource" : "F13",
+      "subtype" : "Type1"
+    },
+    {
+      "embedded" : true,
+      "name" : "DZGKAF+CMSY6",
+      "resource" : "F21",
+      "subtype" : "Type1"
+    },
+    {
+      "embedded" : true,
+      "name" : "FKPJSN+CMSY7",
+      "resource" : "F14",
+      "subtype" : "Type1"
+    },
+    {
+      "embedded" : true,
+      "name" : "FZDNHS+CMR9",
+      "resource" : "F20",
+      "subtype" : "Type1"
+    },
+    {
+      "embedded" : true,
+      "name" : "GJMHKB+CMR6",
+      "resource" : "F22",
+      "subtype" : "Type1"
+    },
+    {
+      "embedded" : true,
+      "name" : "IHAIZV+STSongti-SC-Regular",
+      "resource" : "F1",
+      "subtype" : "Type0"
+    },
+    {
+      "embedded" : true,
+      "name" : "IXFAWU+STSongti-SC-Bold",
+      "resource" : "F5",
+      "subtype" : "Type0"
+    },
+    {
+      "embedded" : true,
+      "name" : "JAGKKY+CMR10",
+      "resource" : "F16",
+      "subtype" : "Type1"
+    },
+    {
+      "embedded" : true,
+      "name" : "KPXLOM+CMMI9",
+      "resource" : "F18",
+      "subtype" : "Type1"
+    },
+    {
+      "embedded" : true,
+      "name" : "NITCSQ+CMMI5",
+      "resource" : "F23",
+      "subtype" : "Type1"
+    },
+    {
+      "embedded" : true,
+      "name" : "NOMARO+CMEX10",
+      "resource" : "F17",
+      "subtype" : "Type1"
+    },
+    {
+      "embedded" : true,
+      "name" : "PVTTLK+CMR7",
+      "resource" : "F15",
+      "subtype" : "Type1"
+    },
+    {
+      "embedded" : true,
+      "name" : "TQTHRL+TeXGyreTermes-Bold-Identity-H",
+      "resource" : "F7",
+      "subtype" : "Type0"
+    },
+    {
+      "embedded" : true,
+      "name" : "UBBQTN+CMSY8",
+      "resource" : "F24",
+      "subtype" : "Type1"
+    },
+    {
+      "embedded" : true,
+      "name" : "UTACNV+CMSY9",
+      "resource" : "F19",
+      "subtype" : "Type1"
+    },
+    {
+      "embedded" : true,
+      "name" : "VDVGTR+CMSY10",
+      "resource" : "F11",
+      "subtype" : "Type1"
+    },
+    {
+      "embedded" : true,
+      "name" : "YEUUOC+TeXGyreTermes-Italic-Identity-H",
+      "resource" : "F9",
+      "subtype" : "Type0"
+    }
+  ],
+  "page_count" : 5,
+  "pages" : [
+    {
+      "character_count" : 2474,
+      "page" : 1,
+      "preview" : "\/Users\/agiuser\/Documents\/work\/CalibTM\/paper\/spin_direct_path_controls_cn_20260917\/build\/page-01.png",
+      "size_points" : [
+        612,
+        792
+      ],
+      "text_bounds_points" : [
+        49.089419264000007,
+        69.747335599999985,
+        563.03288727999995,
+        737.24424342399993
+      ]
+    },
+    {
+      "character_count" : 2400,
+      "page" : 2,
+      "preview" : "\/Users\/agiuser\/Documents\/work\/CalibTM\/paper\/spin_direct_path_controls_cn_20260917\/build\/page-02.png",
+      "size_points" : [
+        612,
+        792
+      ],
+      "text_bounds_points" : [
+        48.884188879999996,
+        69.747625599999978,
+        563.04608064000013,
+        738.24042703999999
+      ]
+    },
+    {
+      "character_count" : 2993,
+      "page" : 3,
+      "preview" : "\/Users\/agiuser\/Documents\/work\/CalibTM\/paper\/spin_direct_path_controls_cn_20260917\/build\/page-03.png",
+      "size_points" : [
+        612,
+        792
+      ],
+      "text_bounds_points" : [
+        48.455795359999996,
+        73.951530080000211,
+        562.8966578400001,
+        741.17942880000021
+      ]
+    },
+    {
+      "character_count" : 3789,
+      "page" : 4,
+      "preview" : "\/Users\/agiuser\/Documents\/work\/CalibTM\/paper\/spin_direct_path_controls_cn_20260917\/build\/page-04.png",
+      "size_points" : [
+        612,
+        792
+      ],
+      "text_bounds_points" : [
+        49.093404320000019,
+        73.961462720000171,
+        564.19795072000011,
+        739.33236534399998
+      ]
+    },
+    {
+      "character_count" : 825,
+      "page" : 5,
+      "preview" : "\/Users\/agiuser\/Documents\/work\/CalibTM\/paper\/spin_direct_path_controls_cn_20260917\/build\/page-05.png",
+      "size_points" : [
+        612,
+        792
+      ],
+      "text_bounds_points" : [
+        49.665259855999999,
+        614.95875558399996,
+        300.09413353599996,
+        738.74257705599996
+      ]
+    }
+  ],
+  "pdf" : "\/Users\/agiuser\/Documents\/work\/CalibTM\/paper\/spin_direct_path_controls_cn_20260917\/build\/manuscript.pdf",
+  "pdf_sha256" : "0428b1b38dfc342748ad7607ee91b56d15cf73f80ee24faedd905844a2db8cf9"
+}

@@ -1,0 +1,25 @@
+{
+  "command": [
+    "/mnt/suzikun/CalibTM/.venv/bin/python",
+    "-u",
+    "-m",
+    "experiments.spin_refine_v1.runner",
+    "--dataset",
+    "geant",
+    "--variant",
+    "one_step",
+    "--seed",
+    "41002",
+    "--device",
+    "cuda:0",
+    "--deadline-unix",
+    "1789647743",
+    "--smoke"
+  ],
+  "hostname": "d-20260913095246-v85qm",
+  "gpu": 0,
+  "started_unix": 1789622911.031293,
+  "finished_unix": 1789622920.6211164,
+  "returncode": 0,
+  "log": "/mnt/suzikun/CalibTM/outputs/spin-refine-20260917-v1/logs/geant-one_step-seed41002-smoke-1789622911030958751.log"
+}
