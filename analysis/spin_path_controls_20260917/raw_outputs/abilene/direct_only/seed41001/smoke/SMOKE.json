@@ -1,0 +1,53 @@
+{
+  "batch": 8,
+  "config_sha256": "a4db46deaf317a460c062f73d156f79da42bf554da874563ce6b09d87bc5c30f",
+  "dataset": "abilene",
+  "development_scores_computed": false,
+  "exact_checkpoint_continuation": true,
+  "finished": "2026-09-16T20:35:15.843712+00:00",
+  "first_step": {
+    "gradient_norm": 2.3706514835357666,
+    "loss": 1.1280996799468994,
+    "missing_targets": 46080
+  },
+  "fit_evaluation_output_sha256": "a1db56d7d9e7f44065bab2fc3a47adea1ef412df22ea723d10d7d9b01ed77026",
+  "fit_evaluation_path_checked": true,
+  "fit_only_metrics_not_development": {
+    "abs_error": 472965977420.0,
+    "abs_truth": 451961609937.0,
+    "count": 46080,
+    "nmae": 1.0464737867579679,
+    "nrmse": 0.9668533499638609,
+    "sq_error": 9.949479230561563e+19,
+    "sq_truth": 1.0643369440293962e+20
+  },
+  "fit_scoring_checked": true,
+  "node_chunk": 32,
+  "parameter_count": 62913,
+  "passed": true,
+  "peak_evaluation_allocated_bytes_including_training_state": 431310848,
+  "peak_training_allocated_bytes": 558605824,
+  "protocol": "spin-path-controls-development-20260917-v1",
+  "replayed_updates": 1,
+  "role": "fit_runner_smoke_not_formal_result",
+  "rough_epoch_seconds_from_smoke": 9.109537523860732,
+  "schedule": {
+    "epoch_zero_based": 0,
+    "mask_sha256": "4b31c16de8581aa3fcdddcf92deb0768338790a73e59e0117169a01194010896",
+    "order_sha256": "55c8cae168e40ecd1bcf253d6dc51dfef5d299ac93483aa4858cba084cc0e4d6",
+    "path": "/mnt/suzikun/CalibTM/outputs/sync-delta-pilot-20260913-v11/abilene/shared/masks/masks_train_seed61001_epoch000.npz",
+    "sha256": "d8dffee08373b5162e1a45f2048a906637bed1f7a7b1549b17b1139fbd171ab4"
+  },
+  "second_step": {
+    "gradient_norm": 2.1489529609680176,
+    "loss": 1.0894404649734497,
+    "missing_targets": 46080
+  },
+  "seconds_per_evaluation_batch": 0.004382790997624397,
+  "seconds_per_update_including_resume_io": 0.14007664720217386,
+  "seed": 41001,
+  "target_block": 144,
+  "training_epoch_zero_based": 0,
+  "unique_updates": 2,
+  "variant": "direct_only"
+}

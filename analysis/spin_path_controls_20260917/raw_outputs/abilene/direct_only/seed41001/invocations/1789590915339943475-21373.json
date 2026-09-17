@@ -1,0 +1,15 @@
+{
+  "config_sha256": "a4db46deaf317a460c062f73d156f79da42bf554da874563ce6b09d87bc5c30f",
+  "cuda_visible_devices": "0",
+  "dataset": "abilene",
+  "deadline_unix": 1789609396.0,
+  "device": "cuda:0",
+  "hostname": "d-20260913095246-v85qm",
+  "pid": 21373,
+  "protocol": "spin-path-controls-development-20260917-v1",
+  "resume": false,
+  "seed": 41001,
+  "smoke": true,
+  "started": "2026-09-16T20:35:15.339888+00:00",
+  "variant": "direct_only"
+}

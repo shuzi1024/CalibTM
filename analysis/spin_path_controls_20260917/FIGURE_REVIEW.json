@@ -1,0 +1,15 @@
+{
+  "checked_utc": "2026-09-16T21:20:08.546356+00:00",
+  "source": "completed 160-epoch development histories, all six trajectories per WAN",
+  "figures_sha256": {
+    "analysis/spin_path_controls_20260917/figures_geant/development_nmae_curves.png": "0ef1d78ef6acdd5b7cd0e4dcec4638fc70e418d764f90c5cfff420e87d9ecc77",
+    "analysis/spin_path_controls_20260917/figures_geant/development_nmae_curves.pdf": "eddd00cd0b982618be6815afd7da6ba2fd4308800b42e62e621e1ca7dab70e55",
+    "analysis/spin_path_controls_20260917/figures_abilene/development_nmae_curves.png": "5e4870113db3f7146c9c3de1e67d8087b62e23001dfe7d04f779e59ed91140da",
+    "analysis/spin_path_controls_20260917/figures_abilene/development_nmae_curves.pdf": "526d3530f93bed2942f0dcffbfbff2227267a7cfe03e9933f84e778c61173521"
+  },
+  "visually_checked": [
+    "GEANT PNG",
+    "Abilene PNG"
+  ],
+  "result": "Legible axes, six complete curves, full/late ranges, LR boundary and legends; all points retained without smoothing. No significance or convergence claim."
+}

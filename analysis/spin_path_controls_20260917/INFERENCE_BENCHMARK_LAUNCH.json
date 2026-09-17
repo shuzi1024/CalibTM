@@ -1,0 +1,28 @@
+{
+  "hostname": "d-20260907060201-gt68m",
+  "gpu": 0,
+  "timeout_pid": 1985430,
+  "started_unix": 1789590810.919807,
+  "deadline_unix": 1789609396,
+  "command": [
+    "timeout",
+    "--signal=TERM",
+    "--kill-after=10s",
+    "18575s",
+    "/mnt/suzikun/CalibTM/.venv/bin/python",
+    "-u",
+    "/mnt/suzikun/CalibTM/analysis/spin_path_controls_20260917/benchmark_inference.py",
+    "--repo-root",
+    "/mnt/suzikun/CalibTM",
+    "--run-root",
+    "outputs/spin-path-controls-20260917-v1",
+    "--device",
+    "cuda:0",
+    "--deadline-unix",
+    "1789609396",
+    "--output",
+    "/mnt/suzikun/CalibTM/analysis/spin_path_controls_20260917/INFERENCE_BENCHMARK.json"
+  ],
+  "log": "/mnt/suzikun/CalibTM/analysis/spin_path_controls_20260917/INFERENCE_BENCHMARK.log",
+  "output": "/mnt/suzikun/CalibTM/analysis/spin_path_controls_20260917/INFERENCE_BENCHMARK.json"
+}

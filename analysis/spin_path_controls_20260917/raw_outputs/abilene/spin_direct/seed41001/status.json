@@ -1,0 +1,13 @@
+{
+  "best_epoch": 158,
+  "best_score": 0.16218478326552707,
+  "config_sha256": "f31fcab03978fcd4b840028ca09462f19f38ae6f1d5bd44eaf896dc4a15b4e01",
+  "dataset": "abilene",
+  "deadline_unix": 1789609396.0,
+  "epochs_completed": 160,
+  "protocol": "spin-path-controls-development-20260917-v1",
+  "seed": 41001,
+  "state": "complete",
+  "updated": "2026-09-16T20:47:50.903712+00:00",
+  "variant": "spin_direct"
+}

@@ -1,0 +1,22 @@
+{
+  "decision": "advance_to_abilene_under_unchanged_protocol",
+  "decided_utc": "2026-09-16T20:34:48.333062+00:00",
+  "basis": "predeclared GEANT route screen passed at 160 epochs; both paired seeds beat both controls and late20 median directions agree; modest cost increment over Context-only",
+  "nmae_means": {
+    "spin_direct": 0.16481004290104592,
+    "context_only": 0.16849399138584115,
+    "direct_only": 0.17224570450269894
+  },
+  "relative_nmae_improvement_percent": {
+    "context_only": 2.186397541238846,
+    "direct_only": 4.316892327225789
+  },
+  "cost_increment_vs_context_percent": {
+    "b1_mean_condition_median_ms_per_batch": 4.0324605336127695,
+    "b8_mean_condition_median_ms_per_window": 3.472169911773859
+  },
+  "role": "development route screening; not independent testing or statistical significance",
+  "remaining_scope": "Abilene same three variants and two seeds; no schedule/architecture changes; original deadline remains",
+  "source_summary_sha256": "a87d88c80cd2e48edac24fd32ae721c390ac7aba7bc274afc3bdf1ff0993ccc3",
+  "benchmark_sha256": "c2e47881a06d07c8d1545b411f444c1e05663d72faf9f9b63786f8392b1695d2"
+}

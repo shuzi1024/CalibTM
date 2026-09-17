@@ -1,0 +1,17 @@
+{
+  "user_instruction": "7-hour GPU allocation for the agreed matched-path experiment",
+  "started_utc": "2026-09-16T18:43:16+00:00",
+  "deadline_utc": "2026-09-17T01:43:16+00:00",
+  "started_beijing": "2026-09-17T02:43:16+08:00",
+  "deadline_beijing": "2026-09-17T09:43:16+08:00",
+  "deadline_unix": 1789609396,
+  "max_gpu_count": 4,
+  "hosts": [
+    "ksc-h200",
+    "ksc-h20-extra"
+  ],
+  "hardware": "4 x NVIDIA H20, two per host; checked idle",
+  "scope": "GEANT matched path controls, conditional Abilene only after GEANT passes, bounded inference measurements and reporting",
+  "stop_early_if_sufficient": true,
+  "no_external_git_push": true
+}

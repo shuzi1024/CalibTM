@@ -1,0 +1,265 @@
+{
+  "created_utc": "2026-09-16T21:13:07.995658+00:00",
+  "state": "complete",
+  "authorization": {
+    "user_instruction": "7-hour GPU allocation for the agreed matched-path experiment",
+    "started_utc": "2026-09-16T18:43:16+00:00",
+    "deadline_utc": "2026-09-17T01:43:16+00:00",
+    "started_beijing": "2026-09-17T02:43:16+08:00",
+    "deadline_beijing": "2026-09-17T09:43:16+08:00",
+    "deadline_unix": 1789609396,
+    "max_gpu_count": 4,
+    "hosts": [
+      "ksc-h200",
+      "ksc-h20-extra"
+    ],
+    "hardware": "4 x NVIDIA H20, two per host; checked idle",
+    "scope": "GEANT matched path controls, conditional Abilene only after GEANT passes, bounded inference measurements and reporting",
+    "stop_early_if_sufficient": true,
+    "no_external_git_push": true
+  },
+  "gpu_process_inventories": {
+    "ksc-h200": {
+      "utc": "2026-09-16T21:12:59.056392+00:00",
+      "hostname": "d-20260907060201-gt68m",
+      "experiment_processes": [],
+      "gpus_csv": "0, GPU-56631519-2edf-fcbc-2dfb-70092068087d, NVIDIA H20, 0, 0\n1, GPU-e6e08566-9a51-425a-81ac-d8af43d299b1, NVIDIA H20, 0, 0",
+      "compute_processes_csv": "",
+      "read_only": true
+    },
+    "ksc-h20-extra": {
+      "utc": "2026-09-16T21:12:59.052261+00:00",
+      "hostname": "d-20260913095246-v85qm",
+      "experiment_processes": [],
+      "gpus_csv": "0, GPU-9c1717c1-947b-c87d-d38d-c0ee5fff848a, NVIDIA H20, 0, 0\n1, GPU-65617023-ac69-623e-5b32-3a6a29de36df, NVIDIA H20, 0, 0",
+      "compute_processes_csv": "",
+      "read_only": true
+    }
+  },
+  "summary_sha256": {
+    "geant": "a87d88c80cd2e48edac24fd32ae721c390ac7aba7bc274afc3bdf1ff0993ccc3",
+    "abilene": "05ea4878873458f865176860eb423d2daac2a3d40dde9f4d87111ecd1081bf29"
+  },
+  "complete_trajectories": 12,
+  "new_from_scratch_trajectories": 8,
+  "continued_prior_trajectories": 4,
+  "max_simultaneous_processes": 4,
+  "all_finished_before_deadline": true,
+  "allocation_to_last_gpu_work_wall_hours": 2.470179075135125,
+  "sum_recorded_gpu_process_wall_hours": 6.025058382882012,
+  "process_time_definition": "12 smoke + 12 formal process wall intervals + 2 inference benchmarks; includes CPU preparation, loading and I/O; excludes historical parent training, idle allocation, launch overhead and CPU-only checks; not utilization/billing",
+  "last_gpu_work_beijing": "2026-09-17T05:11:28.644670+08:00",
+  "intervals": [
+    {
+      "path": "raw_outputs/logs/abilene-context_only-seed41001-smoke-1789590908461606111.exit.json",
+      "kind": "smoke",
+      "hostname": "d-20260907060201-gt68m",
+      "gpu": 0,
+      "start": 1789590908.4619615,
+      "finish": 1789590917.133841
+    },
+    {
+      "path": "raw_outputs/logs/abilene-context_only-seed41001-train-1789590917144144051.exit.json",
+      "kind": "train",
+      "hostname": "d-20260907060201-gt68m",
+      "gpu": 0,
+      "start": 1789590917.1444128,
+      "finish": 1789593059.663264
+    },
+    {
+      "path": "raw_outputs/logs/abilene-context_only-seed41002-smoke-1789590908602115253.exit.json",
+      "kind": "smoke",
+      "hostname": "d-20260907060201-gt68m",
+      "gpu": 1,
+      "start": 1789590908.602335,
+      "finish": 1789590917.0081973
+    },
+    {
+      "path": "raw_outputs/logs/abilene-context_only-seed41002-train-1789590917018722921.exit.json",
+      "kind": "train",
+      "hostname": "d-20260907060201-gt68m",
+      "gpu": 1,
+      "start": 1789590917.0189888,
+      "finish": 1789593052.7247481
+    },
+    {
+      "path": "raw_outputs/logs/abilene-direct_only-seed41001-smoke-1789590908463040989.exit.json",
+      "kind": "smoke",
+      "hostname": "d-20260913095246-v85qm",
+      "gpu": 0,
+      "start": 1789590908.4632401,
+      "finish": 1789590916.3160427
+    },
+    {
+      "path": "raw_outputs/logs/abilene-direct_only-seed41001-train-1789590916327366512.exit.json",
+      "kind": "train",
+      "hostname": "d-20260913095246-v85qm",
+      "gpu": 0,
+      "start": 1789590916.3277001,
+      "finish": 1789591106.3540518
+    },
+    {
+      "path": "raw_outputs/logs/abilene-direct_only-seed41002-smoke-1789590908597762678.exit.json",
+      "kind": "smoke",
+      "hostname": "d-20260913095246-v85qm",
+      "gpu": 1,
+      "start": 1789590908.5980268,
+      "finish": 1789590916.4337049
+    },
+    {
+      "path": "raw_outputs/logs/abilene-direct_only-seed41002-train-1789590916440705374.exit.json",
+      "kind": "train",
+      "hostname": "d-20260913095246-v85qm",
+      "gpu": 1,
+      "start": 1789590916.440973,
+      "finish": 1789591103.2090151
+    },
+    {
+      "path": "raw_outputs/logs/abilene-spin_direct-seed41001-smoke-1789591106367286621.exit.json",
+      "kind": "smoke",
+      "hostname": "d-20260913095246-v85qm",
+      "gpu": 0,
+      "start": 1789591106.3675427,
+      "finish": 1789591112.461275
+    },
+    {
+      "path": "raw_outputs/logs/abilene-spin_direct-seed41001-train-1789591112472393875.exit.json",
+      "kind": "train",
+      "hostname": "d-20260913095246-v85qm",
+      "gpu": 0,
+      "start": 1789591112.4731371,
+      "finish": 1789591671.4113142
+    },
+    {
+      "path": "raw_outputs/logs/abilene-spin_direct-seed41002-smoke-1789591103234208526.exit.json",
+      "kind": "smoke",
+      "hostname": "d-20260913095246-v85qm",
+      "gpu": 1,
+      "start": 1789591103.2345781,
+      "finish": 1789591109.945668
+    },
+    {
+      "path": "raw_outputs/logs/abilene-spin_direct-seed41002-train-1789591109959501009.exit.json",
+      "kind": "train",
+      "hostname": "d-20260913095246-v85qm",
+      "gpu": 1,
+      "start": 1789591109.9597416,
+      "finish": 1789591669.9391494
+    },
+    {
+      "path": "raw_outputs/logs/geant-context_only-seed41001-smoke-1789584728127900581.exit.json",
+      "kind": "smoke",
+      "hostname": "d-20260907060201-gt68m",
+      "gpu": 0,
+      "start": 1789584728.1281104,
+      "finish": 1789584738.5385623
+    },
+    {
+      "path": "raw_outputs/logs/geant-context_only-seed41001-train-1789584738548509470.exit.json",
+      "kind": "train",
+      "hostname": "d-20260907060201-gt68m",
+      "gpu": 0,
+      "start": 1789584738.5487244,
+      "finish": 1789590780.1735468
+    },
+    {
+      "path": "raw_outputs/logs/geant-context_only-seed41002-smoke-1789584728276385882.exit.json",
+      "kind": "smoke",
+      "hostname": "d-20260907060201-gt68m",
+      "gpu": 1,
+      "start": 1789584728.2765994,
+      "finish": 1789584737.5627367
+    },
+    {
+      "path": "raw_outputs/logs/geant-context_only-seed41002-train-1789584737573744229.exit.json",
+      "kind": "train",
+      "hostname": "d-20260907060201-gt68m",
+      "gpu": 1,
+      "start": 1789584737.574011,
+      "finish": 1789590785.5984783
+    },
+    {
+      "path": "raw_outputs/logs/geant-direct_only-seed41001-smoke-1789584728270916801.exit.json",
+      "kind": "smoke",
+      "hostname": "d-20260913095246-v85qm",
+      "gpu": 0,
+      "start": 1789584728.2711313,
+      "finish": 1789584735.4238029
+    },
+    {
+      "path": "raw_outputs/logs/geant-direct_only-seed41001-train-1789584735430655191.exit.json",
+      "kind": "train",
+      "hostname": "d-20260913095246-v85qm",
+      "gpu": 0,
+      "start": 1789584735.4310427,
+      "finish": 1789585021.2861671
+    },
+    {
+      "path": "raw_outputs/logs/geant-direct_only-seed41002-smoke-1789584728888328961.exit.json",
+      "kind": "smoke",
+      "hostname": "d-20260913095246-v85qm",
+      "gpu": 1,
+      "start": 1789584728.888556,
+      "finish": 1789584735.5888743
+    },
+    {
+      "path": "raw_outputs/logs/geant-direct_only-seed41002-train-1789584735598056967.exit.json",
+      "kind": "train",
+      "hostname": "d-20260913095246-v85qm",
+      "gpu": 1,
+      "start": 1789584735.5982933,
+      "finish": 1789585022.292633
+    },
+    {
+      "path": "raw_outputs/logs/geant-spin_direct-seed41001-smoke-1789585021298544103.exit.json",
+      "kind": "smoke",
+      "hostname": "d-20260913095246-v85qm",
+      "gpu": 0,
+      "start": 1789585021.2988212,
+      "finish": 1789585030.182085
+    },
+    {
+      "path": "raw_outputs/logs/geant-spin_direct-seed41001-train-1789585030195327840.exit.json",
+      "kind": "train",
+      "hostname": "d-20260913095246-v85qm",
+      "gpu": 0,
+      "start": 1789585030.1955526,
+      "finish": 1789586590.5560548
+    },
+    {
+      "path": "raw_outputs/logs/geant-spin_direct-seed41002-smoke-1789585022303054275.exit.json",
+      "kind": "smoke",
+      "hostname": "d-20260913095246-v85qm",
+      "gpu": 1,
+      "start": 1789585022.3032904,
+      "finish": 1789585030.1022267
+    },
+    {
+      "path": "raw_outputs/logs/geant-spin_direct-seed41002-train-1789585030112364224.exit.json",
+      "kind": "train",
+      "hostname": "d-20260913095246-v85qm",
+      "gpu": 1,
+      "start": 1789585030.1127467,
+      "finish": 1789586589.4503143
+    },
+    {
+      "path": "INFERENCE_BENCHMARK.json",
+      "kind": "inference_benchmark",
+      "hostname": "d-20260907060201-gt68m",
+      "gpu": 0,
+      "start": 1789590811.0520637,
+      "finish": 1789590838.0963452
+    },
+    {
+      "path": "INFERENCE_BENCHMARK_ABILENE.json",
+      "kind": "inference_benchmark",
+      "hostname": "d-20260907060201-gt68m",
+      "gpu": 0,
+      "start": 1789593077.1150105,
+      "finish": 1789593088.6446705
+    }
+  ],
+  "no_queued_followups": true,
+  "next_experiments_started": false,
+  "external_git_push_attempted": false
+}

@@ -1,0 +1,14 @@
+{
+  "frozen_utc": "2026-09-16T18:51:54.213559+00:00",
+  "files": {
+    "analysis/spin_path_controls_20260917/AUTHORIZATION.json": "b164d199d42a6c4daf9c2d6b34e74cadc05e332594d922039667b8fd137f40d2",
+    "analysis/spin_path_controls_20260917/CPU_CHECKS.json": "de3c1723c4e4c3b42e3bc233757009de45799f658ea81734727d2bc3906851ab",
+    "analysis/spin_path_controls_20260917/PLAN_CN.md": "73aaac1d9ae67eeb0229305868dd38782ad368f8783cee7fd1e1398920f1a620",
+    "analysis/spin_path_controls_20260917/launch_queue.py": "cd48eab49a309168a1ac374591cdba93ce7209ba1234c385209475fbba51769e",
+    "experiments/spin_path_controls_v1/__init__.py": "d66522c5ed37f73838a60487c72878bba0e70b0301608cf380793c87e8ab46f7",
+    "experiments/spin_path_controls_v1/checks.py": "f900cbabb6e08009141e69f7878b69dc7c415036dfcb01e38c534f4fa6c327a0",
+    "experiments/spin_path_controls_v1/models.py": "9b714737e88cf8d9609a52fc3b250ffbf14b864842c27ae1bbdb564a45ed69b2",
+    "experiments/spin_path_controls_v1/runner.py": "e457c1ed8fa1d9655dc7fb25c267638ea05e64887db00ded9777901c3c5cdd09"
+  },
+  "role": "pre-execution source and plan binding; old dependencies independently checked against parent config by runner"
+}

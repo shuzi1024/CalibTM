@@ -1,0 +1,53 @@
+{
+  "batch": 8,
+  "config_sha256": "304409086903719c709c75e565be7c90632914282e17de3d1a77645688b47fd0",
+  "dataset": "abilene",
+  "development_scores_computed": false,
+  "exact_checkpoint_continuation": true,
+  "finished": "2026-09-16T20:35:16.356885+00:00",
+  "first_step": {
+    "gradient_norm": 1.894780158996582,
+    "loss": 1.1280996799468994,
+    "missing_targets": 46080
+  },
+  "fit_evaluation_output_sha256": "4e8da30ae75cb4dc7cf6c5a1dac494e8acac064f4335fbe25af38a039c458d77",
+  "fit_evaluation_path_checked": true,
+  "fit_only_metrics_not_development": {
+    "abs_error": 485433159813.0,
+    "abs_truth": 451961609937.0,
+    "count": 46080,
+    "nmae": 1.0740583915537996,
+    "nrmse": 0.9790442082224861,
+    "sq_error": 1.0201962957387612e+20,
+    "sq_truth": 1.0643369440293962e+20
+  },
+  "fit_scoring_checked": true,
+  "node_chunk": 32,
+  "parameter_count": 72293,
+  "passed": true,
+  "peak_evaluation_allocated_bytes_including_training_state": 3073013760,
+  "peak_training_allocated_bytes": 5485063168,
+  "protocol": "spin-path-controls-development-20260917-v1",
+  "replayed_updates": 1,
+  "role": "fit_runner_smoke_not_formal_result",
+  "rough_epoch_seconds_from_smoke": 20.613351240754128,
+  "schedule": {
+    "epoch_zero_based": 0,
+    "mask_sha256": "4b31c16de8581aa3fcdddcf92deb0768338790a73e59e0117169a01194010896",
+    "order_sha256": "55c8cae168e40ecd1bcf253d6dc51dfef5d299ac93483aa4858cba084cc0e4d6",
+    "path": "/mnt/suzikun/CalibTM/outputs/sync-delta-pilot-20260913-v11/abilene/shared/masks/masks_train_seed61001_epoch000.npz",
+    "sha256": "d8dffee08373b5162e1a45f2048a906637bed1f7a7b1549b17b1139fbd171ab4"
+  },
+  "second_step": {
+    "gradient_norm": 1.710453987121582,
+    "loss": 1.0976730585098267,
+    "missing_targets": 46080
+  },
+  "seconds_per_evaluation_batch": 0.047478511929512024,
+  "seconds_per_update_including_resume_io": 0.2976025054231286,
+  "seed": 41002,
+  "target_block": 144,
+  "training_epoch_zero_based": 0,
+  "unique_updates": 2,
+  "variant": "context_only"
+}

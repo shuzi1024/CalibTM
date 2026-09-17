@@ -1,0 +1,8 @@
+{
+  "utc": "2026-09-16T21:12:59.052261+00:00",
+  "hostname": "d-20260913095246-v85qm",
+  "experiment_processes": [],
+  "gpus_csv": "0, GPU-9c1717c1-947b-c87d-d38d-c0ee5fff848a, NVIDIA H20, 0, 0\n1, GPU-65617023-ac69-623e-5b32-3a6a29de36df, NVIDIA H20, 0, 0",
+  "compute_processes_csv": "",
+  "read_only": true
+}

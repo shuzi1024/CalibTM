@@ -1,0 +1,180 @@
+{
+  "anchor_parent": {
+    "epochs_completed": 120,
+    "files_sha256": {
+      "best.pt": "c47e9b3c47d48af79e229e592dd02ec8331ba83d356e00888f78a943c90937b1",
+      "config.json": "685912b41a4f270c471be613e671cc1ca69edb4796f64a7043db34dc37951980",
+      "history.json": "5756e42dde04f4c1209643417c1e438ceb7d4966885594b2823e4db7148d9cd5",
+      "last.pt": "2e67b23bb541722315a26aaefb0559d9de3dd13428df466d3d11f02c51c9c70c",
+      "result.json": "bff99f45dd0d21c3a7f12659d04569b98e3ebd6af2595c12cfefbb3de6599e06"
+    },
+    "identity": {
+      "config_sha256": "685912b41a4f270c471be613e671cc1ca69edb4796f64a7043db34dc37951980",
+      "dataset": "abilene",
+      "protocol": "spin-sync-unified-fixed120-development-20260916-v1",
+      "seed": 41001,
+      "variant": "spin_direct_no_memory"
+    },
+    "initial_file_sha256": "7b639f6c4eea82bb1633617917b2b934187f521d03fb3a374dc7eac31cfded02",
+    "initial_path": "/mnt/suzikun/CalibTM/outputs/spin-sync-unified-20260916-v1/abilene/spin_direct_no_memory/seed41001/initial.pt",
+    "path": "/mnt/suzikun/CalibTM/outputs/spin-sync-unified-fixed120-20260916-v1/abilene/spin_direct_no_memory/seed41001"
+  },
+  "continuation_checkpoint_loaded": false,
+  "data": {
+    "data_sha256": "f0c3875c0b5bb47407ce9ea178a9dd407166945d65b5404cb2882b59654f48e4",
+    "dev_starts_sha256": "2f8576a2567e3dfc88f4b934ea42b0f9e57846a32772958fd3bec88b981494bd",
+    "dev_window_count": 82,
+    "fit_C": 9502585.857313488,
+    "flows": 144,
+    "mask_array_sha256": {
+      "unequal": "019d6dd1a4036c2a26c8a1404b7db02403171d05c53a1dc66015b2cf8872ca27",
+      "unequal_gap": "e5fde1fb7b8335244eef2513256f272e858fb865ff2e03424d58f74530df6d5f",
+      "uniform": "56e0ad8039b820d5ce9b1dbe3452348e629ec7a58befe27d530764bf13b71af0"
+    },
+    "neighbors_sha256": "c4558d5cdb4fe3e704028217e8142f361382332343578e6f6bbf3fba01ed231d",
+    "stats_sha256": "0b181b3928450ffdb0f8d344669d963d73427124fe25823dcd36b967646d9ce8",
+    "train_starts_sha256": "9be5bffb6376e3e725490511d17bdb8cda75334c640c41bcb23ae65be5fc1c06",
+    "train_window_count": 512
+  },
+  "dataset": "abilene",
+  "fixed_optimization_diagnostic": true,
+  "imported_epoch_count": 0,
+  "independent_test": false,
+  "independent_training_repeat": true,
+  "initial_file_sha256": "37f900cda74960a41199d19a2b70f87be03006d8e3ce4d48be5b991de8fe6f24",
+  "initial_state_sha256": "544b5e793d6d0ad2bb059aa11a14234ab3322a70566d2010d6797289e04a16db",
+  "model_config": {
+    "capacity_matching": false,
+    "context_hidden": 32,
+    "context_layers": 1,
+    "context_spatial_masked": true,
+    "context_temporal_attention": true,
+    "direct_dim": 16,
+    "direct_nearest_per_direction": 2,
+    "initialization": "from scratch; zero final decoder; shared weights identical across variants",
+    "memory_enabled": false,
+    "memory_head_dim": 32,
+    "memory_heads": 4,
+    "normalization": "global_fit_population_mean_std",
+    "query_normalization": "original L2 normalization per 32-dimensional head",
+    "shared_initialization": "construct original no-memory model, then delete inactive modules",
+    "task": "offline T50 imputation; bidirectional own-flow reads; no Sync memory",
+    "variants": {
+      "context_only": "SPIN context retained; decoder([0, 0, Q(H)])",
+      "direct_only": "no observation encoder or SPIN; decoder([Df, Db, Q(P)])",
+      "spin_direct": "original spin_direct_no_memory; decoder([Df, Db, Q(H)])"
+    }
+  },
+  "parameter_count": 72293,
+  "parent": "/mnt/suzikun/CalibTM/outputs/sync-delta-pilot-20260913-v11",
+  "parent_registry_sha256": "f7dae0dfac2a776e75d62e57dade164d60b4fca49d329827018740dc071d3949",
+  "path_control_not_official_spin": true,
+  "protocol": "spin-path-controls-development-20260917-v1",
+  "reference_checkpoint_weights_loaded": false,
+  "references": {
+    "direct_sync": {
+      "path": "/mnt/suzikun/CalibTM/outputs/llm-candidates-20260914-v1/abilene/direct_sync/seed41001/result.json",
+      "selection_score": 0.16563889665365808,
+      "sha256": "22732e1bd9939834276df906dbabcacb1be94a1421ffcece023291f44341a2bd"
+    },
+    "linear": {
+      "path": "/mnt/suzikun/CalibTM/outputs/sync-delta-pilot-20260913-v11/abilene/linear_seed71001.json",
+      "selection_score": 0.17102147810750057,
+      "sha256": "e997fd1674a5ecfd3203e448ba8083aec827b7533c06f8d9d90ed954c7a1aa2f"
+    },
+    "spin_adapted": {
+      "path": "/mnt/suzikun/CalibTM/outputs/spin-comparison-20260914-v1/abilene/spin_adapted/seed41001/result.json",
+      "selection_score": 0.16438013652406452,
+      "sha256": "e89f5a990bab0dcd6faabbcf7fe0c0552e79798bf1286714ed8a4d6480e6d78a"
+    }
+  },
+  "role": "development_only",
+  "runtime": {
+    "cuda": "12.1",
+    "numpy": "1.22.4",
+    "python": "3.10.18",
+    "torch": "2.2.2+cu121"
+  },
+  "seed": 41001,
+  "shared_named_parameters_exact": true,
+  "source_files": {
+    "experiments/direct_only_runtime_v1/run.py": "d1658c803a83fa9b6fa84dfda6b0dff1b0f54a4db9a4ec908556b79aebce0986",
+    "experiments/direct_only_v1/__init__.py": "66b8d5acc6132b77c604e3f7c53815b565919cc369c73c228b3e2d3961061a16",
+    "experiments/direct_only_v1/checks.py": "60706e6143c81b32d5c873f155dcf59b4b707c372145092811dfd75888a855cc",
+    "experiments/direct_only_v1/models.py": "0f79921c5fa26f0f346fe83a49a48f8b6f9d4974a0ee61d130aa1ecfa80c12f4",
+    "experiments/llm_candidates_runtime_v1/__init__.py": "89d2a2575e755f55838b15669da7bf492489368947de9eadd2a3daac18fa04ed",
+    "experiments/llm_candidates_runtime_v1/checks_watch.py": "7bf7b0d4f802abfe09457c8f629f10c2c58ad725512f100667054ed23d0804ee",
+    "experiments/llm_candidates_runtime_v1/report.py": "867bd2c7c1c79aced6ba48093de365c7f0acd50e6df639abc4c7ab2a29f8f326",
+    "experiments/llm_candidates_runtime_v1/run.py": "7542723aff324b2336ca4ddf566f37c8060233b9a4b94f48c61941c8c5886044",
+    "experiments/llm_candidates_runtime_v1/watch.py": "f54ae462e637a58910c6ccec7a007747a5bd27860edbd8953339792534c33460",
+    "experiments/llm_candidates_v1/__init__.py": "bf76aecc8eb36412e5c8e907c81fbd941133bae163e4c4d529c45b46d53da76b",
+    "experiments/llm_candidates_v1/checks_direct.py": "a7b415bb0ccc7168e3bae6a25ffc6811fd0ee2271ca75b2baf34777212eb41cc",
+    "experiments/llm_candidates_v1/checks_feature.py": "35a296376186c260d04d88dca0e54a9e2272c8ccbeba46cb5aaf89284a9bfb81",
+    "experiments/llm_candidates_v1/checks_routing.py": "3e28b63c05473f17ca7c62564d9ff7b96ce79e23313ceb84dc1a2e39df24a7ea",
+    "experiments/llm_candidates_v1/direct.py": "c89dfc0e0718c95fb8beb81095ce7027c75fec91728c39fdfbea739b6bea4211",
+    "experiments/llm_candidates_v1/feature.py": "de639c29c22f9ee11a89f9f196616d712cd32d798c8c6a6a51e55f73150f7473",
+    "experiments/llm_candidates_v1/models.py": "23c2a6f72ec53efc8cd6f6124bb53bb567d79af61a27b9db8a9edb8093744a87",
+    "experiments/llm_candidates_v1/routing.py": "165398b10695903d4822ec2fd7d892a1d7a4aa0e2c84a4400aa2a701ef8794f9",
+    "experiments/spin_comparison_v1/__init__.py": "777ea49fd0cac75281034cab784b867dd057a1dffa7d1b13482cb426f4a0ac84",
+    "experiments/spin_comparison_v1/attention.py": "756c757fbfb29baecf43c4f8dc6db7b21e2c24a67d4d10c82ee0abc1256e3fe5",
+    "experiments/spin_comparison_v1/checks.py": "fb734f2083ff68add353a5eb329ac36010fa40a6a87e9228a55383c804d2f92b",
+    "experiments/spin_comparison_v1/models.py": "001e1cb8a48f988ecee0324dfcf39c33f7a78ebde7ecc84b669d459f4b60899b",
+    "experiments/spin_comparison_v1/positional.py": "c52d03228ad2998677c93894f835e77f266f2d382606d9de3f3e76195037d79f",
+    "experiments/spin_comparison_v1/primitives.py": "6b5d8d6b0ac53b986456dea47fb5ff8df0b53dd47786a28a15febf5d2c344ccb",
+    "experiments/spin_comparison_v1/scheduler.py": "34861fcfe255772c4ea076cd43aca9386355bc08b4def18ad5d1cdff42462a02",
+    "experiments/spin_comparison_v1/source_model.py": "54dd71a4b4afd6fdba49b64dae9f9b776dd0f992a193d53ec68cb6a592f919d6",
+    "experiments/spin_path_controls_v1/__init__.py": "d66522c5ed37f73838a60487c72878bba0e70b0301608cf380793c87e8ab46f7",
+    "experiments/spin_path_controls_v1/models.py": "9b714737e88cf8d9609a52fc3b250ffbf14b864842c27ae1bbdb564a45ed69b2",
+    "experiments/spin_path_controls_v1/runner.py": "e457c1ed8fa1d9655dc7fb25c267638ea05e64887db00ded9777901c3c5cdd09",
+    "experiments/spin_sync_fixed120_v1/__init__.py": "b7bc34372886644bb04e2eb436fed53ecbc8a0c07db085c80e419a63c786b169",
+    "experiments/spin_sync_fixed120_v1/runner.py": "bde70881be8ea1ef026768dc8f04d6d29c6af729abf85f72d51b3529efbbc07f",
+    "experiments/spin_sync_unified_v1/__init__.py": "f8c7813af9c3fb10e16f0e71a915713c19029d23469b5b6b971bfdb7ce1036ca",
+    "experiments/spin_sync_unified_v1/models.py": "a9a27086cfec26999cc5749acbab79264504103617c457d61db1a39566b90fcb",
+    "experiments/spin_sync_unified_v1/runner.py": "48487269adfa6110b849e86299106182249b17a72fd5e62fd8e0c89b68ae6621",
+    "experiments/sync_delta_v1/__init__.py": "b279bd94d33e99de7ef2fbed187e80ecac073e2d315122538b1dd8ecd5063dcd",
+    "experiments/sync_delta_v1/data.py": "ae70e0131ef0017e3df76208bc8d123776955f68d6f8fa7e9de31f7985d263a0",
+    "experiments/sync_delta_v1/engine.py": "8651504ec08225f09edd52d59a482f8fec5f861486c2a72efbfa0bd6bbd17726",
+    "experiments/sync_delta_v1/models.py": "575329e6f4bf7b5e5eb01ec153bf69bef6a577b41890147aa457d6eeb6aa0508",
+    "experiments/sync_delta_v1/preflight.py": "23ac3632c8d0356449f8c039db02db0c581e77c493bc5a970223ed39b66af1ae",
+    "experiments/sync_delta_v1/run.py": "990d28868d7ba0e4e1c7d7678bb12986625a02aa84b3f57690aae2d8fc368ab4",
+    "experiments/sync_delta_v1/summarize.py": "5d5910c6bfdab319001fdc2e42dc14a133407749dc38fc85b5e3b6204d308c87"
+  },
+  "training": {
+    "batch": 8,
+    "betas": [
+      0.9,
+      0.999
+    ],
+    "data_order_seed": 51001,
+    "early_stopping": false,
+    "evaluation_batch": 8,
+    "gradient_checkpointing": true,
+    "gradient_clip": 1.0,
+    "initialization": "paired shared parameters; controls from scratch; spin_direct continues original trajectory",
+    "loss": "unclamped raw missing absolute sum / (fit C * batch missing count)",
+    "lr": 0.001,
+    "lr_schedule": [
+      {
+        "first_epoch": 1,
+        "last_epoch": 120,
+        "lr": 0.001
+      },
+      {
+        "first_epoch": 121,
+        "last_epoch": 160,
+        "lr": 0.0001
+      }
+    ],
+    "max_epochs": 160,
+    "node_chunk": 32,
+    "optimizer": "AdamW",
+    "precision": "FP32; TF32 disabled",
+    "scheduler": "one_predeclared_drop_at_epoch_121",
+    "selection": "equal mean of three condition global missing-only NMAE; strict improvement over epochs 1..cap",
+    "selection_mask_seed": 71001,
+    "stop_rule": "fixed_160_epochs_or_authorization_deadline",
+    "training_mask_seed": 61001,
+    "weight_decay": 0.0001
+  },
+  "variant": "context_only"
+}
