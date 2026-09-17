@@ -1,0 +1,11 @@
+{
+  "config_sha256": "b38ad4dc9fc5b913039e0e32dd74ab66416985f0c963479b08bbf768d26d8c82",
+  "dataset": "abilene",
+  "deadline_unix": 1789609396.0,
+  "eligible_as_completed_result": false,
+  "protocol": "spin-path-controls-development-20260917-v1",
+  "seed": 41002,
+  "state": "smoke_passed",
+  "updated": "2026-09-16T20:38:29.452899+00:00",
+  "variant": "spin_direct"
+}

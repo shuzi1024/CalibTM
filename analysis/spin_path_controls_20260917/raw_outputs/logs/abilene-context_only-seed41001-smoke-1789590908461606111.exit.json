@@ -1,0 +1,25 @@
+{
+  "command": [
+    "/mnt/suzikun/CalibTM/.venv/bin/python",
+    "-u",
+    "-m",
+    "experiments.spin_path_controls_v1.runner",
+    "--dataset",
+    "abilene",
+    "--variant",
+    "context_only",
+    "--seed",
+    "41001",
+    "--device",
+    "cuda:0",
+    "--deadline-unix",
+    "1789609396",
+    "--smoke"
+  ],
+  "hostname": "d-20260907060201-gt68m",
+  "gpu": 0,
+  "started_unix": 1789590908.4619615,
+  "finished_unix": 1789590917.133841,
+  "returncode": 0,
+  "log": "/mnt/suzikun/CalibTM/outputs/spin-path-controls-20260917-v1/logs/abilene-context_only-seed41001-smoke-1789590908461606111.log"
+}

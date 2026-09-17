@@ -1,0 +1,52 @@
+{
+  "batch": 8,
+  "config_sha256": "e6ed01938da987e07e200ad43dfa6c38df261eb32092fc58363ca545220255e9",
+  "dataset": "geant",
+  "development_scores_computed": false,
+  "exact_checkpoint_continuation": true,
+  "finished": "2026-09-16T18:57:09.546305+00:00",
+  "first_step": {
+    "gradient_norm": 2.876361131668091,
+    "loss": 0.16000215709209442,
+    "missing_targets": 147840
+  },
+  "fit_evaluation_output_sha256": "d0dc5a0f73ce43f500c2b480eff4efa99e5f71b93daf7b2285306386100bc99a",
+  "fit_evaluation_path_checked": true,
+  "fit_only_metrics_not_development": {
+    "abs_error": 2367.569020224007,
+    "abs_truth": 13941.006658864964,
+    "count": 147840,
+    "nmae": 0.16982769452437574,
+    "nrmse": 0.22875776803353937,
+    "sq_error": 952.4300140139151,
+    "sq_truth": 18200.418399306367
+  },
+  "fit_scoring_checked": true,
+  "node_chunk": 32,
+  "parameter_count": 83909,
+  "passed": true,
+  "peak_evaluation_allocated_bytes_including_training_state": 3158204416,
+  "peak_training_allocated_bytes": 5872946688,
+  "protocol": "spin-path-controls-development-20260917-v1",
+  "replayed_updates": 1,
+  "role": "fit_runner_smoke_not_formal_result",
+  "rough_epoch_seconds_from_smoke": 48.118889248619475,
+  "schedule": {
+    "epoch_zero_based": 120,
+    "generated_with_frozen_data_module": true,
+    "mask_sha256": "59864050ad213b8dc266c271e9b109f5596059a3460702fc8c40aef48a5825c0",
+    "order_sha256": "6a8a4e1c1fdc668bd7faaa5856ebcac78ccb15fef4570726e727cae0405112b5"
+  },
+  "second_step": {
+    "gradient_norm": 2.896707057952881,
+    "loss": 0.21349209547042847,
+    "missing_targets": 147840
+  },
+  "seconds_per_evaluation_batch": 0.15235707629472017,
+  "seconds_per_update_including_resume_io": 0.7232906927044193,
+  "seed": 41002,
+  "target_block": 462,
+  "training_epoch_zero_based": 120,
+  "unique_updates": 2,
+  "variant": "spin_direct"
+}

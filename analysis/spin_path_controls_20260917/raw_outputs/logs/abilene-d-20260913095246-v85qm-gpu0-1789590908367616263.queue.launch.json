@@ -1,0 +1,32 @@
+{
+  "hostname": "d-20260913095246-v85qm",
+  "gpu": 0,
+  "seed": 41001,
+  "dataset": "abilene",
+  "variants": [
+    "direct_only",
+    "spin_direct"
+  ],
+  "timeout_pid": 21371,
+  "command": [
+    "timeout",
+    "--signal=TERM",
+    "--kill-after=10s",
+    "18477s",
+    "/mnt/suzikun/CalibTM/.venv/bin/python",
+    "-u",
+    "/mnt/suzikun/CalibTM/analysis/spin_path_controls_20260917/launch_queue.py",
+    "--worker",
+    "--gpu",
+    "0",
+    "--dataset",
+    "abilene",
+    "--seed",
+    "41001",
+    "--variants",
+    "direct_only,spin_direct"
+  ],
+  "log": "/mnt/suzikun/CalibTM/outputs/spin-path-controls-20260917-v1/logs/abilene-d-20260913095246-v85qm-gpu0-1789590908367616263.queue.log",
+  "started_unix": 1789590908.372038,
+  "deadline_unix": 1789609396
+}

@@ -1,0 +1,11 @@
+{
+  "config_sha256": "3a0b117a8d2ac5a2a8ddf60c2932658cdd8f772015dda25a421bd3c264cd1ceb",
+  "dataset": "geant",
+  "deadline_unix": 1789609396.0,
+  "eligible_as_completed_result": false,
+  "protocol": "spin-path-controls-development-20260917-v1",
+  "seed": 41002,
+  "state": "smoke_passed",
+  "updated": "2026-09-16T18:52:14.966603+00:00",
+  "variant": "direct_only"
+}

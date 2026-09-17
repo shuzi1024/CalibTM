@@ -1,0 +1,13 @@
+{
+  "best_epoch": 153,
+  "best_score": 0.1644123798370679,
+  "config_sha256": "e6ed01938da987e07e200ad43dfa6c38df261eb32092fc58363ca545220255e9",
+  "dataset": "geant",
+  "deadline_unix": 1789609396.0,
+  "epochs_completed": 160,
+  "protocol": "spin-path-controls-development-20260917-v1",
+  "seed": 41002,
+  "state": "complete",
+  "updated": "2026-09-16T19:23:08.887132+00:00",
+  "variant": "spin_direct"
+}

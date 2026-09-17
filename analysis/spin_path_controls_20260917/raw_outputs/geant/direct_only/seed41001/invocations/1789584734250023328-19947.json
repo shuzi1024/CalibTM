@@ -1,0 +1,15 @@
+{
+  "config_sha256": "1386042d00cc3ec6151dc03edb3950c78d74b6743477c8e5b28a35b5cc15f160",
+  "cuda_visible_devices": "0",
+  "dataset": "geant",
+  "deadline_unix": 1789609396.0,
+  "device": "cuda:0",
+  "hostname": "d-20260913095246-v85qm",
+  "pid": 19947,
+  "protocol": "spin-path-controls-development-20260917-v1",
+  "resume": false,
+  "seed": 41001,
+  "smoke": true,
+  "started": "2026-09-16T18:52:14.249964+00:00",
+  "variant": "direct_only"
+}
