@@ -1,0 +1,15 @@
+{
+  "state": "authorized",
+  "max_concurrent_gpus": 4,
+  "started_unix": 1789622543,
+  "deadline_unix": 1789647743,
+  "hosts": [
+    "d-20260907060201-gt68m",
+    "d-20260913095246-v85qm"
+  ],
+  "previous_authorization_expired_beijing": "2026-09-17 09:43:16",
+  "note": "New allocation. Stop when necessary experiments complete or at deadline, whichever is earlier.",
+  "authorized_by": "User Yes to 4 H20 GPUs for 7 hours",
+  "start_beijing": "2026-09-17 13:22:23",
+  "deadline_beijing": "2026-09-17 20:22:23"
+}

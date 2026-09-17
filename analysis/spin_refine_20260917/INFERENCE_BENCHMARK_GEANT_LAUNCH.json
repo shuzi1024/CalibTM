@@ -1,0 +1,28 @@
+{
+  "hostname": "d-20260907060201-gt68m",
+  "gpu": 0,
+  "timeout_pid": 1993219,
+  "started_unix": 1789635013.788922,
+  "deadline_unix": 1789647743,
+  "command": [
+    "timeout",
+    "--signal=TERM",
+    "--kill-after=10s",
+    "12719s",
+    "/mnt/suzikun/CalibTM/.venv/bin/python",
+    "-u",
+    "/mnt/suzikun/CalibTM/analysis/spin_refine_20260917/benchmark_inference.py",
+    "--repo-root",
+    "/mnt/suzikun/CalibTM",
+    "--run-root",
+    "outputs/spin-refine-20260917-v1",
+    "--dataset",
+    "geant",
+    "--deadline-unix",
+    "1789647743",
+    "--output",
+    "/mnt/suzikun/CalibTM/analysis/spin_refine_20260917/INFERENCE_BENCHMARK_GEANT.json"
+  ],
+  "output": "/mnt/suzikun/CalibTM/analysis/spin_refine_20260917/INFERENCE_BENCHMARK_GEANT.json",
+  "log": "/mnt/suzikun/CalibTM/analysis/spin_refine_20260917/INFERENCE_BENCHMARK_GEANT.log"
+}

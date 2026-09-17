@@ -1,0 +1,106 @@
+{
+  "created_utc": "2026-09-17T08:59:05.474151+00:00",
+  "state": "complete",
+  "decision": "stop_fixed_two_step_refinement",
+  "dataset": "geant",
+  "role": "development_screen",
+  "independent_test": false,
+  "matched_compute": false,
+  "matched_data_and_optimizer_updates": true,
+  "training_trajectories_completed": 4,
+  "epochs_per_trajectory": 160,
+  "component_screen_passed": false,
+  "eligible_to_consider_further_validation": false,
+  "expand_to_abilene": false,
+  "replace_current_main_candidate": false,
+  "current_main_candidate": "original_SPIN_plus_Direct",
+  "scope_of_negative_result": "This fixed shared-weight, two-pass, final-loss-only refinement under the recorded protocol; not a general rejection of ARI-LLM or iterative refinement.",
+  "aggregates_160": {
+    "spin_direct": {
+      "nmae": 0.16481004290104592,
+      "nrmse": 0.22973366847763582,
+      "last20_median_nmae": 0.1655387795124606,
+      "training_seconds": 5800.747982554138,
+      "seeds": [
+        41001,
+        41002
+      ],
+      "parameters": 83909
+    },
+    "one_step": {
+      "nmae": 0.16497120560971415,
+      "nrmse": 0.22775665689830546,
+      "last20_median_nmae": 0.16546674245678183,
+      "training_seconds": 5827.894286793657,
+      "seeds": [
+        41001,
+        41002
+      ],
+      "parameters": 83941
+    },
+    "two_step": {
+      "nmae": 0.17052732626791917,
+      "nrmse": 0.22973867476765408,
+      "last20_median_nmae": 0.17135717622130842,
+      "training_seconds": 11523.180953933392,
+      "seeds": [
+        41001,
+        41002
+      ],
+      "parameters": 83941
+    }
+  },
+  "per_seed_comparisons": [
+    {
+      "per_condition_better_nmae": {
+        "unequal": false,
+        "unequal_gap": false,
+        "uniform": false
+      },
+      "relative_best_nmae_gain": -0.02656141162780385,
+      "seed": 41001,
+      "two_step_better_best_nmae": false,
+      "two_step_better_last20_median": false
+    },
+    {
+      "per_condition_better_nmae": {
+        "unequal": false,
+        "unequal_gap": false,
+        "uniform": false
+      },
+      "relative_best_nmae_gain": -0.04084435550181515,
+      "seed": 41002,
+      "two_step_better_best_nmae": false,
+      "two_step_better_last20_median": false
+    }
+  ],
+  "historical_comparisons": [
+    {
+      "relative_best_nmae_gain": -0.028471893580185394,
+      "seed": 41001,
+      "two_step_better_best_nmae": false,
+      "two_step_better_last20_median": false
+    },
+    {
+      "relative_best_nmae_gain": -0.04093846532453291,
+      "seed": 41002,
+      "two_step_better_best_nmae": false,
+      "two_step_better_last20_median": false
+    }
+  ],
+  "mean_nmae_relative_increase_two_vs_one": 0.033679335964541535,
+  "mean_nmae_relative_increase_two_vs_original": 0.03469013942497412,
+  "mean_nrmse_relative_increase_two_vs_one": 0.008702348797794413,
+  "same_gpu_latency_ratio_two_vs_one": {
+    "1": 1.853469295168502,
+    "8": 1.9460213113834306
+  },
+  "training_seconds_ratio_two_vs_one": 1.9772460492369572,
+  "sources": {
+    "PLAN_CN.md": "376dd7fe7664781e365564b81084529f7cf4fd06b5453d310edd9929d74613b7",
+    "SOURCE_FREEZE.json": "2252380643c98fb074f711d635852f6df97da30dbe2bb7a404624ef48de13ecf",
+    "report_geant/SUMMARY.json": "2f2353be2bbb316ccc30a292d14f3ec07c3695e01ee24af8bb54ea6de55c3170",
+    "INFERENCE_BENCHMARK_GEANT.json": "cde453f7ece3067ec826e8000352c2ade70e5cb8313b6ad21ca3c5010310984a",
+    "ARCHIVE_CHECK.json": "05793e6dc1b9dda49e406231b1a9e7ea5fef696205e8a236c0057af1aeb9f34e"
+  }
+}

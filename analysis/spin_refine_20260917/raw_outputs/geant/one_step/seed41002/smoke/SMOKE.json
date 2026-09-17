@@ -1,0 +1,55 @@
+{
+  "batch": 8,
+  "config_sha256": "ba4d7f27cbc0708b6176c30c0de00db900d38a2bc5e70cdd07d6358dee029cf5",
+  "context_passes_per_prediction": 1,
+  "dataset": "geant",
+  "development_scores_computed": false,
+  "exact_checkpoint_continuation": true,
+  "finished": "2026-09-17T05:28:40.086184+00:00",
+  "first_step": {
+    "gradient_norm": 5.858396530151367,
+    "loss": 1.459338903427124,
+    "missing_targets": 147840
+  },
+  "fit_evaluation_output_sha256": "ac7897d7e09a83005c2d5bd6a43993322f8438908f14036722c3e053cb38604d",
+  "fit_evaluation_path_checked": true,
+  "fit_only_metrics_not_development": {
+    "abs_error": 20003.345537966816,
+    "abs_truth": 14614.590970226795,
+    "count": 147840,
+    "nmae": 1.368724282377668,
+    "nrmse": 0.9636089221838691,
+    "sq_error": 21157.22734454448,
+    "sq_truth": 22785.42469247553
+  },
+  "fit_scoring_checked": true,
+  "matched_compute": false,
+  "node_chunk": 32,
+  "parameter_count": 83941,
+  "passed": true,
+  "peak_evaluation_allocated_bytes_including_training_state": 3349143552,
+  "peak_training_allocated_bytes": 6325583872,
+  "protocol": "spin-refine-development-20260917-v1",
+  "replayed_updates": 1,
+  "role": "fit_runner_smoke_not_formal_result",
+  "rough_epoch_seconds_from_smoke": 46.63683390493194,
+  "schedule": {
+    "epoch_zero_based": 0,
+    "mask_sha256": "8cd018c03ecb841bde4337aaa2488c54b0bae87ae3fc4bafd5f68a536faef679",
+    "order_sha256": "1a6f4e7a257f3e683c1e1cb61fc7cf892fc98d829ceaac6d14dd7f2199f2c166",
+    "path": "/mnt/suzikun/CalibTM/outputs/sync-delta-pilot-20260913-v11/geant/shared/masks/masks_train_seed61001_epoch000.npz",
+    "sha256": "61e9b4c26d904cf346f26808e9facc7a5d480d405154c7a658e55a82b14a414e"
+  },
+  "second_step": {
+    "gradient_norm": 5.784229278564453,
+    "loss": 1.4260520935058594,
+    "missing_targets": 147840
+  },
+  "seconds_per_evaluation_batch": 0.1527388608083129,
+  "seconds_per_update_including_resume_io": 0.7000619933630029,
+  "seed": 41002,
+  "target_block": 462,
+  "training_epoch_zero_based": 0,
+  "unique_updates": 2,
+  "variant": "one_step"
+}

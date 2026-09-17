@@ -1,0 +1,55 @@
+{
+  "batch": 8,
+  "config_sha256": "a8863e1199ccb6ca2a23a6f94a491e8344b0d82d6689d42351d655ac8ee9cfb0",
+  "context_passes_per_prediction": 2,
+  "dataset": "geant",
+  "development_scores_computed": false,
+  "exact_checkpoint_continuation": true,
+  "finished": "2026-09-17T05:28:41.942379+00:00",
+  "first_step": {
+    "gradient_norm": 5.861724853515625,
+    "loss": 1.459338903427124,
+    "missing_targets": 147840
+  },
+  "fit_evaluation_output_sha256": "18f6a9483aba1edfe345bb6e0be2632c779527cd46937b7eee3bc061925dad39",
+  "fit_evaluation_path_checked": true,
+  "fit_only_metrics_not_development": {
+    "abs_error": 19997.270850649802,
+    "abs_truth": 14614.590970226795,
+    "count": 147840,
+    "nmae": 1.3683086233058959,
+    "nrmse": 0.9641374294620538,
+    "sq_error": 21180.441772696726,
+    "sq_truth": 22785.42469247553
+  },
+  "fit_scoring_checked": true,
+  "matched_compute": false,
+  "node_chunk": 32,
+  "parameter_count": 83941,
+  "passed": true,
+  "peak_evaluation_allocated_bytes_including_training_state": 3469072896,
+  "peak_training_allocated_bytes": 7285593088,
+  "protocol": "spin-refine-development-20260917-v1",
+  "replayed_updates": 1,
+  "role": "fit_runner_smoke_not_formal_result",
+  "rough_epoch_seconds_from_smoke": 84.97493991876642,
+  "schedule": {
+    "epoch_zero_based": 0,
+    "mask_sha256": "8cd018c03ecb841bde4337aaa2488c54b0bae87ae3fc4bafd5f68a536faef679",
+    "order_sha256": "1a6f4e7a257f3e683c1e1cb61fc7cf892fc98d829ceaac6d14dd7f2199f2c166",
+    "path": "/mnt/suzikun/CalibTM/outputs/sync-delta-pilot-20260913-v11/geant/shared/masks/masks_train_seed61001_epoch000.npz",
+    "sha256": "61e9b4c26d904cf346f26808e9facc7a5d480d405154c7a658e55a82b14a414e"
+  },
+  "second_step": {
+    "gradient_norm": 5.788983345031738,
+    "loss": 1.4259949922561646,
+    "missing_targets": 147840
+  },
+  "seconds_per_evaluation_batch": 0.29713707137852907,
+  "seconds_per_update_including_resume_io": 1.2720202353472512,
+  "seed": 41002,
+  "target_block": 462,
+  "training_epoch_zero_based": 0,
+  "unique_updates": 2,
+  "variant": "two_step"
+}

@@ -1,0 +1,109 @@
+{
+  "formal_jobs_started": false,
+  "generated_utc": "2026-09-17T05:08:56.906165+00:00",
+  "gpu_used": false,
+  "local_tests": [
+    {
+      "name": "runner_and_summarizer_AST_and_CLI_help",
+      "passed": true
+    },
+    {
+      "name": "expired_deadline_rejected_before_torch_import",
+      "passed": true
+    },
+    {
+      "name": "valid_committed_progress_accepted",
+      "passed": true
+    },
+    {
+      "name": "invalid_updates_rejected",
+      "passed": true
+    },
+    {
+      "name": "invalid_best_epoch_rejected",
+      "passed": true
+    },
+    {
+      "name": "invalid_rng_rejected",
+      "passed": true
+    },
+    {
+      "name": "invalid_lr_rejected",
+      "passed": true
+    },
+    {
+      "name": "strict_best_retains_earliest_tie",
+      "passed": true
+    },
+    {
+      "name": "incomplete_grid_cannot_make_decision",
+      "passed": true
+    },
+    {
+      "name": "both_seed_best_and_tail_gains_pass_gate",
+      "passed": true
+    },
+    {
+      "name": "one_losing_seed_blocks_component_gate",
+      "passed": true
+    },
+    {
+      "name": "losing_original_reference_blocks_replacement_candidate",
+      "passed": true
+    },
+    {
+      "name": "unpaired_initialization_rejected",
+      "passed": true
+    }
+  ],
+  "not_yet_checked": [
+    "CUDA fit-only train/replay smoke",
+    "formal one_step/two_step paired learning curves"
+  ],
+  "remote_cpu_runtime_probes": {
+    "ksc-h20-extra": {
+      "cuda_hidden": true,
+      "rng_preserved_by_seeded_original_builder": true,
+      "runtime": {
+        "cuda": "12.1",
+        "numpy": "1.22.4",
+        "python": "3.10.18",
+        "torch": "2.2.2+cu121"
+      },
+      "same_seed_original_state_exact": true
+    },
+    "ksc-h200": {
+      "cuda_hidden": true,
+      "rng_preserved_by_seeded_original_builder": true,
+      "runtime": {
+        "cuda": "12.1",
+        "numpy": "1.22.4",
+        "python": "3.10.18",
+        "torch": "2.2.2+cu121"
+      },
+      "same_seed_original_state_exact": true
+    }
+  },
+  "remote_files_written": false,
+  "remote_new_model_cpu_probe": {
+    "cuda_hidden": true,
+    "flows": 462,
+    "global_torch_rng_preserved_after_both_builders": true,
+    "host": "ksc-h200",
+    "initial_state_sha256": "76f79ffc7e594d7cd02126638f82cd4496f63163dc97fb36aa1b7bc867b613f9",
+    "model_source_sha256": "073a901b13a815a87d52b7a225025a073b124732d748dd0494f271964b8f41a8",
+    "paired_full_state_exact": true,
+    "paired_parameter_names_and_shapes_exact": true,
+    "parameter_count": 83941,
+    "seed": 41001
+  },
+  "runtime_note": "base.runtime() exposes only python, torch, numpy, cuda; both hosts agree exactly. GPU identity belongs in invocation/cost records.",
+  "scope": "runner protocol validation and CPU initialization probes; not a CUDA training/replay certification",
+  "source_sha256": {
+    "experiments/spin_refine_v1/models.py": "073a901b13a815a87d52b7a225025a073b124732d748dd0494f271964b8f41a8",
+    "experiments/spin_refine_v1/runner.py": "2155e9f86099bc8533efc481e4e85f412159ea54c65d4fc6ee70e3075e8b5f75",
+    "experiments/spin_refine_v1/summarize.py": "c82efa8fdc5a4e194a88889f5263aa275312a61b7224d1182661193ad3de0fee"
+  },
+  "status": "passed",
+  "tests_use_synthetic_metrics_not_research_results": true
+}

@@ -1,0 +1,55 @@
+{
+  "batch": 8,
+  "config_sha256": "8993948c03f1d931d2196a3b98ed148a22983d6206b865c393d7405736b0f15f",
+  "context_passes_per_prediction": 2,
+  "dataset": "geant",
+  "development_scores_computed": false,
+  "exact_checkpoint_continuation": true,
+  "finished": "2026-09-17T05:28:41.942520+00:00",
+  "first_step": {
+    "gradient_norm": 5.31668758392334,
+    "loss": 1.459338903427124,
+    "missing_targets": 147840
+  },
+  "fit_evaluation_output_sha256": "43c289b5d9b4218b3b631f6ec7c19582e8a20b46bdeef5069a7ad8de98ff3f27",
+  "fit_evaluation_path_checked": true,
+  "fit_only_metrics_not_development": {
+    "abs_error": 20256.494632637827,
+    "abs_truth": 14614.590970226795,
+    "count": 147840,
+    "nmae": 1.3860459505096556,
+    "nrmse": 0.959018575293302,
+    "sq_error": 20956.13396018823,
+    "sq_truth": 22785.42469247553
+  },
+  "fit_scoring_checked": true,
+  "matched_compute": false,
+  "node_chunk": 32,
+  "parameter_count": 83941,
+  "passed": true,
+  "peak_evaluation_allocated_bytes_including_training_state": 3469072896,
+  "peak_training_allocated_bytes": 7285593088,
+  "protocol": "spin-refine-development-20260917-v1",
+  "replayed_updates": 1,
+  "role": "fit_runner_smoke_not_formal_result",
+  "rough_epoch_seconds_from_smoke": 84.86547898501158,
+  "schedule": {
+    "epoch_zero_based": 0,
+    "mask_sha256": "8cd018c03ecb841bde4337aaa2488c54b0bae87ae3fc4bafd5f68a536faef679",
+    "order_sha256": "1a6f4e7a257f3e683c1e1cb61fc7cf892fc98d829ceaac6d14dd7f2199f2c166",
+    "path": "/mnt/suzikun/CalibTM/outputs/sync-delta-pilot-20260913-v11/geant/shared/masks/masks_train_seed61001_epoch000.npz",
+    "sha256": "61e9b4c26d904cf346f26808e9facc7a5d480d405154c7a658e55a82b14a414e"
+  },
+  "second_step": {
+    "gradient_norm": 5.268222808837891,
+    "loss": 1.432509183883667,
+    "missing_targets": 147840
+  },
+  "seconds_per_evaluation_batch": 0.2969104442745447,
+  "seconds_per_update_including_resume_io": 1.2703524008393288,
+  "seed": 41001,
+  "target_block": 462,
+  "training_epoch_zero_based": 0,
+  "unique_updates": 2,
+  "variant": "two_step"
+}

@@ -1,0 +1,231 @@
+{
+  "context_passes_per_prediction": 1,
+  "continuation_checkpoint_loaded": false,
+  "data": {
+    "data_sha256": "61c28fdc9728d6adc040e5571fd77a76385a22c69a325edf3062ab1386d9bb20",
+    "dev_starts_sha256": "41dbfe265ba4d6010dff0905d98cf2a1e76ada3accd24fba8778d7706d3ff3ff",
+    "dev_window_count": 25,
+    "fit_C": 0.1007946311172677,
+    "flows": 462,
+    "mask_array_sha256": {
+      "unequal": "3f19c7bf5686e9b7bf75cc8f6932ac9698bd5518f5490c0eda0bdf8c9eb0c53f",
+      "unequal_gap": "f3cc2b19c16034fa59854eebaeb8f88ebf0b196cb80ec61574f05a9af4d239b7",
+      "uniform": "2ff9c30a3971d42042b8d5812f56aea456722d76e42d1cacd726550eeb15afd5"
+    },
+    "neighbors_sha256": "58ca75925aba9631a3a102a7c6239aaa14c7090dd0be4e3b8fe57ac15052dfe9",
+    "stats_sha256": "48b79b3c69e2cebb12a2a9bf4fc47481a2c5477ba010fc763bde6e29e0d71305",
+    "train_starts_sha256": "222bc90db141ff31ac8563a500c90fb4e373e6d18516b6341331eb58b4f27ecd",
+    "train_window_count": 512
+  },
+  "data_metadata": {
+    "cohort_sources": [
+      {
+        "array_sha256": "d90dd56c54a48ce4ee132f284e5dab404f57616076ca22b66e685c042fcd69f4",
+        "bounds": [
+          0,
+          7023
+        ],
+        "cohort": "fit",
+        "dtype": "<f4",
+        "hash_scope": "cohort_rows_only",
+        "parent_header_shape": [
+          7572,
+          462
+        ],
+        "shape": [
+          7023,
+          462
+        ],
+        "source": "/mnt/suzikun/CalibTM/experiments/acil_innovation_v1/canonical/geant_train.npy"
+      },
+      {
+        "array_sha256": "9151f38708f49f961366ab7cc8865c741201166bb3c3f56bc0d4124ab17fd107",
+        "bounds": [
+          7072,
+          7572
+        ],
+        "cohort": "source_dev",
+        "dtype": "<f4",
+        "hash_scope": "cohort_rows_only",
+        "parent_header_shape": [
+          7572,
+          462
+        ],
+        "shape": [
+          500,
+          462
+        ],
+        "source": "/mnt/suzikun/CalibTM/experiments/acil_innovation_v1/canonical/geant_train.npy"
+      },
+      {
+        "array_sha256": "a9b966d8278539dd8f325a61de15e8aef67303f289b0ea79464afa468cf00a81",
+        "bounds": [
+          7572,
+          8322
+        ],
+        "cohort": "tune",
+        "dtype": "<f4",
+        "hash_scope": "cohort_rows_only",
+        "parent_header_shape": [
+          1600,
+          462
+        ],
+        "shape": [
+          750,
+          462
+        ],
+        "source": "/mnt/suzikun/CalibTM/experiments/acil_innovation_v1/canonical/geant_val.npy"
+      }
+    ],
+    "data_sha256": "61c28fdc9728d6adc040e5571fd77a76385a22c69a325edf3062ab1386d9bb20",
+    "dataset": "geant",
+    "ddof": 0,
+    "dev_is_selection_not_test": true,
+    "dev_starts_sha256": "41dbfe265ba4d6010dff0905d98cf2a1e76ada3accd24fba8778d7706d3ff3ff",
+    "fit_full_truth_for_offline_statistics_and_supervision": true,
+    "global_scale": 0.5137473021095954,
+    "neighbors_sha256": "58ca75925aba9631a3a102a7c6239aaa14c7090dd0be4e3b8fe57ac15052dfe9",
+    "online_window_observation_fraction": 0.2,
+    "pearson_sha256": "e239f366e32b393f8a61af6797b901d203e924a8d9b882aaacfc42580cb7cb49",
+    "protocol": "sync-delta-v1.1",
+    "stats_sha256": "48b79b3c69e2cebb12a2a9bf4fc47481a2c5477ba010fc763bde6e29e0d71305",
+    "train_starts_sha256": "222bc90db141ff31ac8563a500c90fb4e373e6d18516b6341331eb58b4f27ecd",
+    "window_length": 50
+  },
+  "dataset": "geant",
+  "fixed_optimization_diagnostic": true,
+  "imported_epoch_count": 0,
+  "independent_test": false,
+  "independent_training_repeat": true,
+  "initial_file_sha256": "97222bbc4d498fafddd8bf1aaaa553dbaec17e7f18a90e0f0f5697882254c682",
+  "initial_state_sha256": "3370c495548ecc3f43714a1e5cbf6e685a41a7d66bfb53ab0644eba3706b37f3",
+  "input_registries": {
+    "/mnt/suzikun/CalibTM/outputs/llm-candidates-20260914-v1/registry.json": "ca2096f69fc57abc218e29d51f5d5defe80ed989f83b51d049947379ecaee194",
+    "/mnt/suzikun/CalibTM/outputs/sync-delta-pilot-20260913-v11/registry.json": "f7dae0dfac2a776e75d62e57dade164d60b4fca49d329827018740dc071d3949"
+  },
+  "matched_compute": false,
+  "model_config": {
+    "backbone": "one SPIN context block plus bidirectional real-observation Direct",
+    "between_passes": "clamp estimates at zero, restore exact original observations; no detach",
+    "context_inputs": [
+      "fit-standardized available value",
+      "original observation flag"
+    ],
+    "direct_sources": "original observed positions and original values in both passes",
+    "loss": "final-pass missing-entry raw loss only; supplied by runner",
+    "new_parameters": "32 zero-initialized observation-flag input weights",
+    "pass1_context_sources": "original observed positions only",
+    "pass2_context_sources": "all positions: original observations or pass1 estimates",
+    "shared_parameters": "all parameters shared between passes",
+    "task": "offline full-window imputation; no cross-window state",
+    "variants": {
+      "one_step": 1,
+      "two_step": 2
+    }
+  },
+  "parameter_count": 83941,
+  "parent": "/mnt/suzikun/CalibTM/outputs/sync-delta-pilot-20260913-v11",
+  "parent_registry_sha256": "f7dae0dfac2a776e75d62e57dade164d60b4fca49d329827018740dc071d3949",
+  "protocol": "spin-refine-development-20260917-v1",
+  "reference_checkpoint_weights_loaded": false,
+  "references": {
+    "linear": {
+      "path": "/mnt/suzikun/CalibTM/outputs/sync-delta-pilot-20260913-v11/geant/linear_seed71001.json",
+      "selection_score": 0.1677390447843818,
+      "sha256": "42bd069bd4a21af08881e048eaf5ef8263b1b5553416bb152c8d7def69519bab"
+    }
+  },
+  "role": "development_only",
+  "runtime": {
+    "cuda": "12.1",
+    "numpy": "1.22.4",
+    "python": "3.10.18",
+    "torch": "2.2.2+cu121"
+  },
+  "seed": 41001,
+  "shared_named_parameters_exact": true,
+  "source_files": {
+    "experiments/direct_only_runtime_v1/run.py": "d1658c803a83fa9b6fa84dfda6b0dff1b0f54a4db9a4ec908556b79aebce0986",
+    "experiments/direct_only_v1/__init__.py": "66b8d5acc6132b77c604e3f7c53815b565919cc369c73c228b3e2d3961061a16",
+    "experiments/direct_only_v1/checks.py": "60706e6143c81b32d5c873f155dcf59b4b707c372145092811dfd75888a855cc",
+    "experiments/direct_only_v1/models.py": "0f79921c5fa26f0f346fe83a49a48f8b6f9d4974a0ee61d130aa1ecfa80c12f4",
+    "experiments/llm_candidates_runtime_v1/__init__.py": "89d2a2575e755f55838b15669da7bf492489368947de9eadd2a3daac18fa04ed",
+    "experiments/llm_candidates_runtime_v1/checks_watch.py": "7bf7b0d4f802abfe09457c8f629f10c2c58ad725512f100667054ed23d0804ee",
+    "experiments/llm_candidates_runtime_v1/report.py": "867bd2c7c1c79aced6ba48093de365c7f0acd50e6df639abc4c7ab2a29f8f326",
+    "experiments/llm_candidates_runtime_v1/run.py": "7542723aff324b2336ca4ddf566f37c8060233b9a4b94f48c61941c8c5886044",
+    "experiments/llm_candidates_runtime_v1/watch.py": "f54ae462e637a58910c6ccec7a007747a5bd27860edbd8953339792534c33460",
+    "experiments/llm_candidates_v1/__init__.py": "bf76aecc8eb36412e5c8e907c81fbd941133bae163e4c4d529c45b46d53da76b",
+    "experiments/llm_candidates_v1/checks_direct.py": "a7b415bb0ccc7168e3bae6a25ffc6811fd0ee2271ca75b2baf34777212eb41cc",
+    "experiments/llm_candidates_v1/checks_feature.py": "35a296376186c260d04d88dca0e54a9e2272c8ccbeba46cb5aaf89284a9bfb81",
+    "experiments/llm_candidates_v1/checks_routing.py": "3e28b63c05473f17ca7c62564d9ff7b96ce79e23313ceb84dc1a2e39df24a7ea",
+    "experiments/llm_candidates_v1/direct.py": "c89dfc0e0718c95fb8beb81095ce7027c75fec91728c39fdfbea739b6bea4211",
+    "experiments/llm_candidates_v1/feature.py": "de639c29c22f9ee11a89f9f196616d712cd32d798c8c6a6a51e55f73150f7473",
+    "experiments/llm_candidates_v1/models.py": "23c2a6f72ec53efc8cd6f6124bb53bb567d79af61a27b9db8a9edb8093744a87",
+    "experiments/llm_candidates_v1/routing.py": "165398b10695903d4822ec2fd7d892a1d7a4aa0e2c84a4400aa2a701ef8794f9",
+    "experiments/spin_comparison_v1/__init__.py": "777ea49fd0cac75281034cab784b867dd057a1dffa7d1b13482cb426f4a0ac84",
+    "experiments/spin_comparison_v1/attention.py": "756c757fbfb29baecf43c4f8dc6db7b21e2c24a67d4d10c82ee0abc1256e3fe5",
+    "experiments/spin_comparison_v1/checks.py": "fb734f2083ff68add353a5eb329ac36010fa40a6a87e9228a55383c804d2f92b",
+    "experiments/spin_comparison_v1/models.py": "001e1cb8a48f988ecee0324dfcf39c33f7a78ebde7ecc84b669d459f4b60899b",
+    "experiments/spin_comparison_v1/positional.py": "c52d03228ad2998677c93894f835e77f266f2d382606d9de3f3e76195037d79f",
+    "experiments/spin_comparison_v1/primitives.py": "6b5d8d6b0ac53b986456dea47fb5ff8df0b53dd47786a28a15febf5d2c344ccb",
+    "experiments/spin_comparison_v1/scheduler.py": "34861fcfe255772c4ea076cd43aca9386355bc08b4def18ad5d1cdff42462a02",
+    "experiments/spin_comparison_v1/source_model.py": "54dd71a4b4afd6fdba49b64dae9f9b776dd0f992a193d53ec68cb6a592f919d6",
+    "experiments/spin_refine_v1/__init__.py": "44f250214da48d5a1f33c82c2ff82c1f01e746e5f03a2b031b489e96d2e8f62f",
+    "experiments/spin_refine_v1/models.py": "073a901b13a815a87d52b7a225025a073b124732d748dd0494f271964b8f41a8",
+    "experiments/spin_refine_v1/runner.py": "2155e9f86099bc8533efc481e4e85f412159ea54c65d4fc6ee70e3075e8b5f75",
+    "experiments/spin_sync_fixed120_v1/__init__.py": "b7bc34372886644bb04e2eb436fed53ecbc8a0c07db085c80e419a63c786b169",
+    "experiments/spin_sync_fixed120_v1/runner.py": "bde70881be8ea1ef026768dc8f04d6d29c6af729abf85f72d51b3529efbbc07f",
+    "experiments/spin_sync_unified_v1/__init__.py": "f8c7813af9c3fb10e16f0e71a915713c19029d23469b5b6b971bfdb7ce1036ca",
+    "experiments/spin_sync_unified_v1/models.py": "a9a27086cfec26999cc5749acbab79264504103617c457d61db1a39566b90fcb",
+    "experiments/spin_sync_unified_v1/runner.py": "48487269adfa6110b849e86299106182249b17a72fd5e62fd8e0c89b68ae6621",
+    "experiments/sync_delta_v1/__init__.py": "b279bd94d33e99de7ef2fbed187e80ecac073e2d315122538b1dd8ecd5063dcd",
+    "experiments/sync_delta_v1/data.py": "ae70e0131ef0017e3df76208bc8d123776955f68d6f8fa7e9de31f7985d263a0",
+    "experiments/sync_delta_v1/engine.py": "8651504ec08225f09edd52d59a482f8fec5f861486c2a72efbfa0bd6bbd17726",
+    "experiments/sync_delta_v1/models.py": "575329e6f4bf7b5e5eb01ec153bf69bef6a577b41890147aa457d6eeb6aa0508",
+    "experiments/sync_delta_v1/preflight.py": "23ac3632c8d0356449f8c039db02db0c581e77c493bc5a970223ed39b66af1ae",
+    "experiments/sync_delta_v1/run.py": "990d28868d7ba0e4e1c7d7678bb12986625a02aa84b3f57690aae2d8fc368ab4",
+    "experiments/sync_delta_v1/summarize.py": "5d5910c6bfdab319001fdc2e42dc14a133407749dc38fc85b5e3b6204d308c87"
+  },
+  "source_freeze_verified_at_every_epoch_commit": true,
+  "training": {
+    "batch": 8,
+    "betas": [
+      0.9,
+      0.999
+    ],
+    "comparison_budget": "matched data and optimizer updates; NOT matched context-forward compute",
+    "data_order_seed": 51001,
+    "early_stopping": false,
+    "evaluation_batch": 8,
+    "first_stage_supervision": false,
+    "gradient_checkpointing": true,
+    "gradient_clip": 1.0,
+    "gradient_through_first_estimate": true,
+    "initialization": "both arms fresh; identical parameter names, shapes and initial values per seed",
+    "loss": "unclamped raw missing absolute sum / (fit C * batch missing count)",
+    "lr": 0.001,
+    "lr_schedule": [
+      {
+        "first_epoch": 1,
+        "last_epoch": 120,
+        "lr": 0.001
+      },
+      {
+        "first_epoch": 121,
+        "last_epoch": 160,
+        "lr": 0.0001
+      }
+    ],
+    "max_epochs": 160,
+    "node_chunk": 32,
+    "optimizer": "AdamW",
+    "precision": "FP32; TF32 disabled",
+    "scheduler": "one_predeclared_drop_at_epoch_121",
+    "selection": "equal mean of three condition global missing-only NMAE; strict improvement over epochs 1..cap",
+    "selection_mask_seed": 71001,
+    "stop_rule": "fixed_160_epochs_or_authorization_deadline",
+    "training_mask_seed": 61001,
+    "weight_decay": 0.0001
+  },
+  "variant": "one_step"
+}

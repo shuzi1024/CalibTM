@@ -1,0 +1,31 @@
+{
+  "hostname": "d-20260907060201-gt68m",
+  "gpu": 1,
+  "seed": 41002,
+  "dataset": "geant",
+  "variants": [
+    "context_only"
+  ],
+  "timeout_pid": 1981813,
+  "command": [
+    "timeout",
+    "--signal=TERM",
+    "--kill-after=10s",
+    "24657s",
+    "/mnt/suzikun/CalibTM/.venv/bin/python",
+    "-u",
+    "/mnt/suzikun/CalibTM/analysis/spin_path_controls_20260917/launch_queue.py",
+    "--worker",
+    "--gpu",
+    "1",
+    "--dataset",
+    "geant",
+    "--seed",
+    "41002",
+    "--variants",
+    "context_only"
+  ],
+  "log": "/mnt/suzikun/CalibTM/outputs/spin-path-controls-20260917-v1/logs/geant-d-20260907060201-gt68m-gpu1-1789584728181401007.queue.log",
+  "started_unix": 1789584728.1843576,
+  "deadline_unix": 1789609396
+}

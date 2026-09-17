@@ -1,0 +1,40 @@
+{
+  "verified": true,
+  "role": "completed_one_step_archive_only_not_four_arm_decision",
+  "verified_utc": "2026-09-17T07:14:20.089935+00:00",
+  "verifier_sha256": "8dab25b67bd14e5cd9169e0e13b1120d0dc10f9240b03bcabaa1c4214ac60647",
+  "records": [
+    {
+      "seed": 41001,
+      "cap": 120,
+      "best_epoch": 118,
+      "nmae": 0.16786317504616907,
+      "nrmse": 0.22909257536189423,
+      "last20_median_nmae": 0.1712484545771752
+    },
+    {
+      "seed": 41001,
+      "cap": 160,
+      "best_epoch": 137,
+      "nmae": 0.16551516574002176,
+      "nrmse": 0.22821767807267676,
+      "last20_median_nmae": 0.1662710554928471
+    },
+    {
+      "seed": 41002,
+      "cap": 120,
+      "best_epoch": 118,
+      "nmae": 0.1658507158741749,
+      "nrmse": 0.22905407570796804,
+      "last20_median_nmae": 0.17059871111281594
+    },
+    {
+      "seed": 41002,
+      "cap": 160,
+      "best_epoch": 153,
+      "nmae": 0.16442724547940654,
+      "nrmse": 0.22729563572393416,
+      "last20_median_nmae": 0.16466242942071654
+    }
+  ]
+}

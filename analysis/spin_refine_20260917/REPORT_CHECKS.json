@@ -1,0 +1,50 @@
+{
+  "GPU_used": false,
+  "checks": [
+    {
+      "name": "AST_and_CLI_help",
+      "passed": true
+    },
+    {
+      "name": "geant_complete_grid_dataset_identity_tailmean_and_markdown",
+      "passed": true
+    },
+    {
+      "name": "GEANT_decision_exactly_matches_frozen_original_summarizer",
+      "passed": true
+    },
+    {
+      "name": "geant_CLI_JSON_Markdown_and_30_condition_rows",
+      "passed": true
+    },
+    {
+      "name": "abilene_complete_grid_dataset_identity_tailmean_and_markdown",
+      "passed": true
+    },
+    {
+      "name": "abilene_CLI_JSON_Markdown_and_30_condition_rows",
+      "passed": true
+    },
+    {
+      "name": "cost_condition_mean_and_peak_aggregation",
+      "passed": true
+    },
+    {
+      "name": "cost_wrong_dataset_rejected",
+      "passed": true
+    },
+    {
+      "name": "duplicate_cost_condition_rejected",
+      "passed": true
+    }
+  ],
+  "frozen_runner_and_summarizer_unchanged": {
+    "runner.py": "2155e9f86099bc8533efc481e4e85f412159ea54c65d4fc6ee70e3075e8b5f75",
+    "summarize.py": "c82efa8fdc5a4e194a88889f5263aa275312a61b7224d1182661193ad3de0fee"
+  },
+  "generated_utc": "2026-09-17T05:26:48.823434+00:00",
+  "optional_matplotlib_execution_checked": false,
+  "report_generator_sha256": "8dab25b67bd14e5cd9169e0e13b1120d0dc10f9240b03bcabaa1c4214ac60647",
+  "status": "passed",
+  "synthetic_metrics_only": true
+}

@@ -1,0 +1,14 @@
+{
+  "dataset": "geant",
+  "state": "complete",
+  "started_unix": 1789623445.2987413,
+  "updated_unix": 1789635066.1970499,
+  "deadline_unix": 1789647743,
+  "complete": 4,
+  "total": 4,
+  "summary": "/mnt/suzikun/CalibTM/analysis/spin_refine_20260917/report_geant/SUMMARY.json",
+  "summary_sha256": "2f2353be2bbb316ccc30a292d14f3ec07c3695e01ee24af8bb54ea6de55c3170",
+  "component_screen_passed": false,
+  "eligible_to_consider_further_validation": false,
+  "automatic_training_expansion": false
+}

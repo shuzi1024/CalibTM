@@ -1,0 +1,26 @@
+{
+  "dataset": "geant",
+  "hostname": "d-20260907060201-gt68m",
+  "pid": 1991851,
+  "started_unix": 1789623445.2130544,
+  "deadline_unix": 1789647743,
+  "command": [
+    "timeout",
+    "--signal=TERM",
+    "--kill-after=10s",
+    "24287s",
+    "/mnt/suzikun/CalibTM/.venv/bin/python",
+    "-u",
+    "/mnt/suzikun/CalibTM/analysis/spin_refine_20260917/finish_phase.py",
+    "--dataset",
+    "geant",
+    "--worker"
+  ],
+  "log": "/mnt/suzikun/CalibTM/analysis/spin_refine_20260917/finish-geant.log",
+  "files_sha256": {
+    "finish_phase.py": "b8f2b70e49d9c32118ee4a9a8ef118668f48ea5b57add24b5833911f319ebb70",
+    "benchmark_job.py": "0527e5a0b2fed1da1550998b0df1c651ddb36b0d5236b52375ded03dabea9d18",
+    "benchmark_inference.py": "a77a4d629eaf62a7f298020512cdf7d6bd9e9def9eafc6af191b5e4ef140c23c",
+    "report_refinement.py": "8dab25b67bd14e5cd9169e0e13b1120d0dc10f9240b03bcabaa1c4214ac60647"
+  }
+}

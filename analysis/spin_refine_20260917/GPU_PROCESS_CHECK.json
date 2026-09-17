@@ -1,0 +1,25 @@
+{
+  "checked_utc": "2026-09-17T08:59:36.363Z",
+  "snapshots": [
+    {
+      "ssh_host": "ksc-h200",
+      "hostname": "d-20260907060201-gt68m",
+      "checked_unix": 1789635576.5778434,
+      "compute_query_returncode": 0,
+      "compute_processes": "",
+      "gpu_status": "0, NVIDIA H20, GPU-56631519-2edf-fcbc-2dfb-70092068087d, 0, 0\n1, NVIDIA H20, GPU-e6e08566-9a51-425a-81ac-d8af43d299b1, 0, 0",
+      "matching_processes": []
+    },
+    {
+      "ssh_host": "ksc-h20-extra",
+      "hostname": "d-20260913095246-v85qm",
+      "checked_unix": 1789635576.5822008,
+      "compute_query_returncode": 0,
+      "compute_processes": "",
+      "gpu_status": "0, NVIDIA H20, GPU-9c1717c1-947b-c87d-d38d-c0ee5fff848a, 0, 0\n1, NVIDIA H20, GPU-65617023-ac69-623e-5b32-3a6a29de36df, 0, 0",
+      "matching_processes": []
+    }
+  ],
+  "all_clear": true,
+  "action": "read_only_verification_no_processes_killed"
+}

@@ -1,0 +1,47 @@
+{
+  "device": "cpu",
+  "gpu_used": false,
+  "real_data_loaded": false,
+  "torch_version": "2.2.2+cu121",
+  "variants": [
+    "one_step",
+    "two_step"
+  ],
+  "matched_state_and_parameter_order_exact_both_seeds": true,
+  "original_parameters_preserved_with_32_zero_flag_weights": true,
+  "hidden_nan_infinity_truth_isolation": true,
+  "hidden_input_gradients_zero": true,
+  "forward_restores_exact_observations": true,
+  "context_calls_per_prediction": {
+    "one_step": 1,
+    "two_step": 2
+  },
+  "fixed_shared_unroll_and_source_masks_verified": true,
+  "direct_nearest_two_true_observations_preserved": true,
+  "first_pass_matches_one_step_exactly": true,
+  "second_pass_depends_on_predicted_values": true,
+  "estimated_values_cannot_change_direct_reads": true,
+  "final_objective_backpropagates_through_estimates": true,
+  "full_graph_target_chunk_output_gradient_invariance": true,
+  "batch_chunk_and_target_order_invariance": true,
+  "checkpointing_forward_and_gradient_equivalence": true,
+  "all_retained_information_paths_and_provenance_trainable": true,
+  "empty_observations_finite_with_zero_direct": true,
+  "exact_state_reload": true,
+  "inference_interventions_rejected": true,
+  "parameters_synthetic_F4": {
+    "one_step": 69285,
+    "two_step": 69285
+  },
+  "passed": true,
+  "execution_host": "ksc-h200",
+  "executed_utc": "2026-09-17T05:08:44.831Z",
+  "command": "CUDA_VISIBLE_DEVICES='' PYTHONDONTWRITEBYTECODE=1 PYTHONPATH=/tmp/calibtm-refine-20260917:/mnt/suzikun/CalibTM .venv/bin/python -m experiments.spin_refine_v1.checks",
+  "source_files": {
+    "experiments/spin_refine_v1/models.py": "073a901b13a815a87d52b7a225025a073b124732d748dd0494f271964b8f41a8",
+    "experiments/spin_refine_v1/checks.py": "6034e152d8d3ef619230ac0813815a9144edc3c98d17e9c373f4d35aa9875d08",
+    "experiments/spin_refine_v1/__init__.py": "44f250214da48d5a1f33c82c2ff82c1f01e746e5f03a2b031b489e96d2e8f62f",
+    "experiments/spin_sync_unified_v1/checks.py": "887aa80f4c9d46213c5ecc498265a344c480d30d371db65fbd8d3c3e43a60ade",
+    "experiments/spin_sync_unified_v1/models.py": "a9a27086cfec26999cc5749acbab79264504103617c457d61db1a39566b90fcb"
+  }
+}

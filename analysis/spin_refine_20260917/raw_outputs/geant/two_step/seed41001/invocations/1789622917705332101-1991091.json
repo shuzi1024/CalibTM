@@ -1,0 +1,15 @@
+{
+  "config_sha256": "8993948c03f1d931d2196a3b98ed148a22983d6206b865c393d7405736b0f15f",
+  "cuda_visible_devices": "1",
+  "dataset": "geant",
+  "deadline_unix": 1789647743.0,
+  "device": "cuda:0",
+  "hostname": "d-20260907060201-gt68m",
+  "pid": 1991091,
+  "protocol": "spin-refine-development-20260917-v1",
+  "resume": false,
+  "seed": 41001,
+  "smoke": true,
+  "started": "2026-09-17T05:28:37.705289+00:00",
+  "variant": "two_step"
+}

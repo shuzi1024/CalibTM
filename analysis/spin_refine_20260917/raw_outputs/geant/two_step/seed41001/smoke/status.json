@@ -1,0 +1,11 @@
+{
+  "config_sha256": "8993948c03f1d931d2196a3b98ed148a22983d6206b865c393d7405736b0f15f",
+  "dataset": "geant",
+  "deadline_unix": 1789647743.0,
+  "eligible_as_completed_result": false,
+  "protocol": "spin-refine-development-20260917-v1",
+  "seed": 41001,
+  "state": "smoke_passed",
+  "updated": "2026-09-17T05:28:41.951183+00:00",
+  "variant": "two_step"
+}

@@ -1,0 +1,25 @@
+{
+  "command": [
+    "/mnt/suzikun/CalibTM/.venv/bin/python",
+    "-u",
+    "-m",
+    "experiments.spin_path_controls_v1.runner",
+    "--dataset",
+    "geant",
+    "--variant",
+    "spin_direct",
+    "--seed",
+    "41001",
+    "--device",
+    "cuda:0",
+    "--deadline-unix",
+    "1789609396",
+    "--smoke"
+  ],
+  "hostname": "d-20260913095246-v85qm",
+  "gpu": 0,
+  "started_unix": 1789585021.2988212,
+  "finished_unix": 1789585030.182085,
+  "returncode": 0,
+  "log": "/mnt/suzikun/CalibTM/outputs/spin-path-controls-20260917-v1/logs/geant-spin_direct-seed41001-smoke-1789585021298544103.log"
+}

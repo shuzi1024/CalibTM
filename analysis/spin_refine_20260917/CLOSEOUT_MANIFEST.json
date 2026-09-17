@@ -1,0 +1,24 @@
+{
+  "created_utc": "2026-09-17T09:06:10.582756+00:00",
+  "purpose": "Bind final decision, archive verification, resource closeout, report and current handoff; source and raw-output manifests are linked separately.",
+  "files": {
+    "analysis/spin_refine_20260917/OUTCOME_CN.md": "99aeb952401fbc75d0d9752f97435690448de532fcb76c48f620855353afee81",
+    "analysis/spin_refine_20260917/DECISION.json": "7ee7c54eead6572e9293b3f07182a86578abd5e42f286e70805212e52c0c6446",
+    "analysis/spin_refine_20260917/STATUS.json": "312839c3ae16f2a9b8d3042730f9725274d206acf4844855f250822a72313b82",
+    "analysis/spin_refine_20260917/STATUS_CN.md": "268b7f7a6a7106e00fcb6eccf9310549a16555da3445de88919fa188e9b13d81",
+    "analysis/spin_refine_20260917/ARCHIVE_CHECK.json": "05793e6dc1b9dda49e406231b1a9e7ea5fef696205e8a236c0057af1aeb9f34e",
+    "analysis/spin_refine_20260917/REMOTE_ARCHIVE_MANIFEST.json": "ccaa6f296b3fa34159120f4a0ce4dc5495f1ac85f419ffe59701648f9055ee68",
+    "analysis/spin_refine_20260917/GPU_CLOSEOUT.json": "babeafe4f2ad24391008700872e541f93d13e81a3dc226016ff722e43316fafb",
+    "analysis/spin_refine_20260917/GPU_PROCESS_CHECK.json": "8d2669aef952c00400790ec03124fdea4a360c250222e8cb13f0ad1158d69d6e",
+    "analysis/spin_refine_20260917/FINAL_CHECK.json": "4a765c81d2abf73031ad7f1247175a3a2b94fe6b014a4e83ae43ebee59d7f398",
+    "analysis/spin_refine_20260917/report_geant/SUMMARY.json": "2f2353be2bbb316ccc30a292d14f3ec07c3695e01ee24af8bb54ea6de55c3170",
+    "analysis/spin_refine_20260917/report_geant/REPORT_CN.md": "5dabc2f660de43239c182b4053ccd91eea7dd575c1715a1f196cbe75a043069f",
+    "analysis/spin_refine_20260917/report_geant/RESULTS.csv": "dc473cf083900309dc1352bdcfa8b9c2081e1eeb82af87f6951882eac61403b2",
+    "analysis/spin_refine_20260917/report_geant/geant_learning_curves.png": "9aa0d7b1d8befa69ce7fa766e1c3eb639c16dcf0baa6145de966a36cf4887944",
+    "analysis/spin_refine_20260917/report_geant/geant_learning_curves.pdf": "6c9591c76be19d056f72be0a5e3c5773a083af5540e839d9d42b21cd54f9dfef",
+    "analysis/spin_refine_20260917/INFERENCE_BENCHMARK_GEANT.json": "cde453f7ece3067ec826e8000352c2ade70e5cb8313b6ad21ca3c5010310984a",
+    "analysis/spin_refine_20260917/PHASE_GEANT.json": "c1175a798b454d29d4d97f875abe6c3d98560603942b8fe1c055488eab37d396",
+    "README.md": "b0d5639c7d0c85876b2c8f511abda7cbaa76cd07c6c8abbe4827b912542eea33",
+    "HANDOFF_CALIBTM_CURRENT_CN.md": "7e0928b737ef730c00874f7cc55c611c148fc54b57dc3b66af0394201296c5c3"
+  }
+}

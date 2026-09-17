@@ -1,0 +1,13 @@
+{
+  "best_epoch": 137,
+  "best_score": 0.16551516574002176,
+  "config_sha256": "76f1d9728951620003afcd25c57906d42e36751f20c3a29637455e8a3559ba15",
+  "dataset": "geant",
+  "deadline_unix": 1789647743.0,
+  "epochs_completed": 160,
+  "protocol": "spin-refine-development-20260917-v1",
+  "seed": 41001,
+  "state": "complete",
+  "updated": "2026-09-17T07:11:22.298152+00:00",
+  "variant": "one_step"
+}
